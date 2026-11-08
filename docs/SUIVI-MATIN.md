@@ -33,7 +33,7 @@ construction est bloquée par le téléchargement de l'image depuis Docker Deskt
 | 1. Choix de stack | Écrire les choix dans le README : Express/TypeScript et Vite/TypeScript acceptés ; fournisseur IA à décider avec l'équipe | Choix et décision en attente lisibles dans le README et les ADR | [x] | [ ] |
 | 2. Windows et Git | Préparer une copie de travail dans Ubuntu/WSL en préservant les changements locaux ; vérifier Docker, identité et SSH depuis cet environnement | Docker fonctionne depuis WSL ; dépôt et modifications retrouvés ; accès GitHub vérifié | [x] | [ ] |
 | 3. Dev container | Créer `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json` et `compose.yaml` avec le seul service `dev` | VS Code s'attache ; Node 24, npm 11 et client PostgreSQL 17 répondent | [ ] | [ ] |
-| 4. Historique partagé | Repartir de `origin/develop` sur `feature/environnement-cours` après suppression de l'ancienne branche, conformément à l'ADR 0004 | Environnement enregistré sur une branche dédiée, puis publié pour revue | [ ] | [ ] |
+| 4. Historique partagé | Repartir de `origin/develop` sur `feature/environnement-cours` après suppression de l'ancienne branche, conformément à l'ADR 0004 | Environnement enregistré sur une branche dédiée, puis publié pour revue | [x] | [ ] |
 | 5. Base de données | Ajouter PostgreSQL 17, son healthcheck, `db/data/` et les scripts de `db/init/` | Deux questions de test accessibles par SQL ; données conservées après recréation du conteneur | [ ] | [ ] |
 | 6. API et front de test | Créer les workspaces `api` et `web`, le lockfile unique et les scripts communs ; ajouter les routes et le proxy Vite | `/api/health` et `/api/questions` répondent ; le navigateur affiche les données ; `npm run build` passe | [ ] | [ ] |
 | 7. Installation automatique | Configurer `postCreateCommand` pour `npm ci` et la copie du `.env.example` si nécessaire | Reconstruction réussie ; un `.env` existant est conservé | [ ] | [ ] |
@@ -128,3 +128,7 @@ avant de préparer les commits.
 - Étape 3 non cochée : aucun conteneur du projet n'est démarré ; les versions
   de Node, npm et psql ainsi que l'ouverture dans Dev Containers restent à vérifier.
 - La validation de Christopher reste distincte et n'est pas cochée par l'assistant.
+- Commit `e597516` publié sur `origin/feature/environnement-cours` avec les
+  exemples, le README et les documents de suivi. Aucun merge vers `develop`
+  ou `main` n'a été effectué. La suppression préexistante du fichier `README`
+  reste une modification locale, hors de ce commit.
