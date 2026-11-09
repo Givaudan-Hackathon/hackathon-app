@@ -5,7 +5,8 @@ Source : [Matin : l'environnement](https://learn.glassworks.tech/fullstack-setup
 Ce document suit les étapes du cours. Une étape réalisée par l'assistant et la
 validation de Christopher sont cochées séparément. La copie WSL et ses contrôles
 Docker/SSH sont réalisés. Le dev container est démarré et ses outils sont vérifiés.
-La base et sa persistance sont validées. L’API et le front restent à ajouter.
+La base et sa persistance sont validées. L'API et le front de test sont créés ;
+leur compilation, les routes et l'affichage dans Chromium sont vérifiés.
 
 ## État initial vérifié le 8 novembre 2026
 
@@ -35,8 +36,8 @@ La base et sa persistance sont validées. L’API et le front restent à ajouter
 | 3. Dev container | Créer `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json` et `compose.yaml` avec le seul service `dev` | VS Code s'attache ; Node 24, npm 11 et client PostgreSQL 17 répondent | [x] | [ ] |
 | 4. Historique partagé | Repartir de `origin/develop` sur `feature/environnement-cours` après suppression de l'ancienne branche, conformément à l'ADR 0004 | Environnement enregistré sur une branche dédiée, puis publié pour revue | [x] | [ ] |
 | 5. Base de données | Ajouter PostgreSQL 17, son healthcheck, `db/data/` et les scripts de `db/init/` | Deux questions de test accessibles par SQL ; données conservées après recréation du conteneur | [x] | [x] |
-| 6. API et front de test | Créer les workspaces `api` et `web`, le lockfile unique et les scripts communs ; ajouter les routes et le proxy Vite | `/api/health` et `/api/questions` répondent ; le navigateur affiche les données ; `npm run build` passe | [ ] | [ ] |
-| 7. Installation automatique | Configurer `postCreateCommand` pour `npm ci` et la copie du `.env.example` si nécessaire | Reconstruction réussie ; un `.env` existant est conservé | [ ] | [ ] |
+| 6. API et front de test | Créer les workspaces `api` et `web`, le lockfile unique et les scripts communs ; ajouter les routes et le proxy Vite | `/api/health` et `/api/questions` répondent ; le navigateur affiche les données ; `npm run build` passe | [x] | [x] |
+| 7. Installation automatique | Configurer `postCreateCommand` pour `npm ci` et la copie du `.env.example` si nécessaire | Reconstruction réussie ; un `.env` existant est conservé | [x] | [ ] |
 | 8. IA | Configurer un des fournisseurs du cours ; ajouter le formulaire et POST `/api/questions` | Une question reçoit une vraie réponse et les deux sont enregistrées en base | [ ] | [ ] |
 | 9. README et nouvel arrivant | Décrire les prérequis et le démarrage en trois étapes ; faire tester un clone par un coéquipier | Le coéquipier démarre avec le README seul, si possible sur un autre OS | [ ] | [ ] |
 
@@ -147,13 +148,71 @@ avant de préparer les commits.
   depuis VS Code. L'étape 5 reste donc non cochée.
 - Aucun commit, push ou merge effectué ; modifications locales préexistantes conservées.
 
-### 9 novembre 2026 — Base validée et commit du cours préparé
+### 9 novembre 2026 — Persistance validée, API et front de test
 
-- Les deux questions de démonstration sont accessibles par SQL et dans TablePlus.
-  Christopher confirme la persistance d’une ligne temporaire après reconstruction ;
-  cette ligne a ensuite été supprimée. L’étape 5 est réalisée et validée.
-- Le commit « Base de données PostgreSQL » regroupe Compose avec `postgres:17`,
-  le transfert `db:5432`, les scripts SQL et la documentation de la base.
-- Le rangement des ADR et le verrouillage de la feature du dev container sont
-  inclus. Le passage local à pgvector reste hors de ce commit, comme la
-  suppression préexistante du fichier `README`.
+- Les requêtes SQL depuis `/workspace` retrouvent les deux questions de démonstration.
+  Christopher confirme la présence de sa question temporaire après reconstruction
+  du conteneur. Le nettoyage est vérifié : seules les deux questions initiales restent.
+  L'étape 5 est réalisée et validée par Christopher.
+- Lecture de la page « Tester la stack » du cours. Création des workspaces npm
+  `api` et `web`, d'un lockfile unique, des scripts communs `dev` et `build`.
+  TypeScript reste en `~6.0.3`, les types Node en version 24 et Vite en version 8,
+  conformément à l'exemple consulté.
+- L'API Express lit `api/.env`, interroge PostgreSQL dans `/api/health` et renvoie
+  les dix dernières questions dans `/api/questions`. Les erreurs de requête sont
+  journalisées côté serveur avec une réponse JSON générique.
+- Le front Vite écoute sur toutes les interfaces, port 5173, et transmet `/api`
+  vers le port 3000. Les questions sont insérées comme texte dans la page ; un
+  message visible signale une erreur de chargement.
+- Vérifications réussies : `npm run build` pour les deux workspaces, requêtes HTTP
+  directes et via le proxy Vite, puis affichage de la version PostgreSQL et des
+  deux questions avec leurs réponses dans Chromium sans erreur JavaScript.
+  Une réponse HTTP 500 simulée dans le navigateur affiche bien le message d'erreur.
+- Playwright, Chromium et leurs bibliothèques de test ont été préparés uniquement
+  dans `/tmp`, sans ajout aux dépendances du projet ni à l'image du conteneur.
+- `api/.env`, `node_modules/` et les dossiers `dist/` sont bien ignorés par Git.
+  L'étape 6 est réalisée ; sa validation par Christopher reste à faire dans son
+  navigateur. L'installation automatique appartient toujours à l'étape 7.
+- README et guides actualisés. Aucun commit, push ou merge effectué ;
+  modifications locales préexistantes conservées.
+
+### 9 novembre 2026 — Étape 6 validée et installation automatique préparée
+
+- Christopher fournit une compilation réussie (`tsc` et `vite build`) et une
+  capture du front sur `localhost:5173` affichant « API OK », PostgreSQL 17.11
+  et les deux questions avec leurs réponses. L'étape 6 est validée par Christopher.
+- `postCreateCommand` conserve la déclaration Git existante, exécute `npm ci`,
+  puis crée `api/.env` depuis le modèle uniquement si ce fichier est absent.
+  Le README décrit maintenant le démarrage avec cette installation automatique.
+- Le contenu exact de `postCreateCommand` a été exécuté deux fois dans une copie
+  temporaire du projet, avec une configuration Git globale temporaire :
+  installation réussie, création du `.env` absent et conservation octet pour
+  octet d'un `.env` personnalisé au second passage. La compilation des deux
+  workspaces dans cette copie réussit. Le `.env` du projet reste intact.
+- `git diff --check` réussit. Docker n'est pas disponible dans cette session :
+  la reconstruction réelle reste à lancer par Christopher avec
+  `Dev Containers: Rebuild Container`, puis `npm run dev` et contrôle du front.
+  L'étape 7 est implémentée ; sa validation après reconstruction reste ouverte.
+- L'étape 8 attend le choix du fournisseur IA avec l'équipe. Le test de clone
+  par un coéquipier de l'étape 9 reste également à effectuer.
+- Aucun commit, push ou merge effectué ; modifications préexistantes conservées.
+
+### 9 novembre 2026 — Rattrapage des commits du cours
+
+- Le cours prévoit « Base de données PostgreSQL », puis « API et front de test ».
+  L’installation automatique fait partie du chapitre « Tester la stack » :
+  les étapes locales 6 et 7 sont regroupées dans le second commit.
+- Le commit PostgreSQL `e3b949e` contient la base,
+  son transfert de port, les scripts SQL, le rangement des ADR et leur documentation.
+- Le commit API/front regroupe les workspaces, le lockfile npm, les routes,
+  le proxy Vite et l’installation automatique. `npm run build` a été relancé
+  avec succès avant les commits. Le test de création/conservation du `.env`
+  dans une copie temporaire avait également réussi.
+- La reconstruction réelle depuis VS Code reste à valider par Christopher ;
+  l’étape 7 n’est pas cochée dans sa colonne de validation. Le choix IA et
+  le test du clone par un coéquipier restent en attente.
+- La suppression préexistante de `README` et le passage local de Compose
+  à `pgvector/pgvector:pg17` restent hors des deux commits et sont conservés.
+  Les commits utilisent `postgres:17`, conformément à la configuration testée.
+- Publication prévue sur `feature/environnement-cours`, pour revue vers `develop`.
+  Aucun merge vers `develop` ou `main` n’est effectué.

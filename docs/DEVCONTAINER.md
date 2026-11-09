@@ -54,8 +54,11 @@ chaque correctif : ce n'est pas une image verrouillée par son empreinte.
   ESLint et Prettier devront aussi être configurés dans l'application ensuite.
 - `forwardPorts` prépare l'accès aux futurs serveurs sur 3000 et 5173.
   Il ne démarre aucun serveur à lui seul.
-- `postCreateCommand` déclare `/workspace` comme dépôt de confiance pour Git.
-  L’installation npm sera ajoutée quand les workspaces et le lockfile existeront.
+- `postCreateCommand` déclare `/workspace` comme dépôt de confiance pour Git,
+  installe les dépendances avec `npm ci`, puis copie `api/.env.example` dans
+  `api/.env` uniquement si ce fichier n'existe pas. Il s'exécute à la création
+  ou à la reconstruction du conteneur. Le démarrage de l'application reste
+  manuel avec `npm run dev` : voir le [README](../README.md).
 
 Les commentaires `//` sont acceptés dans ce fichier par Dev Containers : c'est
 du JSON avec commentaires.
@@ -78,6 +81,13 @@ uname -m         # aarch64 sur Mac Apple Silicon, x86_64 sur PC : même environn
 ```
 
 Après modification de la configuration, utiliser `Dev Containers: Rebuild Container`.
+
+Pour vérifier l'installation automatique de l'étape 7 : avant reconstruction,
+exécuter `sha256sum api/.env` si le fichier existe. Après reconstruction,
+vérifier la fin de `postCreateCommand` sans erreur dans le journal Dev Containers,
+puis relancer `sha256sum api/.env` : l'empreinte doit être identique.
+Lancer ensuite `npm run dev` et vérifier `http://localhost:5173`.
+Sur un clone neuf, `api/.env` doit être créé automatiquement.
 
 ## Résultats du 8 novembre 2026
 
