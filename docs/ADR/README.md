@@ -12,6 +12,7 @@ les tâches et les vérifications. Ces trois outils sont complémentaires.
 | [0003](0003-travail-dans-wsl.md)              | Travailler dans le système de fichiers WSL         | Accepté                                              |
 | [0004](0004-branche-environnement.md)         | Reprendre l'environnement sur une branche dédiée   | Accepté ; remplace le choix de branche de l'ADR 0001 |
 | [0005](0005-collaboration-et-depot-public.md) | Collaboration, qualité et dépôt public             | Accepté ; visibilité autorisée par Christopher       |
+| [0006](0006-integration-sequentielle.md)      | Intégration séquentielle des ateliers dans develop | Accepté ; remplace l’ordre de revue de l’ADR 0005    |
 
 Créer un fichier numéroté pour chaque décision technique significative avec :
 date, statut, contexte, options envisagées, décision et conséquences.

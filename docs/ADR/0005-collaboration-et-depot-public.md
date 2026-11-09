@@ -2,6 +2,8 @@
 
 - Date : 9 novembre 2026
 - Statut : Accepté ; passage en public explicitement autorisé par Christopher
+- Mise à jour : la séquence d'intégration et le calendrier d'exigence du check
+  sont remplacés par l'[ADR 0006](0006-integration-sequentielle.md).
 
 ## Contexte et options
 
@@ -39,7 +41,7 @@ La CI reprend `node:24-trixie`, `actions/checkout@v7` et le job `qualite` :
 installation, lint, formatage et build. Elle ne démarre pas PostgreSQL ni Ollama,
 conformément au chapitre CI ; la preuve de la chaîne applicative relève de l'atelier 1.
 
-## Revue sans fusion automatique
+## Séquence initiale de revue — remplacée par l'ADR 0006
 
 La PR #2 de l'atelier 1 attend la revue humaine. La branche `feature/collaboration`
 part donc de `feature/environnement-cours`, dans une copie isolée, et reprend les
