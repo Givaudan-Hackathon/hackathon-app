@@ -19,7 +19,7 @@ async function readJson<T>(url: string, options?: RequestInit): Promise<T> {
   }
   return data;
 }
-
+//Hell E
 async function refresh() {
   try {
     const status = await readJson<{ status: string; db: string }>(
