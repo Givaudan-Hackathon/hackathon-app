@@ -132,6 +132,7 @@ Références : [compatibilité OpenAI](https://docs.ollama.com/api/openai-compat
 - La compilation API/front et la validation Compose réussissent. Les erreurs
   400, 502, 503 et le délai réel de 60 secondes (504) ont été contrôlés avec un
   fournisseur simulé et des schémas SQL temporaires supprimés ensuite.
-- La validation manuelle de Christopher et le test sur un clone neuf restent
-  à effectuer. L'alias ajouté dans Compose sera pris en compte lors de la
+- Christopher a confirmé la saisie, la réponse et l'enregistrement par une
+  capture du 9 novembre. Le test humain d'un clone neuf reste à effectuer.
+  L'alias ajouté dans Compose sera pris en compte lors de la
   prochaine reconstruction ; Docker Desktop fournit déjà ce nom sur ce poste.

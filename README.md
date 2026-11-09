@@ -26,6 +26,9 @@ puis intégrés à `main` pour une version démontrable, selon le
 
 ## Démarrer l'environnement
 
+La collaboration, les contrôles de qualité et l'ordre de revue des PR sont
+décrits dans le [suivi de l'atelier 2](docs/SUIVI-APRES-MIDI.md).
+
 1. Cloner le dépôt dans le système de fichiers Linux de WSL (sous Windows),
    avec Docker Desktop et VS Code / Dev Containers disponibles.
 2. Ouvrir le dossier dans VS Code puis lancer `Dev Containers: Reopen in Container`.
