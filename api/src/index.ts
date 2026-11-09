@@ -10,7 +10,9 @@ try {
 
 const { DATABASE_URL, AI_BASE_URL, AI_MODEL, AI_API_KEY = '' } = process.env;
 if (!DATABASE_URL) {
-  throw new Error('DATABASE_URL manquante : copier api/.env.example dans api/.env.');
+  throw new Error(
+    'DATABASE_URL manquante : copier api/.env.example dans api/.env.',
+  );
 }
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -33,9 +35,12 @@ app.get('/api/questions', async (_req, res) => {
 });
 
 app.post('/api/questions', async (req, res) => {
-  const question = typeof req.body?.question === 'string' ? req.body.question.trim() : '';
+  const question =
+    typeof req.body?.question === 'string' ? req.body.question.trim() : '';
   if (!question) {
-    res.status(400).json({ error: 'Question manquante : saisir une question.' });
+    res
+      .status(400)
+      .json({ error: 'Question manquante : saisir une question.' });
     return;
   }
 
@@ -48,7 +53,10 @@ app.post('/api/questions', async (req, res) => {
 });
 
 class AIError extends Error {
-  constructor(message: string, public status = 502) {
+  constructor(
+    message: string,
+    public status = 502,
+  ) {
     super(message);
   }
 }
@@ -56,27 +64,35 @@ class AIError extends Error {
 // Appel compatible OpenAI de l'exemple du cours : l'URL et le modèle viennent du .env.
 async function ask(question: string): Promise<string> {
   if (!AI_BASE_URL || !AI_MODEL) {
-    throw new AIError('IA non configurée : renseigner AI_BASE_URL et AI_MODEL dans api/.env.', 503);
+    throw new AIError(
+      'IA non configurée : renseigner AI_BASE_URL et AI_MODEL dans api/.env.',
+      503,
+    );
   }
 
   try {
-    const response = await fetch(`${AI_BASE_URL.replace(/\/+$/, '')}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(AI_API_KEY ? { Authorization: `Bearer ${AI_API_KEY}` } : {}),
+    const response = await fetch(
+      `${AI_BASE_URL.replace(/\/+$/, '')}/chat/completions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(AI_API_KEY ? { Authorization: `Bearer ${AI_API_KEY}` } : {}),
+        },
+        body: JSON.stringify({
+          model: AI_MODEL,
+          messages: [{ role: 'user', content: question }],
+          stream: false,
+        }),
+        // Un serveur arrêté ou une génération bloquée ne doit pas attendre indéfiniment.
+        signal: AbortSignal.timeout(60_000),
       },
-      body: JSON.stringify({
-        model: AI_MODEL,
-        messages: [{ role: 'user', content: question }],
-        stream: false,
-      }),
-      // Un serveur arrêté ou une génération bloquée ne doit pas attendre indéfiniment.
-      signal: AbortSignal.timeout(60_000),
-    });
+    );
     if (!response.ok) {
       console.error(`IA : HTTP ${response.status}`);
-      throw new AIError("L'IA a refusé la demande. Vérifier le serveur et le modèle Ollama.");
+      throw new AIError(
+        "L'IA a refusé la demande. Vérifier le serveur et le modèle Ollama.",
+      );
     }
 
     let data;
@@ -94,10 +110,16 @@ async function ask(question: string): Promise<string> {
   } catch (error) {
     if (error instanceof AIError) throw error;
     if (error instanceof Error && error.name === 'TimeoutError') {
-      throw new AIError("L'IA n'a pas répondu dans les 60 secondes. Réessayer.", 504);
+      throw new AIError(
+        "L'IA n'a pas répondu dans les 60 secondes. Réessayer.",
+        504,
+      );
     }
     console.error('Connexion IA :', error);
-    throw new AIError('Ollama est injoignable. Vérifier son démarrage et AI_BASE_URL.', 503);
+    throw new AIError(
+      'Ollama est injoignable. Vérifier son démarrage et AI_BASE_URL.',
+      503,
+    );
   }
 }
 
@@ -106,7 +128,11 @@ const handleError: ErrorRequestHandler = (error, _req, res, _next) => {
     res.status(error.status).json({ error: error.message });
     return;
   }
-  if (error instanceof SyntaxError && 'status' in error && error.status === 400) {
+  if (
+    error instanceof SyntaxError &&
+    'status' in error &&
+    error.status === 400
+  ) {
     res.status(400).json({ error: 'Corps JSON invalide.' });
     return;
   }
