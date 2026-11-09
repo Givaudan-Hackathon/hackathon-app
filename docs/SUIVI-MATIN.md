@@ -40,7 +40,7 @@ enregistrée en base et affichée dans le navigateur.
 | 5. Base de données | Ajouter PostgreSQL 17, son healthcheck, `db/data/` et les scripts de `db/init/` | Deux questions de test accessibles par SQL ; données conservées après recréation du conteneur | [x] | [x] |
 | 6. API et front de test | Créer les workspaces `api` et `web`, le lockfile unique et les scripts communs ; ajouter les routes et le proxy Vite | `/api/health` et `/api/questions` répondent ; le navigateur affiche les données ; `npm run build` passe | [x] | [x] |
 | 7. Installation automatique | Configurer `postCreateCommand` pour `npm ci` et la copie du `.env.example` si nécessaire | Reconstruction réussie ; un `.env` existant est conservé | [x] | [ ] |
-| 8. IA | Configurer Ollama sur Windows ; ajouter le formulaire et POST `/api/questions` | Une question reçoit une vraie réponse et les deux sont enregistrées en base | [x] | [ ] |
+| 8. IA | Configurer Ollama sur Windows ; ajouter le formulaire et POST `/api/questions` | Une question reçoit une vraie réponse et les deux sont enregistrées en base | [x] | [x] |
 | 9. README et nouvel arrivant | Décrire les prérequis et le démarrage en trois étapes ; faire tester un clone par un coéquipier | Le coéquipier démarre avec le README seul, si possible sur un autre OS | [ ] | [ ] |
 
 ## Choix proposés pour suivre l'exemple du cours
@@ -260,3 +260,11 @@ avant de préparer les commits.
   ont été vérifiés sans insertion dans des schémas temporaires, puis nettoyés.
 - Étape 8 réalisée ; validation de Christopher laissée ouverte. Le test de clone
   par un autre membre de l'équipe reste à effectuer pour l'étape 9.
+
+### 9 novembre 2026 — Validation IA par Christopher
+
+- Christopher confirme le fonctionnement et fournit une capture du formulaire,
+  de la réponse à « Qui es-tu ? » et des quatre échanges présents dans TablePlus.
+  L'étape 8 est validée par Christopher.
+- La compréhension du code et le test d'installation par un autre membre restent
+  à vérifier séparément ; ils ne sont pas déduits de cette capture.
