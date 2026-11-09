@@ -6,7 +6,7 @@ Pour l'atelier, nous suivons la stack de test du cours :
 
 - API : Express et TypeScript, avec PostgreSQL 17 et Node 24.
 - Front : Vite et TypeScript.
-- IA : fournisseur à décider avec l'équipe ; essai local avec Ollama proposé.
+- IA : Ollama sur Windows avec le modèle local `llama3.2:1b`.
 
 Le dev container démarre : Node 24, npm 11 et le client PostgreSQL 17 sont vérifiés.
 PostgreSQL est accessible et la conservation des données après reconstruction
@@ -14,6 +14,10 @@ est validée. L'API Express et le front Vite de test sont en place.
 Consulter le [plan et les vérifications](docs/SUIVI-MATIN.md), le
 [guide WSL](docs/WSL.md), les [explications du dev container](docs/DEVCONTAINER.md)
 et le [journal des décisions (ADR)](docs/ADR/README.md).
+
+Le formulaire appelle maintenant `POST /api/questions`, qui interroge Ollama
+et enregistre l'échange en base. Installer le serveur et le modèle sur Windows
+avant de l'utiliser ; voir le [guide IA](docs/IA.md) pour les étapes et leur rôle.
 
 Le travail en cours se fait sur `feature/environnement-cours`, créée depuis
 `develop`. Les changements seront relus via une pull request vers `develop`,
@@ -69,8 +73,8 @@ npm run build
 
 `/api/health` interroge réellement PostgreSQL et renvoie sa version.
 `/api/questions` renvoie les dix dernières questions, de la plus récente à la
-plus ancienne. Le front affiche les questions et leurs réponses ; il n'en crée
-pas encore. L'ajout de questions avec une réponse IA appartient à l'étape 8.
+plus ancienne. Le front affiche les questions et leurs réponses ; son formulaire
+permet de créer une question et sa réponse avec Ollama à l'étape 8.
 
 Voir le [guide PostgreSQL](docs/BASE-DE-DONNEES.md) pour les contrôles SQL et
 le test de persistance.

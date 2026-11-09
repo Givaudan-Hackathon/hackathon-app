@@ -7,6 +7,8 @@ validation de Christopher sont cochées séparément. La copie WSL et ses contr�
 Docker/SSH sont réalisés. Le dev container est démarré et ses outils sont vérifiés.
 La base et sa persistance sont validées. L'API et le front de test sont créés ;
 leur compilation, les routes et l'affichage dans Chromium sont vérifiés.
+Ollama Windows est maintenant accessible : une vraie réponse a été générée,
+enregistrée en base et affichée dans le navigateur.
 
 ## État initial vérifié le 8 novembre 2026
 
@@ -31,14 +33,14 @@ leur compilation, les routes et l'affichage dans Chromium sont vérifiés.
 | Étape | Travail à réaliser | Preuve attendue | Réalisé | Validé par Christopher |
 | --- | --- | --- | --- | --- |
 | 0. Audit et suivi | Examiner la machine et Git ; créer ce suivi, `.gitignore` et `.gitattributes` | État initial documenté ; règles Git vérifiées | [x] | [ ] |
-| 1. Choix de stack | Écrire les choix dans le README : Express/TypeScript et Vite/TypeScript acceptés ; fournisseur IA à décider avec l'équipe | Choix et décision en attente lisibles dans le README et les ADR | [x] | [ ] |
+| 1. Choix de stack | Écrire les choix dans le README : Express/TypeScript, Vite/TypeScript et Ollama sur Windows retenus | Choix et raisons lisibles dans le README et les ADR | [x] | [ ] |
 | 2. Windows et Git | Préparer une copie de travail dans Ubuntu/WSL en préservant les changements locaux ; vérifier Docker, identité et SSH depuis cet environnement | Docker fonctionne depuis WSL ; dépôt et modifications retrouvés ; accès GitHub vérifié | [x] | [ ] |
 | 3. Dev container | Créer `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json` et `compose.yaml` avec le seul service `dev` | VS Code s'attache ; Node 24, npm 11 et client PostgreSQL 17 répondent | [x] | [ ] |
 | 4. Historique partagé | Repartir de `origin/develop` sur `feature/environnement-cours` après suppression de l'ancienne branche, conformément à l'ADR 0004 | Environnement enregistré sur une branche dédiée, puis publié pour revue | [x] | [ ] |
 | 5. Base de données | Ajouter PostgreSQL 17, son healthcheck, `db/data/` et les scripts de `db/init/` | Deux questions de test accessibles par SQL ; données conservées après recréation du conteneur | [x] | [x] |
 | 6. API et front de test | Créer les workspaces `api` et `web`, le lockfile unique et les scripts communs ; ajouter les routes et le proxy Vite | `/api/health` et `/api/questions` répondent ; le navigateur affiche les données ; `npm run build` passe | [x] | [x] |
 | 7. Installation automatique | Configurer `postCreateCommand` pour `npm ci` et la copie du `.env.example` si nécessaire | Reconstruction réussie ; un `.env` existant est conservé | [x] | [ ] |
-| 8. IA | Configurer un des fournisseurs du cours ; ajouter le formulaire et POST `/api/questions` | Une question reçoit une vraie réponse et les deux sont enregistrées en base | [ ] | [ ] |
+| 8. IA | Configurer Ollama sur Windows ; ajouter le formulaire et POST `/api/questions` | Une question reçoit une vraie réponse et les deux sont enregistrées en base | [x] | [ ] |
 | 9. README et nouvel arrivant | Décrire les prérequis et le démarrage en trois étapes ; faire tester un clone par un coéquipier | Le coéquipier démarre avec le README seul, si possible sur un autre OS | [ ] | [ ] |
 
 ## Choix proposés pour suivre l'exemple du cours
@@ -47,14 +49,12 @@ L'API de test utilisera Express et TypeScript ; le front utilisera Vite et
 TypeScript. Le poste de travail sera basé sur Node 24 et Debian trixie, avec
 PostgreSQL 17. Les dépendances seront installées dans le conteneur.
 
-Pour l'IA, le point de départ proposé est Ollama sur la machine hôte avec
-`llama3.2:1b`. Le cours permet aussi une API commerciale, le service de l'équipe
-Data/IA ou Ollama dans un conteneur optionnel. Le choix devra être adapté au
-matériel et à l'organisation de l'équipe avant l'étape 8 ; ces options ne sont
-pas toutes à installer. Une éventuelle clé restera dans un `.env` ignoré par Git.
+Pour l'IA, Christopher a choisi le 9 novembre Ollama sur Windows avec
+`llama3.2:1b`, conformément à l'option recommandée par le cours. Le serveur local,
+une réponse réelle et son enregistrement en base sont vérifiés pour l'étape 8.
+La configuration reste dans `api/.env`, ignoré par Git.
 
-Christopher a confirmé la stack d'exemple. Le fournisseur d'IA sera discuté
-avec les équipes Data et Product Owner le lundi 9 novembre. Voir le
+Christopher a confirmé la stack d'exemple et le fournisseur Ollama. Voir le
 [journal des décisions (ADR)](ADR/README.md) pour les raisons des choix
 et le statut des propositions. Le barème ne réserve pas de bonus à l'IA locale.
 
@@ -216,3 +216,47 @@ avant de préparer les commits.
   Les commits utilisent `postgres:17`, conformément à la configuration testée.
 - Publication prévue sur `feature/environnement-cours`, pour revue vers `develop`.
   Aucun merge vers `develop` ou `main` n’est effectué.
+
+### 9 novembre 2026 — Intégration Ollama préparée
+
+- Christopher choisit Ollama, puis confirme l'installation sur Windows plutôt
+  que le conteneur optionnel. L'ADR 0002 est accepté et complété avec les raisons,
+  les contraintes et le rôle distinct du serveur Ollama et du modèle Llama.
+- Relecture de la page IA du cours et de la documentation officielle Ollama.
+  Ajout de `AI_BASE_URL`, `AI_MODEL=llama3.2:1b`, `AI_API_KEY` au modèle de
+  configuration et des seules variables absentes au `.env` local existant.
+- Ajout du bloc `extra_hosts` du cours au service `dev`. Le changement local
+  préexistant de l'image PostgreSQL vers pgvector est conservé.
+- Ajout de `POST /api/questions`, de l'appel compatible OpenAI via `fetch`, de
+  l'insertion SQL paramétrée et du formulaire du cours. Les adaptations portent
+  sur les entrées invalides, les messages d'erreur et le délai maximal de 60 s.
+- Compilation des workspaces et validation Compose réussies. Un serveur HTTP
+  simulé et un schéma SQL temporaire vérifient la création/persistance, le contrat
+  de l'appel IA, le rejet des entrées invalides, les erreurs du fournisseur et
+  l'absence d'insertion en cas d'échec. Le schéma temporaire est supprimé.
+- Ces tests de contrat ne sont pas une preuve d'inférence réelle. Aucun Ollama
+  n'est encore accessible sur l'hôte lors du contrôle initial ; l'étape 8 reste
+  non cochée en attendant l'installation et la validation de bout en bout.
+- Ajout du [guide IA](IA.md), avec les exemples de commande du professeur et
+  les explications pour le tech lead. Téléchargement de l'installateur Windows
+  officiel en cours.
+
+### 9 novembre 2026 — Chaîne Ollama réelle vérifiée
+
+- L'installateur officiel téléchargé porte une signature Windows valide
+  d'Ollama Inc. Une installation Ollama `0.40.15` est déjà présente au moment
+  du lancement ; elle est conservée et l'installateur n'est pas exécuté.
+- Démarrage du serveur Windows natif, joignable sur son écoute locale
+  `127.0.0.1:11434` et depuis le conteneur avec `host.docker.internal`.
+  Aucune modification de l'adresse d'écoute ni du pare-feu n'a été nécessaire.
+- Téléchargement de `llama3.2:1b` et contrôle de sa présence via `/v1/models`.
+- POST via `http://localhost:5173/api/questions` : HTTP 201 en 34 secondes,
+  réponse « La capitale du Japon est Tokyo. ». La ligne d'identifiant 3 est
+  vérifiée dans PostgreSQL et relue par GET `/api/questions`.
+- `ollama ps` confirme `100% GPU`, environ 1,5 Go et un contexte de 4096 jetons.
+- Edge sans interface, avec un profil temporaire distinct, affiche « API OK »,
+  le formulaire et la réponse réelle. Ce contrôle complète les tests HTTP/SQL.
+- Les erreurs de configuration (503) et le vrai délai de 60 secondes (504)
+  ont été vérifiés sans insertion dans des schémas temporaires, puis nettoyés.
+- Étape 8 réalisée ; validation de Christopher laissée ouverte. Le test de clone
+  par un autre membre de l'équipe reste à effectuer pour l'étape 9.

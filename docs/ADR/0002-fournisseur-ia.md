@@ -1,7 +1,7 @@
 # ADR 0002 — Choisir le fournisseur d'IA de l'application
 
 - Date : 8 novembre 2026
-- Statut : Proposé, décision à prendre avec l'équipe le lundi 9 novembre
+- Statut : Accepté par Christopher le 9 novembre 2026
 
 ## Contexte
 
@@ -23,7 +23,7 @@ pas de bonus spécifique pour une IA locale.
 - Ollama dans un conteneur optionnel : variante du cours avec contraintes de
   performance à examiner.
 
-## Proposition
+## Proposition initiale du 8 novembre
 
 Pour tester la chaîne avant de figer le choix du produit, essayer Ollama sur
 la machine hôte avec le petit modèle du cours si le matériel convient.
@@ -31,9 +31,36 @@ Cette proposition ne constitue pas une décision d'installation.
 Le poste annonce 32 Go de RAM ; l'accélération GPU et la performance réelle
 du modèle ne sont pas encore vérifiées.
 
-## Conséquences à examiner
+## Décision du 9 novembre
 
-L'application devra lire sa configuration depuis les variables d'environnement.
+Christopher choisit Ollama installé sur Windows, conformément à l'option
+recommandée par le cours. Le modèle de test est `llama3.2:1b` : il permet de
+vérifier la chaîne complète avec un téléchargement d'environ 1,3 Go et une
+qualité de réponse modeste. Ce modèle reste à évaluer pour le produit final.
+
+L'API utilise l'exemple compatible OpenAI du cours : appel HTTP avec `fetch`
+vers `/v1/chat/completions`. `AI_BASE_URL`, `AI_MODEL` et `AI_API_KEY` viennent
+de `api/.env`. Depuis le conteneur, l'hôte s'appelle `host.docker.internal`.
+
+Ollama est le serveur qui exécute le modèle ; Llama 3.2 est le modèle qui génère
+les réponses. L'application Windows permet de profiter du matériel de l'hôte
+sans ajouter un service Ollama au Compose commun. La disponibilité et
+l'utilisation réelle du GPU devront être vérifiées sur le poste.
+
+## Conséquences
+
+Il faut installer Ollama et télécharger le modèle sur chaque poste qui développe
+avec cette configuration. Le service local et le modèle doivent être disponibles
+pour répondre. Il n'y a pas de facturation par appel en local ; il reste un coût
+en stockage, mémoire, calcul et électricité. Les requêtes de ce modèle local
+restent traitées sur le poste.
+
+Le serveur reçoit une question sans historique de conversation. La réponse
+complète est attendue avant l'enregistrement en base et le retour au navigateur.
+Le modèle n'utilise pas de recherche documentaire ni de recherche vectorielle
+à cette étape. Le besoin éventuel de pgvector relève d'une décision distincte.
+
+L'application lit sa configuration depuis les variables d'environnement.
 Le choix du fournisseur ne doit pas imposer de réécrire le front ou la base.
 Les clés éventuelles restent dans le `.env` local, hors de Git.
 

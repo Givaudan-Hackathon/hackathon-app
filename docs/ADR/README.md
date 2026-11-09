@@ -8,7 +8,7 @@ les tâches et les vérifications. Ces trois outils sont complémentaires.
 | ADR | Sujet | Statut |
 | --- | --- | --- |
 | [0001](0001-environnement-du-cours.md) | Suivre la stack de test du cours | Accepté |
-| [0002](0002-fournisseur-ia.md) | Choisir le fournisseur d'IA de l'application | Proposé, à décider avec l'équipe |
+| [0002](0002-fournisseur-ia.md) | Ollama sur Windows avec llama3.2:1b pour l'atelier | Accepté le 9 novembre par Christopher |
 | [0003](0003-travail-dans-wsl.md) | Travailler dans le système de fichiers WSL | Accepté |
 | [0004](0004-branche-environnement.md) | Reprendre l'environnement sur une branche dédiée | Accepté ; remplace le choix de branche de l'ADR 0001 |
 
