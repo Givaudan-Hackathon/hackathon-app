@@ -1,0 +1,7 @@
+pandas<3  # pandas 3.x DLL bloque par Windows Application Control
+requests
+python-dotenv
+fastapi
+uvicorn
+scikit-learn
+jupyter

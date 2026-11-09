@@ -1,0 +1,22 @@
+# Environnement local et secrets
+.venv/
+.env
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Notes de travail locales (contenu versionne dans docs/brief_data.md)
+CLAUDE.md
+
+# Exports complets volumineux (dumps OFF/OBF, Sirene, IFRA) : jamais versionnes
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/off_obf_sample.csv
+!data/raw/off_obf_sample.meta.json
+data/processed/*
+!data/processed/.gitkeep
+*.parquet
+*.csv.gz
+*.jsonl
+*.jsonl.gz
+*.zip
