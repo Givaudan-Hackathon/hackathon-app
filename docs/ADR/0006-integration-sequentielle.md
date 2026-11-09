@@ -52,9 +52,21 @@ une fusion ; tant que la PR #2 n'est pas fusionnée, la PR #3 ne peut pas encore
 hériter du `develop` final de l'atelier 1.
 
 La configuration dans `.github/rulesets/main-develop.json` reflète l'état
-actuellement appliqué, sans check pendant l'amorçage. Sa modification seule
-n'applique pas les réglages distants. Lors du rétablissement, relire les règles
-distantes et conserver les autres réglages existants.
+appliqué : le check a été retiré pendant l'amorçage, puis rétabli après la CI
+verte de la branche mise à jour. Modifier ce fichier seul n'applique pas les
+réglages distants ; les autres réglages existants sont conservés.
 
 Sources : [GitFlow du cours](https://learn.glassworks.tech/fullstack-setup/collaboration/gitflow),
 [CI du cours](https://learn.glassworks.tech/fullstack-setup/collaboration/ci).
+
+## Réalisation le 9 novembre
+
+La PR #2 est fusionnée dans `develop` au commit `92cc465`. La branche
+`feature/collaboration` reprend ce résultat au commit `5ee4b68`, sans conflit.
+Lint, contrôle de formatage et build passent localement, et la
+[CI de ce commit](https://github.com/Givaudan-Hackathon/hackathon-app/actions/runs/42644201232)
+est verte. Le check `qualite`, lié à GitHub Actions, est rétabli dans le ruleset,
+avec toutes les autres protections et une liste de bypass vide.
+
+La PR #3 pourra être revue après la CI du dernier commit. Sa fusion et la PR
+de `develop` vers `main` restent les prochaines étapes humaines.

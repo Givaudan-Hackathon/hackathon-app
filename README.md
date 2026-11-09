@@ -19,9 +19,9 @@ Le formulaire appelle maintenant `POST /api/questions`, qui interroge Ollama
 et enregistre l'échange en base. Installer le serveur et le modèle sur Windows
 avant de l'utiliser ; voir le [guide IA](docs/IA.md) pour les étapes et leur rôle.
 
-Le travail en cours se fait sur `feature/environnement-cours`, créée depuis
-`develop`. Les changements seront relus via une pull request vers `develop`,
-puis intégrés à `main` pour une version démontrable, selon le
+La branche d'intégration est `develop`. Chaque branche de travail est mise à
+jour depuis `develop`, puis relue via une pull request vers cette branche.
+Une pull request de `develop` vers `main` prépare une version démontrable, selon le
 [GitFlow du cours](https://learn.glassworks.tech/fullstack-setup/collaboration/gitflow).
 
 ## Démarrer l'environnement
