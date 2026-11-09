@@ -4,8 +4,8 @@ Source : [Matin : l'environnement](https://learn.glassworks.tech/fullstack-setup
 
 Ce document suit les étapes du cours. Une étape réalisée par l'assistant et la
 validation de Christopher sont cochées séparément. La copie WSL et ses contrôles
-Docker/SSH sont réalisés. Les exemples du dev container sont recopiés ; sa
-construction est bloquée par le téléchargement de l'image depuis Docker Desktop.
+Docker/SSH sont réalisés. Le dev container est démarré et ses outils sont vérifiés.
+La base et sa persistance sont validées. L’API et le front restent à ajouter.
 
 ## État initial vérifié le 8 novembre 2026
 
@@ -32,9 +32,9 @@ construction est bloquée par le téléchargement de l'image depuis Docker Deskt
 | 0. Audit et suivi | Examiner la machine et Git ; créer ce suivi, `.gitignore` et `.gitattributes` | État initial documenté ; règles Git vérifiées | [x] | [ ] |
 | 1. Choix de stack | Écrire les choix dans le README : Express/TypeScript et Vite/TypeScript acceptés ; fournisseur IA à décider avec l'équipe | Choix et décision en attente lisibles dans le README et les ADR | [x] | [ ] |
 | 2. Windows et Git | Préparer une copie de travail dans Ubuntu/WSL en préservant les changements locaux ; vérifier Docker, identité et SSH depuis cet environnement | Docker fonctionne depuis WSL ; dépôt et modifications retrouvés ; accès GitHub vérifié | [x] | [ ] |
-| 3. Dev container | Créer `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json` et `compose.yaml` avec le seul service `dev` | VS Code s'attache ; Node 24, npm 11 et client PostgreSQL 17 répondent | [ ] | [ ] |
+| 3. Dev container | Créer `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json` et `compose.yaml` avec le seul service `dev` | VS Code s'attache ; Node 24, npm 11 et client PostgreSQL 17 répondent | [x] | [ ] |
 | 4. Historique partagé | Repartir de `origin/develop` sur `feature/environnement-cours` après suppression de l'ancienne branche, conformément à l'ADR 0004 | Environnement enregistré sur une branche dédiée, puis publié pour revue | [x] | [ ] |
-| 5. Base de données | Ajouter PostgreSQL 17, son healthcheck, `db/data/` et les scripts de `db/init/` | Deux questions de test accessibles par SQL ; données conservées après recréation du conteneur | [ ] | [ ] |
+| 5. Base de données | Ajouter PostgreSQL 17, son healthcheck, `db/data/` et les scripts de `db/init/` | Deux questions de test accessibles par SQL ; données conservées après recréation du conteneur | [x] | [x] |
 | 6. API et front de test | Créer les workspaces `api` et `web`, le lockfile unique et les scripts communs ; ajouter les routes et le proxy Vite | `/api/health` et `/api/questions` répondent ; le navigateur affiche les données ; `npm run build` passe | [ ] | [ ] |
 | 7. Installation automatique | Configurer `postCreateCommand` pour `npm ci` et la copie du `.env.example` si nécessaire | Reconstruction réussie ; un `.env` existant est conservé | [ ] | [ ] |
 | 8. IA | Configurer un des fournisseurs du cours ; ajouter le formulaire et POST `/api/questions` | Une question reçoit une vraie réponse et les deux sont enregistrées en base | [ ] | [ ] |
@@ -54,7 +54,7 @@ pas toutes à installer. Une éventuelle clé restera dans un `.env` ignoré par
 
 Christopher a confirmé la stack d'exemple. Le fournisseur d'IA sera discuté
 avec les équipes Data et Product Owner le lundi 9 novembre. Voir le
-[journal des décisions (ADR)](decisions/README.md) pour les raisons des choix
+[journal des décisions (ADR)](ADR/README.md) pour les raisons des choix
 et le statut des propositions. Le barème ne réserve pas de bonus à l'IA locale.
 
 ## Comment suivre les modifications
@@ -132,3 +132,28 @@ avant de préparer les commits.
   exemples, le README et les documents de suivi. Aucun merge vers `develop`
   ou `main` n'a été effectué. La suppression préexistante du fichier `README`
   reste une modification locale, hors de ce commit.
+
+### 9 novembre 2026 — Dev container vérifié et PostgreSQL préparé
+
+- Session connectée dans `/workspace`, sous Debian 13 / x86_64, utilisateur `node`.
+- Node `24.22.1`, npm `11.19.1`, psql `17.11`, Git et CLI GitHub disponibles.
+- `/workspace` est déclaré comme dépôt de confiance Git ; étape 3 réalisée.
+- Ajout du service `db` PostgreSQL 17, du healthcheck, de la dépendance de `dev`,
+  du stockage `db/data/` et des deux scripts SQL du cours dans `db/init/`.
+- Ajout du transfert VS Code `db:5432` et du guide `BASE-DE-DONNEES.md`.
+- Correction des liens après le déplacement local de `docs/decisions/` vers `docs/ADR/`.
+- Docker et son socket ne sont pas accessibles depuis cette session. La validation
+  Compose, l'exécution SQL et la persistance restent à tester après reconstruction
+  depuis VS Code. L'étape 5 reste donc non cochée.
+- Aucun commit, push ou merge effectué ; modifications locales préexistantes conservées.
+
+### 9 novembre 2026 — Base validée et commit du cours préparé
+
+- Les deux questions de démonstration sont accessibles par SQL et dans TablePlus.
+  Christopher confirme la persistance d’une ligne temporaire après reconstruction ;
+  cette ligne a ensuite été supprimée. L’étape 5 est réalisée et validée.
+- Le commit « Base de données PostgreSQL » regroupe Compose avec `postgres:17`,
+  le transfert `db:5432`, les scripts SQL et la documentation de la base.
+- Le rangement des ADR et le verrouillage de la feature du dev container sont
+  inclus. Le passage local à pgvector reste hors de ce commit, comme la
+  suppression préexistante du fichier `README`.

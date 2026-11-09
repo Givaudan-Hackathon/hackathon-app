@@ -8,11 +8,12 @@ Pour l'atelier, nous suivons la stack de test du cours :
 - Front : Vite et TypeScript.
 - IA : fournisseur à décider avec l'équipe ; essai local avec Ollama proposé.
 
-L'installation est en cours. Les fichiers du dev container reprennent les exemples
-du cours ; leur construction reste bloquée par un téléchargement Docker (`EOF`).
+Le dev container démarre : Node 24, npm 11 et le client PostgreSQL 17 sont vérifiés.
+PostgreSQL est accessible et la conservation des données après reconstruction
+est validée. Voir le [guide PostgreSQL](docs/BASE-DE-DONNEES.md).
 Consulter le [plan et les vérifications](docs/SUIVI-MATIN.md), le
 [guide WSL](docs/WSL.md), les [explications du dev container](docs/DEVCONTAINER.md)
-et le [journal des décisions (ADR)](docs/decisions/README.md).
+et le [journal des décisions (ADR)](docs/ADR/README.md).
 
 Le travail en cours se fait sur `feature/environnement-cours`, créée depuis
 `develop`. Les changements seront relus via une pull request vers `develop`,
