@@ -100,12 +100,12 @@ psql postgres://app:app@db:5432/app -c "SELECT id, question, answer FROM questio
 
 ## Comprendre un échec
 
-| Statut | Signification |
-| --- | --- |
-| 400 | Question absente/non textuelle, ou corps JSON invalide |
-| 502 | Erreur HTTP d'Ollama ou réponse inexploitable |
-| 503 | Configuration IA absente ou serveur injoignable |
-| 504 | L'appel IA a dépassé 60 secondes |
+| Statut | Signification                                          |
+| ------ | ------------------------------------------------------ |
+| 400    | Question absente/non textuelle, ou corps JSON invalide |
+| 502    | Erreur HTTP d'Ollama ou réponse inexploitable          |
+| 503    | Configuration IA absente ou serveur injoignable        |
+| 504    | L'appel IA a dépassé 60 secondes                       |
 
 Une erreur IA n'insère aucune ligne en base. Une erreur PostgreSQL après la
 génération échoue aussi côté navigateur : l'enregistrement fait partie de la
@@ -132,6 +132,7 @@ Références : [compatibilité OpenAI](https://docs.ollama.com/api/openai-compat
 - La compilation API/front et la validation Compose réussissent. Les erreurs
   400, 502, 503 et le délai réel de 60 secondes (504) ont été contrôlés avec un
   fournisseur simulé et des schémas SQL temporaires supprimés ensuite.
-- La validation manuelle de Christopher et le test sur un clone neuf restent
-  à effectuer. L'alias ajouté dans Compose sera pris en compte lors de la
+- Christopher a confirmé la saisie, la réponse et l'enregistrement par une
+  capture du 9 novembre. Le test humain d'un clone neuf reste à effectuer.
+  L'alias ajouté dans Compose sera pris en compte lors de la
   prochaine reconstruction ; Docker Desktop fournit déjà ce nom sur ce poste.
