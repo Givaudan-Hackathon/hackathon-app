@@ -1,0 +1,241 @@
+modele,id,brief,rang,code,product_name,query_category,attendue,score
+tfidf (baseline),1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",1,3027030019977,Flan entremets Pistache,desserts_aromatises,desserts_aromatises,0.0978
+tfidf (baseline),1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",2,5000112533316,Boisson rafraîchissante aux extraits végétaux,boissons_aromatisees,desserts_aromatises,0.0969
+tfidf (baseline),1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",3,5410063018136,Milkshake minceur chocolat,boissons_lactees,desserts_aromatises,0.0724
+tfidf (baseline),1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",4,3608580890980,Gourmand & Végétal - Le Délice Caramel,desserts_aromatises,desserts_aromatises,0.0704
+tfidf (baseline),1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",5,3254381026907,Cola,boissons_aromatisees,desserts_aromatises,0.0685
+tfidf (baseline),2,"boisson protéinée vanille pour sportifs, base pois",1,3257985312964,Boisson au soja vanille,boissons_vegetales,boissons_proteinees,0.1031
+tfidf (baseline),2,"boisson protéinée vanille pour sportifs, base pois",2,10901809,Boisson Soja Vanille,boissons_vegetales,boissons_proteinees,0.0926
+tfidf (baseline),2,"boisson protéinée vanille pour sportifs, base pois",3,3229820806006,Barista avoine vanille,boissons_vegetales,boissons_proteinees,0.0904
+tfidf (baseline),2,"boisson protéinée vanille pour sportifs, base pois",4,3021760406403,Dessert Végétal Vanille de Madagascar,boissons_vegetales,boissons_proteinees,0.0896
+tfidf (baseline),2,"boisson protéinée vanille pour sportifs, base pois",5,5400706614726,Protéine De Pois Et Riz en Poudre,boissons_proteinees,boissons_proteinees,0.0892
+tfidf (baseline),3,arôme fraise pour yaourt à boire,1,3335030030404,Yaourt à boire fermier Fraise,boissons_lactees,boissons_lactees,0.2134
+tfidf (baseline),3,arôme fraise pour yaourt à boire,2,3596710434619,Yaourt a boiresaveur fraise,boissons_lactees,boissons_lactees,0.1958
+tfidf (baseline),3,arôme fraise pour yaourt à boire,3,3258561420189,Yaourt à boire fraise,boissons_lactees,boissons_lactees,0.1908
+tfidf (baseline),3,arôme fraise pour yaourt à boire,4,3329770063273,Yaourt à boire sucré aromatisé,boissons_lactees,boissons_lactees,0.1892
+tfidf (baseline),3,arôme fraise pour yaourt à boire,5,3350033646797,Yaourt à boire fraise,boissons_lactees,boissons_lactees,0.1861
+tfidf (baseline),4,sirop goût menthe pour cafés,1,3660668209510,Sirop de Menthe,boissons_aromatisees,boissons_aromatisees,0.4198
+tfidf (baseline),4,sirop goût menthe pour cafés,2,3092712200226,Sirop de Menthe Verte,boissons_aromatisees,boissons_aromatisees,0.3995
+tfidf (baseline),4,sirop goût menthe pour cafés,3,3560070339228,Sirop Menthe,boissons_aromatisees,boissons_aromatisees,0.3189
+tfidf (baseline),4,sirop goût menthe pour cafés,4,5400113504276,Sirop De Menthe Bio,boissons_aromatisees,boissons_aromatisees,0.2551
+tfidf (baseline),4,sirop goût menthe pour cafés,5,3350033184169,"Sirop à diluer à la menthe, sans sucre",boissons_aromatisees,boissons_aromatisees,0.1705
+tfidf (baseline),5,"un shake protéiné à prendre après la muscu, goût chocolat",1,5425002403430,Protein Shake 330ML Chocolat,boissons_proteinees,boissons_proteinees,0.0906
+tfidf (baseline),5,"un shake protéiné à prendre après la muscu, goût chocolat",2,5060385448984,Soy Protein Isolate 90 Biscuit Choco-Caramel,boissons_proteinees,boissons_proteinees,0.0769
+tfidf (baseline),5,"un shake protéiné à prendre après la muscu, goût chocolat",3,5055534352977,"Impact Whey Protein, Blueberry and Raspberry Stevia",boissons_proteinees,boissons_proteinees,0.0767
+tfidf (baseline),5,"un shake protéiné à prendre après la muscu, goût chocolat",4,5600380892346,100 % Whey premium protein,boissons_proteinees,boissons_proteinees,0.0745
+tfidf (baseline),5,"un shake protéiné à prendre après la muscu, goût chocolat",5,0728633106974,Scitec Nutrition Protein Delite Alpine Milk Chocolate,boissons_proteinees,boissons_proteinees,0.0696
+tfidf (baseline),6,"une boisson sans lait pour le petit-déjeuner, goût noisette",1,3229820804118,Noisette sans sucres,boissons_vegetales,boissons_vegetales,0.1319
+tfidf (baseline),6,"une boisson sans lait pour le petit-déjeuner, goût noisette",2,3596710520640,Boisson végétale Noisette au chocolat,boissons_vegetales,boissons_vegetales,0.1158
+tfidf (baseline),6,"une boisson sans lait pour le petit-déjeuner, goût noisette",3,3256225743780,Boisson sans théine saveur pêche abricot,boissons_aromatisees,boissons_vegetales,0.1079
+tfidf (baseline),6,"une boisson sans lait pour le petit-déjeuner, goût noisette",4,3251491809161,Soja doux - Saveur Noisette,boissons_vegetales,boissons_vegetales,0.0971
+tfidf (baseline),6,"une boisson sans lait pour le petit-déjeuner, goût noisette",5,3662072011369,Whey Harder Protéine Native,boissons_proteinees,boissons_vegetales,0.0965
+tfidf (baseline),7,"une petite crème qui a le goût d'enfance, comme chez mamie",1,0049000062823,Strawberry,boissons_aromatisees,desserts_aromatises,0.092
+tfidf (baseline),7,"une petite crème qui a le goût d'enfance, comme chez mamie",2,4061459313826,Whey protéines,boissons_proteinees,desserts_aromatises,0.0904
+tfidf (baseline),7,"une petite crème qui a le goût d'enfance, comme chez mamie",3,3175681064096,Milical Pur Protéines Vanille,boissons_proteinees,desserts_aromatises,0.0839
+tfidf (baseline),7,"une petite crème qui a le goût d'enfance, comme chez mamie",4,3180297807814,1L Sirop Peche Giffard,boissons_aromatisees,desserts_aromatises,0.0718
+tfidf (baseline),7,"une petite crème qui a le goût d'enfance, comme chez mamie",5,8594071014094,Lait d’amande,boissons_vegetales,desserts_aromatises,0.0675
+tfidf (baseline),8,une limonade pétillante au citron pour l'été,1,20656942,Pétillante Saveur Citron vert,boissons_aromatisees,boissons_aromatisees,0.2091
+tfidf (baseline),8,une limonade pétillante au citron pour l'été,2,3450970004657,Limonade,boissons_aromatisees,boissons_aromatisees,0.1763
+tfidf (baseline),8,une limonade pétillante au citron pour l'été,3,3551720003941,1L LIMONADE ARTISANAL LORINA,boissons_aromatisees,boissons_aromatisees,0.1548
+tfidf (baseline),8,une limonade pétillante au citron pour l'été,4,3168311883303,Limonade à la myrtille,boissons_aromatisees,boissons_aromatisees,0.15
+tfidf (baseline),8,une limonade pétillante au citron pour l'été,5,3250392549190,Limonade NETTO BIO 1L,boissons_aromatisees,boissons_aromatisees,0.1351
+tfidf (baseline),9,un lait chocolaté pour le goûter des enfants,1,20091286,lait chocolaté,boissons_lactees,boissons_lactees,0.2721
+tfidf (baseline),9,un lait chocolaté pour le goûter des enfants,2,5055534320273,"Impact Whey Protein, Natural Chocolate",boissons_proteinees,boissons_lactees,0.0839
+tfidf (baseline),9,un lait chocolaté pour le goûter des enfants,3,5391534950097,Whey protein Chocolate,boissons_proteinees,boissons_lactees,0.079
+tfidf (baseline),9,un lait chocolaté pour le goûter des enfants,4,8718774017224,Smart Protein Drink Chocolate,boissons_proteinees,boissons_lactees,0.0657
+tfidf (baseline),9,un lait chocolaté pour le goûter des enfants,5,0049000062823,Strawberry,boissons_aromatisees,boissons_lactees,0.0608
+tfidf (baseline),10,une boisson au soja goût vanille pour une clientèle vegan,1,3257985312964,Boisson au soja vanille,boissons_vegetales,boissons_vegetales,0.3717
+tfidf (baseline),10,une boisson au soja goût vanille pour une clientèle vegan,2,10901809,Boisson Soja Vanille,boissons_vegetales,boissons_vegetales,0.3341
+tfidf (baseline),10,une boisson au soja goût vanille pour une clientèle vegan,3,3564700685105,Boisson au soja vanille,boissons_vegetales,boissons_vegetales,0.3042
+tfidf (baseline),10,une boisson au soja goût vanille pour une clientèle vegan,4,3229820793672,Boisson Soja Vanille,boissons_vegetales,boissons_vegetales,0.2817
+tfidf (baseline),10,une boisson au soja goût vanille pour une clientèle vegan,5,3259011074303,Boisson au soja goût vanille,boissons_vegetales,boissons_vegetales,0.2231
+tfidf (baseline),11,"une eau avec un petit goût de fruits rouges, sans sucre",1,3245412918988,Soja fruits rouges,desserts_aromatises,boissons_aromatisees,0.216
+tfidf (baseline),11,"une eau avec un petit goût de fruits rouges, sans sucre",2,3265266075101,Sirop de fruits rouges,boissons_aromatisees,boissons_aromatisees,0.199
+tfidf (baseline),11,"une eau avec un petit goût de fruits rouges, sans sucre",3,3092718618674,Sirop de Grenadine,boissons_aromatisees,boissons_aromatisees,0.1957
+tfidf (baseline),11,"une eau avec un petit goût de fruits rouges, sans sucre",4,3560071470876,Soja fruits mixes fraise fruits rouges abricot peche,desserts_aromatises,boissons_aromatisees,0.1745
+tfidf (baseline),11,"une eau avec un petit goût de fruits rouges, sans sucre",5,3297560130248,Yaourts Panier De Yoplait Fruits Rouges 12 Pots De 125g,desserts_aromatises,boissons_aromatisees,0.1646
+tfidf (baseline),12,un yaourt onctueux à la noix de coco,1,3266191089980,Riz noix de coco,boissons_vegetales,desserts_aromatises,0.3156
+tfidf (baseline),12,un yaourt onctueux à la noix de coco,2,3396411235627,Boisson à base de noix de coco,boissons_vegetales,desserts_aromatises,0.2778
+tfidf (baseline),12,un yaourt onctueux à la noix de coco,3,8023678425304,Boisson biologique à base de riz et noix de coco sans gluten,boissons_vegetales,desserts_aromatises,0.242
+tfidf (baseline),12,un yaourt onctueux à la noix de coco,4,3250392653361,Boisson riz et coco BIO 1L,boissons_vegetales,desserts_aromatises,0.2278
+tfidf (baseline),12,un yaourt onctueux à la noix de coco,5,8023678165101,Boisson riz coco,boissons_vegetales,desserts_aromatises,0.227
+nomic-embed-text,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",1,3027030019977,Flan entremets Pistache,desserts_aromatises,desserts_aromatises,0.7513
+nomic-embed-text,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",2,3256224809746,"Dessert végétal soja au chocolat, brique 530g",boissons_vegetales,desserts_aromatises,0.7376
+nomic-embed-text,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",3,325622480974600,"Dessert végétal soja au chocolat, brique 530g",boissons_vegetales,desserts_aromatises,0.7352
+nomic-embed-text,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",4,3256226076634,Dessert végétal au lait de soja sur lit de mûre 4 pots x100g,desserts_aromatises,desserts_aromatises,0.7318
+nomic-embed-text,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",5,3608580890980,Gourmand & Végétal - Le Délice Caramel,desserts_aromatises,desserts_aromatises,0.7285
+nomic-embed-text,2,"boisson protéinée vanille pour sportifs, base pois",1,5400706614764,Mix De Protéines à La Vanille Et Banane Bio - 400 G - Purasana,boissons_proteinees,boissons_proteinees,0.7849
+nomic-embed-text,2,"boisson protéinée vanille pour sportifs, base pois",2,4260363480345,Bio Protein Vanille,boissons_proteinees,boissons_proteinees,0.7848
+nomic-embed-text,2,"boisson protéinée vanille pour sportifs, base pois",3,3396411246357,Proteine,boissons_proteinees,boissons_proteinees,0.773
+nomic-embed-text,2,"boisson protéinée vanille pour sportifs, base pois",4,3583788287452,Lean Protein,boissons_proteinees,boissons_proteinees,0.7717
+nomic-embed-text,2,"boisson protéinée vanille pour sportifs, base pois",5,0635131499173,whey proteine bio vanille,boissons_proteinees,boissons_proteinees,0.7709
+nomic-embed-text,3,arôme fraise pour yaourt à boire,1,3770003809036,Yaourt à boire bio et local - Fraise,boissons_lactees,boissons_lactees,0.7524
+nomic-embed-text,3,arôme fraise pour yaourt à boire,2,3335030030404,Yaourt à boire fermier Fraise,boissons_lactees,boissons_lactees,0.7499
+nomic-embed-text,3,arôme fraise pour yaourt à boire,3,3297560130248,Yaourts Panier De Yoplait Fruits Rouges 12 Pots De 125g,desserts_aromatises,boissons_lactees,0.7462
+nomic-embed-text,3,arôme fraise pour yaourt à boire,4,3273220140659,Yaourt de Brebis Saveur Framboise,desserts_aromatises,boissons_lactees,0.7447
+nomic-embed-text,3,arôme fraise pour yaourt à boire,5,3329770057180,Yo Fruit Fraise,boissons_lactees,boissons_lactees,0.7392
+nomic-embed-text,4,sirop goût menthe pour cafés,1,3560070339228,Sirop Menthe,boissons_aromatisees,boissons_aromatisees,0.6716
+nomic-embed-text,4,sirop goût menthe pour cafés,2,3092712200226,Sirop de Menthe Verte,boissons_aromatisees,boissons_aromatisees,0.6611
+nomic-embed-text,4,sirop goût menthe pour cafés,3,3660668209510,Sirop de Menthe,boissons_aromatisees,boissons_aromatisees,0.6568
+nomic-embed-text,4,sirop goût menthe pour cafés,4,4056489276500,Sirop zéro sucres parfum menthe verte,boissons_aromatisees,boissons_aromatisees,0.651
+nomic-embed-text,4,sirop goût menthe pour cafés,5,3350033184169,"Sirop à diluer à la menthe, sans sucre",boissons_aromatisees,boissons_aromatisees,0.648
+nomic-embed-text,5,"un shake protéiné à prendre après la muscu, goût chocolat",1,3175681795822,"Milk-shake Chocolat, Riches En Protéines, Repas Minceur, Les 9 Milk-shakes De 30 Grammes, Marque Gerlinéa",boissons_proteinees,boissons_proteinees,0.7864
+nomic-embed-text,5,"un shake protéiné à prendre après la muscu, goût chocolat",2,5425002403430,Protein Shake 330ML Chocolat,boissons_proteinees,boissons_proteinees,0.7783
+nomic-embed-text,5,"un shake protéiné à prendre après la muscu, goût chocolat",3,3608419150759,Whey Protein goût Chocolat,boissons_proteinees,boissons_proteinees,0.7748
+nomic-embed-text,5,"un shake protéiné à prendre après la muscu, goût chocolat",4,5600380894463,Oatmeal + Whey Protein (Chocolate Chip),boissons_proteinees,boissons_proteinees,0.7746
+nomic-embed-text,5,"un shake protéiné à prendre après la muscu, goût chocolat",5,3175681287686,Repas minceur milk-shake saveur café,boissons_lactees,boissons_proteinees,0.7722
+nomic-embed-text,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",1,3229820784489,Boisson gourmande Amandes noisettes,boissons_vegetales,boissons_vegetales,0.7394
+nomic-embed-text,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",2,3596710520640,Boisson végétale Noisette au chocolat,boissons_vegetales,boissons_vegetales,0.7281
+nomic-embed-text,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",3,3329770055803,Petit Filou Gourde Fraise 80G,boissons_lactees,boissons_vegetales,0.7184
+nomic-embed-text,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",4,3329770049628,Mini Yop Gôut Fraise,boissons_lactees,boissons_vegetales,0.7181
+nomic-embed-text,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",5,4056489320364,Lait de noisette cacao,boissons_vegetales,boissons_vegetales,0.7155
+nomic-embed-text,7,"une petite crème qui a le goût d'enfance, comme chez mamie",1,3329770054028,Petits Filous (Magic Duo Goût Framboise & Goût Vanille),desserts_aromatises,desserts_aromatises,0.6878
+nomic-embed-text,7,"une petite crème qui a le goût d'enfance, comme chez mamie",2,3329770057340,Petits Filous Tub's Goûts Myrtille et Abricot (édition limitée),boissons_lactees,desserts_aromatises,0.676
+nomic-embed-text,7,"une petite crème qui a le goût d'enfance, comme chez mamie",3,3180297807814,1L Sirop Peche Giffard,boissons_aromatisees,desserts_aromatises,0.6718
+nomic-embed-text,7,"une petite crème qui a le goût d'enfance, comme chez mamie",4,3033491270109,Cocktail Plaisir Goût Grenade Myrtille Maca,boissons_lactees,desserts_aromatises,0.6656
+nomic-embed-text,7,"une petite crème qui a le goût d'enfance, comme chez mamie",5,5410063018136,Milkshake minceur chocolat,boissons_lactees,desserts_aromatises,0.6649
+nomic-embed-text,8,une limonade pétillante au citron pour l'été,1,3450970004657,Limonade,boissons_aromatisees,boissons_aromatisees,0.7587
+nomic-embed-text,8,une limonade pétillante au citron pour l'été,2,3248710510106,Hamoud Limonade 1.5L PET,boissons_aromatisees,boissons_aromatisees,0.7469
+nomic-embed-text,8,une limonade pétillante au citron pour l'été,3,3551720003941,1L LIMONADE ARTISANAL LORINA,boissons_aromatisees,boissons_aromatisees,0.7417
+nomic-embed-text,8,une limonade pétillante au citron pour l'été,4,20656942,Pétillante Saveur Citron vert,boissons_aromatisees,boissons_aromatisees,0.7368
+nomic-embed-text,8,une limonade pétillante au citron pour l'été,5,3250392549190,Limonade NETTO BIO 1L,boissons_aromatisees,boissons_aromatisees,0.7274
+nomic-embed-text,9,un lait chocolaté pour le goûter des enfants,1,3700279306168,RÉCRÉ O'LÉ Goûter laitier Gourdes Multivariétés 12x85g,desserts_aromatises,boissons_lactees,0.7546
+nomic-embed-text,9,un lait chocolaté pour le goûter des enfants,2,3474340089495,Amande Chocolatée,boissons_vegetales,boissons_lactees,0.7475
+nomic-embed-text,9,un lait chocolaté pour le goûter des enfants,3,20091286,lait chocolaté,boissons_lactees,boissons_lactees,0.7446
+nomic-embed-text,9,un lait chocolaté pour le goûter des enfants,4,3533631744991,Candy'up Edition Limitée,boissons_lactees,boissons_lactees,0.7408
+nomic-embed-text,9,un lait chocolaté pour le goûter des enfants,5,3456774797771,L'Instant plaisir avec mon chocolat à boire,boissons_lactees,boissons_lactees,0.7388
+nomic-embed-text,10,une boisson au soja goût vanille pour une clientèle vegan,1,3229820793702,Boissons soja vanille,boissons_vegetales,boissons_vegetales,0.7927
+nomic-embed-text,10,une boisson au soja goût vanille pour une clientèle vegan,2,3256224809739,Boisson bio au soja saveur vanille,boissons_vegetales,boissons_vegetales,0.7867
+nomic-embed-text,10,une boisson au soja goût vanille pour une clientèle vegan,3,3229820793672,Boisson Soja Vanille,boissons_vegetales,boissons_vegetales,0.786
+nomic-embed-text,10,une boisson au soja goût vanille pour une clientèle vegan,4,3229820121888,Soja Vanille bio,boissons_vegetales,boissons_vegetales,0.7816
+nomic-embed-text,10,une boisson au soja goût vanille pour une clientèle vegan,5,3259011074303,Boisson au soja goût vanille,boissons_vegetales,boissons_vegetales,0.7797
+nomic-embed-text,11,"une eau avec un petit goût de fruits rouges, sans sucre",1,3329770054028,Petits Filous (Magic Duo Goût Framboise & Goût Vanille),desserts_aromatises,boissons_aromatisees,0.7476
+nomic-embed-text,11,"une eau avec un petit goût de fruits rouges, sans sucre",2,3265266075101,Sirop de fruits rouges,boissons_aromatisees,boissons_aromatisees,0.7449
+nomic-embed-text,11,"une eau avec un petit goût de fruits rouges, sans sucre",3,3222474650292,Sirop grenadine au sucre de canne,boissons_aromatisees,boissons_aromatisees,0.7393
+nomic-embed-text,11,"une eau avec un petit goût de fruits rouges, sans sucre",4,3257980496645,Sirop de Pêche,boissons_aromatisees,boissons_aromatisees,0.7372
+nomic-embed-text,11,"une eau avec un petit goût de fruits rouges, sans sucre",5,3257980976895,Sirop De Cassis,boissons_aromatisees,boissons_aromatisees,0.7366
+nomic-embed-text,12,un yaourt onctueux à la noix de coco,1,3770003245254,Yaourts Fermiers Noix de Coco,desserts_aromatises,desserts_aromatises,0.7817
+nomic-embed-text,12,un yaourt onctueux à la noix de coco,2,3596710538171,Yaourt au lait entier à l'arôme naturel de : fraise - citron - noix de coco - vanille,desserts_aromatises,desserts_aromatises,0.7408
+nomic-embed-text,12,un yaourt onctueux à la noix de coco,3,3278690075630,Yaourt au lait entier saveur coco,desserts_aromatises,desserts_aromatises,0.7375
+nomic-embed-text,12,un yaourt onctueux à la noix de coco,4,61944565,Yaourt,desserts_aromatises,desserts_aromatises,0.722
+nomic-embed-text,12,un yaourt onctueux à la noix de coco,5,3273220540886,Yaourt bio au lait de chèvre Vanille,desserts_aromatises,desserts_aromatises,0.7209
+bge-m3,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",1,3027030019977,Flan entremets Pistache,desserts_aromatises,desserts_aromatises,0.5681
+bge-m3,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",2,0680569854070,Dessert végétal au lait de coco,desserts_aromatises,desserts_aromatises,0.5582
+bge-m3,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",3,3608580891000,Gourmand & Végétal Ananas,desserts_aromatises,desserts_aromatises,0.538
+bge-m3,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",4,5411188649458,Vanille vegan,desserts_aromatises,desserts_aromatises,0.5375
+bge-m3,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",5,3850354011996,Dessert vannilla flavor,desserts_aromatises,desserts_aromatises,0.5355
+bge-m3,2,"boisson protéinée vanille pour sportifs, base pois",1,5400706614764,Mix De Protéines à La Vanille Et Banane Bio - 400 G - Purasana,boissons_proteinees,boissons_proteinees,0.6988
+bge-m3,2,"boisson protéinée vanille pour sportifs, base pois",2,4260363480345,Bio Protein Vanille,boissons_proteinees,boissons_proteinees,0.6776
+bge-m3,2,"boisson protéinée vanille pour sportifs, base pois",3,0814784024301,Protein Warrior Blend Vanille,boissons_proteinees,boissons_proteinees,0.6638
+bge-m3,2,"boisson protéinée vanille pour sportifs, base pois",4,8414192309254,Vegan protein vanilla,boissons_proteinees,boissons_proteinees,0.662
+bge-m3,2,"boisson protéinée vanille pour sportifs, base pois",5,0814784020341,Classic Plus - Protéines Végétales - Saveur Vanille,boissons_proteinees,boissons_proteinees,0.6615
+bge-m3,3,arôme fraise pour yaourt à boire,1,3450971457414,Yaourt à boire saveur fraise,boissons_lactees,boissons_lactees,0.7119
+bge-m3,3,arôme fraise pour yaourt à boire,2,3596710434619,Yaourt a boiresaveur fraise,boissons_lactees,boissons_lactees,0.7099
+bge-m3,3,arôme fraise pour yaourt à boire,3,3291330000526,Yaourt a boire fraise,boissons_lactees,boissons_lactees,0.7025
+bge-m3,3,arôme fraise pour yaourt à boire,4,3250391693009,YAB - Yaourt à boire fraise,boissons_lactees,boissons_lactees,0.6969
+bge-m3,3,arôme fraise pour yaourt à boire,5,3250392486341,Yaourt sans lactose aromatisé à la fraise,desserts_aromatises,boissons_lactees,0.6936
+bge-m3,4,sirop goût menthe pour cafés,1,3092712200226,Sirop de Menthe Verte,boissons_aromatisees,boissons_aromatisees,0.6787
+bge-m3,4,sirop goût menthe pour cafés,2,3560070339228,Sirop Menthe,boissons_aromatisees,boissons_aromatisees,0.6768
+bge-m3,4,sirop goût menthe pour cafés,3,3660668209510,Sirop de Menthe,boissons_aromatisees,boissons_aromatisees,0.6759
+bge-m3,4,sirop goût menthe pour cafés,4,4056489276500,Sirop zéro sucres parfum menthe verte,boissons_aromatisees,boissons_aromatisees,0.6616
+bge-m3,4,sirop goût menthe pour cafés,5,5400113504276,Sirop De Menthe Bio,boissons_aromatisees,boissons_aromatisees,0.6601
+bge-m3,5,"un shake protéiné à prendre après la muscu, goût chocolat",1,5425002403430,Protein Shake 330ML Chocolat,boissons_proteinees,boissons_proteinees,0.6719
+bge-m3,5,"un shake protéiné à prendre après la muscu, goût chocolat",2,4260363480796,"Shape Shake Protein, Schokolade",boissons_proteinees,boissons_proteinees,0.6656
+bge-m3,5,"un shake protéiné à prendre après la muscu, goût chocolat",3,3175681795822,"Milk-shake Chocolat, Riches En Protéines, Repas Minceur, Les 9 Milk-shakes De 30 Grammes, Marque Gerlinéa",boissons_proteinees,boissons_proteinees,0.6613
+bge-m3,5,"un shake protéiné à prendre après la muscu, goût chocolat",4,3175681295810,fit & protein milk shake cookie caramel,boissons_proteinees,boissons_proteinees,0.6564
+bge-m3,5,"un shake protéiné à prendre après la muscu, goût chocolat",5,3662072158279,Protein Shake Vanille,boissons_proteinees,boissons_proteinees,0.6284
+bge-m3,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",1,3229820804118,Noisette sans sucres,boissons_vegetales,boissons_vegetales,0.6416
+bge-m3,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",2,4056489320364,Lait de noisette cacao,boissons_vegetales,boissons_vegetales,0.6232
+bge-m3,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",3,3560071457396,Gout chocolat noisette,boissons_vegetales,boissons_vegetales,0.618
+bge-m3,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",4,8428532230146,Hazelnut Drink U.H.T.,boissons_vegetales,boissons_vegetales,0.6047
+bge-m3,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",5,5711953145506,Noisette/Hazelnut Macchiato,boissons_lactees,boissons_vegetales,0.5962
+bge-m3,7,"une petite crème qui a le goût d'enfance, comme chez mamie",1,3250391277728,CREME BRULEE 4x100g,desserts_aromatises,desserts_aromatises,0.574
+bge-m3,7,"une petite crème qui a le goût d'enfance, comme chez mamie",2,3701002400207,Crème brûlée,desserts_aromatises,desserts_aromatises,0.5672
+bge-m3,7,"une petite crème qui a le goût d'enfance, comme chez mamie",3,3560070726653,MINI YAB saveurs 4 fraise banane 4 pêche abricot,boissons_lactees,desserts_aromatises,0.5645
+bge-m3,7,"une petite crème qui a le goût d'enfance, comme chez mamie",4,3564700007051,Crème dessert au café,desserts_aromatises,desserts_aromatises,0.5636
+bge-m3,7,"une petite crème qui a le goût d'enfance, comme chez mamie",5,3700036909410,Creme dessert vanille,desserts_aromatises,desserts_aromatises,0.5628
+bge-m3,8,une limonade pétillante au citron pour l'été,1,5400601005346,Lemonade Lemon,boissons_aromatisees,boissons_aromatisees,0.5979
+bge-m3,8,une limonade pétillante au citron pour l'été,2,3168311883303,Limonade à la myrtille,boissons_aromatisees,boissons_aromatisees,0.5867
+bge-m3,8,une limonade pétillante au citron pour l'été,3,3450970004657,Limonade,boissons_aromatisees,boissons_aromatisees,0.5833
+bge-m3,8,une limonade pétillante au citron pour l'été,4,3551720003941,1L LIMONADE ARTISANAL LORINA,boissons_aromatisees,boissons_aromatisees,0.5811
+bge-m3,8,une limonade pétillante au citron pour l'été,5,8001620015124,Prima Spremitura Limone,boissons_aromatisees,boissons_aromatisees,0.5719
+bge-m3,9,un lait chocolaté pour le goûter des enfants,1,3428273160035,Matin léger - Boisson au lait au chocolat,boissons_lactees,boissons_lactees,0.6419
+bge-m3,9,un lait chocolaté pour le goûter des enfants,2,3256226767020,Dessert lacté au lait de brebis et au chocolat 2x115g,desserts_aromatises,boissons_lactees,0.6302
+bge-m3,9,un lait chocolaté pour le goûter des enfants,3,20091286,lait chocolaté,boissons_lactees,boissons_lactees,0.6237
+bge-m3,9,un lait chocolaté pour le goûter des enfants,4,3456774797771,L'Instant plaisir avec mon chocolat à boire,boissons_lactees,boissons_lactees,0.6107
+bge-m3,9,un lait chocolaté pour le goûter des enfants,5,5410146418594,Crème dessert au chocolat saveur noisette,desserts_aromatises,boissons_lactees,0.6033
+bge-m3,10,une boisson au soja goût vanille pour une clientèle vegan,1,3229820793689,Soja vanille,boissons_vegetales,boissons_vegetales,0.6944
+bge-m3,10,une boisson au soja goût vanille pour une clientèle vegan,2,3229820793702,Boissons soja vanille,boissons_vegetales,boissons_vegetales,0.6935
+bge-m3,10,une boisson au soja goût vanille pour une clientèle vegan,3,3229820121888,Soja Vanille bio,boissons_vegetales,boissons_vegetales,0.6932
+bge-m3,10,une boisson au soja goût vanille pour une clientèle vegan,4,3273227080279,So soja ! Vanille,boissons_vegetales,boissons_vegetales,0.6927
+bge-m3,10,une boisson au soja goût vanille pour une clientèle vegan,5,20451530,Soia drink vanilla,boissons_vegetales,boissons_vegetales,0.6842
+bge-m3,11,"une eau avec un petit goût de fruits rouges, sans sucre",1,00687010,Jelly Babies,boissons_aromatisees,boissons_aromatisees,0.65
+bge-m3,11,"une eau avec un petit goût de fruits rouges, sans sucre",2,3265266075101,Sirop de fruits rouges,boissons_aromatisees,boissons_aromatisees,0.6372
+bge-m3,11,"une eau avec un petit goût de fruits rouges, sans sucre",3,3229820804118,Noisette sans sucres,boissons_vegetales,boissons_aromatisees,0.6243
+bge-m3,11,"une eau avec un petit goût de fruits rouges, sans sucre",4,3092718610227,"Sirop parfum grenadine, zéro sucres",boissons_aromatisees,boissons_aromatisees,0.6197
+bge-m3,11,"une eau avec un petit goût de fruits rouges, sans sucre",5,3229820787015,Amande sans sucres,boissons_vegetales,boissons_aromatisees,0.6131
+bge-m3,12,un yaourt onctueux à la noix de coco,1,3278690075630,Yaourt au lait entier saveur coco,desserts_aromatises,desserts_aromatises,0.6496
+bge-m3,12,un yaourt onctueux à la noix de coco,2,3770003245254,Yaourts Fermiers Noix de Coco,desserts_aromatises,desserts_aromatises,0.6461
+bge-m3,12,un yaourt onctueux à la noix de coco,3,3329770063327,Yaourt à boire YOP parfum coco,boissons_lactees,desserts_aromatises,0.6285
+bge-m3,12,un yaourt onctueux à la noix de coco,4,3596710538171,Yaourt au lait entier à l'arôme naturel de : fraise - citron - noix de coco - vanille,desserts_aromatises,desserts_aromatises,0.6188
+bge-m3,12,un yaourt onctueux à la noix de coco,5,61944565,Yaourt,desserts_aromatises,desserts_aromatises,0.6019
+mxbai-embed-large,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",1,3213820085301,"Dessert végétal, Noisettes Amandes (4 Pots)",desserts_aromatises,desserts_aromatises,0.7365
+mxbai-embed-large,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",2,3027030019977,Flan entremets Pistache,desserts_aromatises,desserts_aromatises,0.7355
+mxbai-embed-large,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",3,3256224809746,"Dessert végétal soja au chocolat, brique 530g",boissons_vegetales,desserts_aromatises,0.732
+mxbai-embed-large,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",4,325622480974600,"Dessert végétal soja au chocolat, brique 530g",boissons_vegetales,desserts_aromatises,0.7318
+mxbai-embed-large,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",5,3256226076634,Dessert végétal au lait de soja sur lit de mûre 4 pots x100g,desserts_aromatises,desserts_aromatises,0.724
+mxbai-embed-large,2,"boisson protéinée vanille pour sportifs, base pois",1,3428272140021,Sportéus saveur Vanille,boissons_lactees,boissons_proteinees,0.7892
+mxbai-embed-large,2,"boisson protéinée vanille pour sportifs, base pois",2,0067002304529,"100% Whey Poudre De Protéine, 907 G, Crème à La Vanille",boissons_proteinees,boissons_proteinees,0.778
+mxbai-embed-large,2,"boisson protéinée vanille pour sportifs, base pois",3,0814784024301,Protein Warrior Blend Vanille,boissons_proteinees,boissons_proteinees,0.7639
+mxbai-embed-large,2,"boisson protéinée vanille pour sportifs, base pois",4,3033491604898,Hipro a boire uht vanille 345 g x 8,boissons_lactees,boissons_proteinees,0.7554
+mxbai-embed-large,2,"boisson protéinée vanille pour sportifs, base pois",5,3700225601132,Whey Pure Premium Protein Vanille - 750GR - STC Nutrition,boissons_proteinees,boissons_proteinees,0.7542
+mxbai-embed-large,3,arôme fraise pour yaourt à boire,1,3291330000526,Yaourt a boire fraise,boissons_lactees,boissons_lactees,0.7471
+mxbai-embed-large,3,arôme fraise pour yaourt à boire,2,3257983858532,Yaourt à boire fraise,boissons_lactees,boissons_lactees,0.7446
+mxbai-embed-large,3,arôme fraise pour yaourt à boire,3,3176575825014,Yaourt à boire aromatisé Goût Fraise,boissons_lactees,boissons_lactees,0.7436
+mxbai-embed-large,3,arôme fraise pour yaourt à boire,4,3596710538171,Yaourt au lait entier à l'arôme naturel de : fraise - citron - noix de coco - vanille,desserts_aromatises,boissons_lactees,0.7419
+mxbai-embed-large,3,arôme fraise pour yaourt à boire,5,3350033646797,Yaourt à boire fraise,boissons_lactees,boissons_lactees,0.7414
+mxbai-embed-large,4,sirop goût menthe pour cafés,1,3258561300696,Thé Glacé Goût Mangue,boissons_aromatisees,boissons_aromatisees,0.7312
+mxbai-embed-large,4,sirop goût menthe pour cafés,2,3176575825014,Yaourt à boire aromatisé Goût Fraise,boissons_lactees,boissons_aromatisees,0.6955
+mxbai-embed-large,4,sirop goût menthe pour cafés,3,3329770049628,Mini Yop Gôut Fraise,boissons_lactees,boissons_aromatisees,0.6914
+mxbai-embed-large,4,sirop goût menthe pour cafés,4,3033491312892,Actimel goût multifruits,boissons_lactees,boissons_aromatisees,0.6852
+mxbai-embed-large,4,sirop goût menthe pour cafés,5,3033491213199,Actimel gout fraise 100 g x 12,boissons_lactees,boissons_aromatisees,0.6851
+mxbai-embed-large,5,"un shake protéiné à prendre après la muscu, goût chocolat",1,3175681795822,"Milk-shake Chocolat, Riches En Protéines, Repas Minceur, Les 9 Milk-shakes De 30 Grammes, Marque Gerlinéa",boissons_proteinees,boissons_proteinees,0.8272
+mxbai-embed-large,5,"un shake protéiné à prendre après la muscu, goût chocolat",2,3596710547982,Whey* - Goût Chocolat. *WHEY = Protéines de lactosérum.,boissons_proteinees,boissons_proteinees,0.8165
+mxbai-embed-large,5,"un shake protéiné à prendre après la muscu, goût chocolat",3,3608419150759,Whey Protein goût Chocolat,boissons_proteinees,boissons_proteinees,0.8069
+mxbai-embed-large,5,"un shake protéiné à prendre après la muscu, goût chocolat",4,5425002403430,Protein Shake 330ML Chocolat,boissons_proteinees,boissons_proteinees,0.8054
+mxbai-embed-large,5,"un shake protéiné à prendre après la muscu, goût chocolat",5,3175681295810,fit & protein milk shake cookie caramel,boissons_proteinees,boissons_proteinees,0.7875
+mxbai-embed-large,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",1,3329770049628,Mini Yop Gôut Fraise,boissons_lactees,boissons_vegetales,0.7537
+mxbai-embed-large,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",2,3560071457396,Gout chocolat noisette,boissons_vegetales,boissons_vegetales,0.7522
+mxbai-embed-large,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",3,3329770057340,Petits Filous Tub's Goûts Myrtille et Abricot (édition limitée),boissons_lactees,boissons_vegetales,0.7476
+mxbai-embed-large,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",4,3176575825014,Yaourt à boire aromatisé Goût Fraise,boissons_lactees,boissons_vegetales,0.7383
+mxbai-embed-large,6,"une boisson sans lait pour le petit-déjeuner, goût noisette",5,3033491974175,Skyr à Boire Goût Vanille,boissons_lactees,boissons_vegetales,0.7369
+mxbai-embed-large,7,"une petite crème qui a le goût d'enfance, comme chez mamie",1,3329770054028,Petits Filous (Magic Duo Goût Framboise & Goût Vanille),desserts_aromatises,desserts_aromatises,0.746
+mxbai-embed-large,7,"une petite crème qui a le goût d'enfance, comme chez mamie",2,3329770057340,Petits Filous Tub's Goûts Myrtille et Abricot (édition limitée),boissons_lactees,desserts_aromatises,0.7394
+mxbai-embed-large,7,"une petite crème qui a le goût d'enfance, comme chez mamie",3,3329770049628,Mini Yop Gôut Fraise,boissons_lactees,desserts_aromatises,0.6981
+mxbai-embed-large,7,"une petite crème qui a le goût d'enfance, comme chez mamie",4,3596710547982,Whey* - Goût Chocolat. *WHEY = Protéines de lactosérum.,boissons_proteinees,desserts_aromatises,0.6981
+mxbai-embed-large,7,"une petite crème qui a le goût d'enfance, comme chez mamie",5,3176575825014,Yaourt à boire aromatisé Goût Fraise,boissons_lactees,desserts_aromatises,0.6962
+mxbai-embed-large,8,une limonade pétillante au citron pour l'été,1,20656942,Pétillante Saveur Citron vert,boissons_aromatisees,boissons_aromatisees,0.7789
+mxbai-embed-large,8,une limonade pétillante au citron pour l'été,2,3450970004657,Limonade,boissons_aromatisees,boissons_aromatisees,0.765
+mxbai-embed-large,8,une limonade pétillante au citron pour l'été,3,3248710510106,Hamoud Limonade 1.5L PET,boissons_aromatisees,boissons_aromatisees,0.7636
+mxbai-embed-large,8,une limonade pétillante au citron pour l'été,4,3551720003941,1L LIMONADE ARTISANAL LORINA,boissons_aromatisees,boissons_aromatisees,0.7629
+mxbai-embed-large,8,une limonade pétillante au citron pour l'été,5,3551720205000,"Limonade sans sucre, sans calories",boissons_aromatisees,boissons_aromatisees,0.7262
+mxbai-embed-large,9,un lait chocolaté pour le goûter des enfants,1,3700279306168,RÉCRÉ O'LÉ Goûter laitier Gourdes Multivariétés 12x85g,desserts_aromatises,boissons_lactees,0.7474
+mxbai-embed-large,9,un lait chocolaté pour le goûter des enfants,2,3181550000508,MON PREMIER CACOLAC BRICK 20 CL,boissons_lactees,boissons_lactees,0.7369
+mxbai-embed-large,9,un lait chocolaté pour le goûter des enfants,3,3533631744991,Candy'up Edition Limitée,boissons_lactees,boissons_lactees,0.7365
+mxbai-embed-large,9,un lait chocolaté pour le goûter des enfants,4,20091286,lait chocolaté,boissons_lactees,boissons_lactees,0.729
+mxbai-embed-large,9,un lait chocolaté pour le goûter des enfants,5,3023290633236,La Laitière Mousse Au Chocolat,desserts_aromatises,boissons_lactees,0.729
+mxbai-embed-large,10,une boisson au soja goût vanille pour une clientèle vegan,1,3256224809746,"Dessert végétal soja au chocolat, brique 530g",boissons_vegetales,boissons_vegetales,0.7792
+mxbai-embed-large,10,une boisson au soja goût vanille pour une clientèle vegan,2,325622480974600,"Dessert végétal soja au chocolat, brique 530g",boissons_vegetales,boissons_vegetales,0.779
+mxbai-embed-large,10,une boisson au soja goût vanille pour une clientèle vegan,3,3257985312964,Boisson au soja vanille,boissons_vegetales,boissons_vegetales,0.7697
+mxbai-embed-large,10,une boisson au soja goût vanille pour une clientèle vegan,4,5411188649458,Vanille vegan,desserts_aromatises,boissons_vegetales,0.7646
+mxbai-embed-large,10,une boisson au soja goût vanille pour une clientèle vegan,5,3564707105590,Boisson soja au chocolat,boissons_vegetales,boissons_vegetales,0.7493
+mxbai-embed-large,11,"une eau avec un petit goût de fruits rouges, sans sucre",1,2023790999994,Soda goût Citron-Citron Vert,boissons_aromatisees,boissons_aromatisees,0.7607
+mxbai-embed-large,11,"une eau avec un petit goût de fruits rouges, sans sucre",2,8480017506894,Leche y fruta (sin grasas),boissons_lactees,boissons_aromatisees,0.75
+mxbai-embed-large,11,"une eau avec un petit goût de fruits rouges, sans sucre",3,3258561300696,Thé Glacé Goût Mangue,boissons_aromatisees,boissons_aromatisees,0.743
+mxbai-embed-large,11,"une eau avec un petit goût de fruits rouges, sans sucre",4,5056784900635,Ultra Strawberry Dreams,boissons_aromatisees,boissons_aromatisees,0.742
+mxbai-embed-large,11,"une eau avec un petit goût de fruits rouges, sans sucre",5,8410261642420,Pineapple and guava,boissons_aromatisees,boissons_aromatisees,0.7409
+mxbai-embed-large,12,un yaourt onctueux à la noix de coco,1,3770003245254,Yaourts Fermiers Noix de Coco,desserts_aromatises,desserts_aromatises,0.8359
+mxbai-embed-large,12,un yaourt onctueux à la noix de coco,2,3278690075630,Yaourt au lait entier saveur coco,desserts_aromatises,desserts_aromatises,0.781
+mxbai-embed-large,12,un yaourt onctueux à la noix de coco,3,3596710538171,Yaourt au lait entier à l'arôme naturel de : fraise - citron - noix de coco - vanille,desserts_aromatises,desserts_aromatises,0.7673
+mxbai-embed-large,12,un yaourt onctueux à la noix de coco,4,3222477234277,Yaourt à boire lait de coco citron vert,boissons_lactees,desserts_aromatises,0.7618
+mxbai-embed-large,12,un yaourt onctueux à la noix de coco,5,3329770063884,"Spécialité végétale fermentée à base de lait de coco, à la Mangue-Passion, aromatisée",desserts_aromatises,desserts_aromatises,0.7581
