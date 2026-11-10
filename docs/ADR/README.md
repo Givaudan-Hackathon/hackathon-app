@@ -14,6 +14,10 @@ les tâches et les vérifications. Ces trois outils sont complémentaires.
 | [0005](0005-collaboration-et-depot-public.md) | Collaboration, qualité et dépôt public             | Accepté ; visibilité autorisée par Christopher       |
 | [0006](0006-integration-sequentielle.md)      | Intégration séquentielle des ateliers dans develop | Accepté ; remplace l’ordre de revue de l’ADR 0005    |
 
+Nouvelle proposition à relire : [0007 — Organisation du dépôt](0007-organisation-du-depot.md).
+Les résultats de l’exploration et la procédure de reproduction sont conservés
+dans le [Spike #13](https://github.com/Givaudan-Hackathon/hackathon-app/issues/13).
+
 Créer un fichier numéroté pour chaque décision technique significative avec :
 date, statut, contexte, options envisagées, décision et conséquences.
 Un statut « Accepté » indique un choix, pas une installation terminée.
