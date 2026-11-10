@@ -28,6 +28,8 @@ Une pull request de `develop` vers `main` prépare une version démontrable, sel
 
 La collaboration, les contrôles de qualité et l'ordre de revue des PR sont
 décrits dans le [suivi de l'atelier 2](docs/SUIVI-APRES-MIDI.md).
+Le [guide du tableau Hackathon](docs/TABLEAU-HACKATHON.md) décrit les colonnes,
+les critères Ready/Done, les accès et le parcours d'un ticket jusqu'à la démo.
 
 1. Cloner le dépôt dans le système de fichiers Linux de WSL (sous Windows),
    avec Docker Desktop et VS Code / Dev Containers disponibles.
