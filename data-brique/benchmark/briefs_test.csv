@@ -1,0 +1,16 @@
+id,type,brief,division_attendue,query_category_attendue,arome_attendu
+1,persona_lou,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré",flavors,desserts_aromatises,pistache
+2,baseline,"boisson protéinée vanille pour sportifs, base pois",flavors,boissons_proteinees,vanille
+3,baseline,arôme fraise pour yaourt à boire,flavors,boissons_lactees,fraise
+4,baseline,sirop goût menthe pour cafés,flavors,boissons_aromatisees,menthe
+5,difficile_synonyme,"un shake protéiné à prendre après la muscu, goût chocolat",flavors,boissons_proteinees,chocolat
+6,difficile_synonyme,"une boisson sans lait pour le petit-déjeuner, goût noisette",flavors,boissons_vegetales,noisette
+7,difficile_synonyme,"une petite crème qui a le goût d'enfance, comme chez mamie",flavors,desserts_aromatises,vanille|caramel
+8,courant,une limonade pétillante au citron pour l'été,flavors,boissons_aromatisees,citron
+9,courant,un lait chocolaté pour le goûter des enfants,flavors,boissons_lactees,chocolat
+10,courant,une boisson au soja goût vanille pour une clientèle vegan,flavors,boissons_vegetales,vanille
+11,courant,"une eau avec un petit goût de fruits rouges, sans sucre",flavors,boissons_aromatisees,fruits rouges
+12,courant,un yaourt onctueux à la noix de coco,flavors,desserts_aromatises,coco
+13,fragrance,une odeur de lavande pour mes savons faits main,fragrance,savons,lavande
+14,fragrance,un gel douche qui sent bon les agrumes,fragrance,gels_douche,agrume|citron|orange|bergamote|pamplemousse
+15,fragrance,un parfum léger et fleuri pour femme,fragrance,parfums,fleur|floral|fleuri|rose|jasmin|muguet

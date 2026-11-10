@@ -1,0 +1,113 @@
+{
+  "date": "2026-11-10T14:14:26",
+  "config": {
+    "os": "Windows 11 (10.0.26200)",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13420H",
+    "coeurs_physiques": 8,
+    "threads": 12,
+    "ram_go": 15.6,
+    "gpu": "Intel(R) UHD Graphics",
+    "python": "3.12.10",
+    "ollama": "0.40.16"
+  },
+  "recherche": [
+    {
+      "modele": "tfidf (baseline)",
+      "texte_indexe": "complet",
+      "indexation_s": 0.46251620003022254,
+      "cache": false,
+      "chargement_s": 0.0,
+      "vram_octets": 0,
+      "categorie_top5_pct": 83.33333333333334,
+      "categorie_rang1_pct": 66.66666666666666,
+      "precision_top5_pct": 56.66666666666668,
+      "arome_dans_nom_top5_pct": 100.0,
+      "ms_par_requete": 2.0703166568030915
+    },
+    {
+      "modele": "nomic-embed-text",
+      "texte_indexe": "nom + categorie + 300 car.",
+      "indexation_s": 156.5987976999022,
+      "cache": true,
+      "chargement_s": 0.8822310999967158,
+      "vram_octets": 0,
+      "categorie_top5_pct": 100.0,
+      "categorie_rang1_pct": 83.33333333333334,
+      "precision_top5_pct": 76.66666666666666,
+      "arome_dans_nom_top5_pct": 100.0,
+      "ms_par_requete": 77.09499165260543
+    },
+    {
+      "modele": "bge-m3",
+      "texte_indexe": "nom + categorie + 300 car.",
+      "indexation_s": 587.528285099892,
+      "cache": true,
+      "chargement_s": 3.5858193000312895,
+      "vram_octets": 0,
+      "categorie_top5_pct": 100.0,
+      "categorie_rang1_pct": 100.0,
+      "precision_top5_pct": 86.66666666666667,
+      "arome_dans_nom_top5_pct": 91.66666666666666,
+      "ms_par_requete": 78.92703334800899
+    },
+    {
+      "modele": "mxbai-embed-large",
+      "texte_indexe": "nom + categorie + 300 car.",
+      "indexation_s": 735.7846556000877,
+      "cache": true,
+      "chargement_s": 1.205755200004205,
+      "vram_octets": 0,
+      "categorie_top5_pct": 100.0,
+      "categorie_rang1_pct": 75.0,
+      "precision_top5_pct": 63.33333333333332,
+      "arome_dans_nom_top5_pct": 83.33333333333334,
+      "ms_par_requete": 94.21269172647347
+    }
+  ],
+  "llm": [
+    {
+      "modele": "mots-cles (baseline)",
+      "chargement_s": 0.0,
+      "vram_octets": 0,
+      "division_pct": 93.33333333333333,
+      "json_valide_pct": null,
+      "arome_principal_pct": null,
+      "s_par_brief": 0.0
+    },
+    {
+      "modele": "qwen2.5:1.5b",
+      "chargement_s": 5.442887300159782,
+      "vram_octets": 0,
+      "division_pct": 93.33333333333333,
+      "json_valide_pct": 100.0,
+      "arome_principal_pct": 86.66666666666667,
+      "s_par_brief": 1.7874743667120734
+    },
+    {
+      "modele": "qwen2.5:3b",
+      "chargement_s": 8.541965200100094,
+      "vram_octets": 0,
+      "division_pct": 100.0,
+      "json_valide_pct": 100.0,
+      "arome_principal_pct": 86.66666666666667,
+      "s_par_brief": 2.9355367133859547
+    },
+    {
+      "modele": "llama3.2:3b",
+      "chargement_s": 12.263667699880898,
+      "vram_octets": 0,
+      "division_pct": 100.0,
+      "json_valide_pct": 100.0,
+      "arome_principal_pct": 100.0,
+      "s_par_brief": 4.016044886643067
+    }
+  ],
+  "digests": {
+    "nomic-embed-text": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+    "bge-m3": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+    "mxbai-embed-large": "468836162de7f81e041c43663fedbbba921dcea9b9fefea135685a39b2d83dd8",
+    "qwen2.5:1.5b": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+    "qwen2.5:3b": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+    "llama3.2:3b": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72"
+  }
+}

@@ -30,3 +30,6 @@ data/processed/catalogue_complet/*
 *.jsonl
 *.jsonl.gz
 *.zip
+
+# Vecteurs d'embeddings du benchmark (regeneres par benchmark/run_benchmark.py)
+benchmark/cache/
