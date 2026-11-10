@@ -4,6 +4,7 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.pytest_cache/
 
 # Notes de travail locales (contenu versionne dans docs/brief_data.md)
 CLAUDE.md

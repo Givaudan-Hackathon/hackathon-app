@@ -1,8 +1,12 @@
 pandas<3  # pandas 3.x DLL bloque par Windows Application Control
 requests
 python-dotenv
-fastapi
-uvicorn
+fastapi==0.162.2
+uvicorn==0.54.0
 scikit-learn
 jupyter
 duckdb==2.0.0
+nbformat==5.11.1
+# tests
+pytest==9.2.0
+httpx2==2.16.0  # client de fastapi.testclient (httpx deprecie par Starlette)
