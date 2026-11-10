@@ -9,12 +9,21 @@ __pycache__/
 CLAUDE.md
 
 # Exports complets volumineux (dumps OFF/OBF, Sirene, IFRA) : jamais versionnes
+# -> retelecharger avec scripts/extract_exports.py (revision figee)
 data/raw/*
 !data/raw/.gitkeep
-!data/raw/off_obf_sample.csv
-!data/raw/off_obf_sample.meta.json
+!data/raw/off_obf_sample_v0.csv
+!data/raw/off_obf_sample_v0.meta.json
+
+# Jeux de donnees constitues : seuls les fichiers listes sont versionnes
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/sample_v1.csv
+!data/processed/sample_v1.meta.json
+!data/processed/catalogue_complet/
+data/processed/catalogue_complet/*
+!data/processed/catalogue_complet/flavors_catalogue_complet.csv
+
 *.parquet
 *.csv.gz
 *.jsonl

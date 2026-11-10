@@ -1,0 +1,81 @@
+{
+  "fichier": "sample_v1.csv",
+  "catalogue_complet": "catalogue_complet/flavors_catalogue_complet.csv",
+  "sources": {
+    "off": "Open Food Facts",
+    "obf": "Open Beauty Facts"
+  },
+  "export": "https://huggingface.co/datasets/openfoodfacts/product-database",
+  "revision_export": "99d3492aa6986a56a13a272c5314e80fa3850d25",
+  "licence": "ODbL 1.0 (base) / DbCL (contenu)",
+  "date_constitution": "2026-11-10T10:00:50+00:00",
+  "filtres": {
+    "commun": "countries_tags contient en:france, lang = fr, non obsolete",
+    "flavors": "ingredients mentionnant un arome, hors fromages/biscuits/alcools",
+    "fragrance": "ingredients remplis ; deodorants, 2-en-1 et savons de rasage parfumes"
+  },
+  "echantillonnage": {
+    "flavors": "200 par query_category, graine 42",
+    "fragrance": "exhaustif"
+  },
+  "n_catalogue_flavors": 8943,
+  "n_lignes": 2193,
+  "par_query_category": [
+    {
+      "division": "flavors",
+      "query_category": "boissons_aromatisees",
+      "n": 200
+    },
+    {
+      "division": "flavors",
+      "query_category": "boissons_lactees",
+      "n": 200
+    },
+    {
+      "division": "flavors",
+      "query_category": "boissons_proteinees",
+      "n": 200
+    },
+    {
+      "division": "flavors",
+      "query_category": "boissons_vegetales",
+      "n": 200
+    },
+    {
+      "division": "flavors",
+      "query_category": "desserts_aromatises",
+      "n": 200
+    },
+    {
+      "division": "fragrance",
+      "query_category": "deodorants",
+      "n": 315
+    },
+    {
+      "division": "fragrance",
+      "query_category": "gels_douche",
+      "n": 400
+    },
+    {
+      "division": "fragrance",
+      "query_category": "parfums",
+      "n": 88
+    },
+    {
+      "division": "fragrance",
+      "query_category": "savons",
+      "n": 315
+    },
+    {
+      "division": "fragrance",
+      "query_category": "savons_rasage",
+      "n": 3
+    },
+    {
+      "division": "fragrance",
+      "query_category": "shampoings_gels_douche",
+      "n": 72
+    }
+  ],
+  "donnees_personnelles": "aucune (champs contributeurs exclus a l'extraction)"
+}

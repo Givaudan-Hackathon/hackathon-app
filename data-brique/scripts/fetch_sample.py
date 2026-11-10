@@ -1,4 +1,6 @@
-"""Premier echantillon Open Food Facts / Open Beauty Facts.
+"""Echantillon v0 (9 nov.) Open Food Facts / Open Beauty Facts via l'API /search.
+
+Remplace par la v1 (scripts/extract_exports.py + build_sample_v1.py), conserve pour comparaison.
 
 Respecte la doc API OFF : User-Agent identifiant, <= 10 req/min sur /search.
 Pour du volume, utiliser les dumps officiels (https://world.openfoodfacts.org/data).
@@ -71,7 +73,7 @@ def main() -> None:
     df = pd.DataFrame(rows).drop_duplicates(subset=["source", "code"])
     for col in ("categories_tags", "labels_tags", "countries_tags"):
         df[col] = df[col].apply(lambda v: "|".join(v) if isinstance(v, list) else v)
-    out = RAW_DIR / "off_obf_sample.csv"
+    out = RAW_DIR / "off_obf_sample_v0.csv"
     df.to_csv(out, index=False, encoding="utf-8")
 
     meta = {
@@ -84,7 +86,7 @@ def main() -> None:
         "n_lignes": len(df),
         "donnees_personnelles": "aucune (champs produit uniquement)",
     }
-    (RAW_DIR / "off_obf_sample.meta.json").write_text(
+    (RAW_DIR / "off_obf_sample_v0.meta.json").write_text(
         json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"-> {out} ({len(df)} lignes)")
 

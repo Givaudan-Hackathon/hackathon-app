@@ -5,3 +5,4 @@ fastapi
 uvicorn
 scikit-learn
 jupyter
+duckdb==2.0.0
