@@ -121,36 +121,3 @@ est traitée par l’auteur. Si tout est en cours, finir avant de commencer autr
 Avant une démo, préparer une PR de `develop` vers `main`, avec CI et revue.
 La démonstration au Product se fait sur `main`, à partir des critères d’acceptation.
 Après la démo, prévoir quinze minutes de rétro : garder, arrêter, essayer.
-
-## Premiers tickets
-
-- [#5 — Ajouter les modèles de tickets](https://github.com/Givaudan-Hackathon/hackathon-app/issues/5).
-- [#6 — Valider le démarrage depuis un clone par un coéquipier](https://github.com/Givaudan-Hackathon/hackathon-app/issues/6) : attend un volontaire.
-- [#7 — Définir et prioriser le backlog du MVP avec le Product](https://github.com/Givaudan-Hackathon/hackathon-app/issues/7) : attend le cadrage métier.
-
-## Configuration vérifiée le 10 novembre 2026
-
-La configuration du projet est appliquée et contrôlée par l’API GitHub et dans
-l’interface de Projects :
-
-- Projet privé lié à `hackathon-app`, également choisi comme dépôt par défaut.
-- Cinq options Status dans l’ordre du cours, avec leurs descriptions ; les
-  identifiants existants ont été conservés pour préserver les cartes et workflows.
-- Size en choix unique S, M, L, avec les durées dans les descriptions.
-- Rôle de base **No access** ; tech-leads Admin, data et product Write,
-  evaluation Read. Le propriétaire conserve son accès Admin.
-- Auto-add actif sur `hackathon-app`, filtre exact `is:issue` ; Item added
-  attribue Backlog ; Pull request linked to issue attribue In review ; Item closed
-  attribue Done. Ces destinations ont été contrôlées dans l’interface.
-- Vues Board et Daily avec leurs colonnes groupées par Status ; Table et Mon
-  travail avec leurs filtres enregistrés et les champs Title, Assignees, Status, Size.
-- Type Spike présent dans l’organisation ; squash activé avec le titre de PR
-  comme titre de commit ; branche par défaut `develop`.
-- Trois issues de type Task, estimées S : #5 en In review, #6 et #7 en Backlog.
-  La PR #8 est bien liée au ticket #5 par `Closes #5`.
-
-Les formulaires et ce guide sont proposés dans la
-[PR #8](https://github.com/Givaudan-Hackathon/hackathon-app/pull/8). Ils attendent
-une revue et une fusion dans `develop` avant que GitHub propose les formulaires.
-Le cadrage métier, l’accord de l’équipe sur Ready/Done et le test humain du clone
-restent suivis dans les tickets #7 et #6 ; ils ne sont pas déclarés réalisés.

@@ -4,8 +4,9 @@ Configuration reprise du [cours : la base de données](https://learn.glassworks.
 
 ## Démarrer et vérifier
 
-Après ajout du service `db`, lancer `Dev Containers: Rebuild Container` depuis
-la palette de commandes VS Code. Le service `dev` attend le healthcheck PostgreSQL.
+Ouvrir le projet avec `Dev Containers: Reopen in Container` depuis la palette
+de commandes VS Code. Après une modification de Compose, utiliser
+`Dev Containers: Rebuild Container`. Le service `dev` attend le healthcheck PostgreSQL.
 
 Dans le terminal du conteneur :
 
@@ -13,8 +14,9 @@ Dans le terminal du conteneur :
 psql postgres://app:app@db:5432/app -v ON_ERROR_STOP=1 -c "SELECT id, question, answer, created_at FROM questions ORDER BY id"
 ```
 
-Résultat attendu : deux lignes, avec les réponses `Paris.` et `Deux semaines.`.
-Ces lignes sont des données de démonstration du cours.
+Sur une base nouvellement initialisée, les exemples incluent les réponses
+`Paris.` et `Deux semaines.`. Les échanges créés ensuite apparaissent également
+dans cette liste ; les exemples sont des données de démonstration du cours.
 
 Depuis un terminal WSL, dans le dépôt, les contrôles Docker sont :
 
@@ -54,11 +56,3 @@ docker compose logs db
 
 La ligne doit être présente après reconstruction. Les données de test ne sont
 pas réinsérées à chaque démarrage.
-
-## État de validation
-
-Le 9 novembre 2026, la connexion depuis le dev container et les deux questions
-de démonstration ont été vérifiées directement par SQL. Christopher a confirmé
-que la question temporaire reste présente après `Dev Containers: Rebuild Container` :
-le test de persistance est réussi. La base contient de nouveau uniquement les
-deux questions de démonstration après nettoyage.

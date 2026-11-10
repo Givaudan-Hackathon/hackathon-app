@@ -150,9 +150,3 @@ lisible par `evaluation`. Fusionner les livrables et vérifier la CI avant de
 publier le tag sur le `develop` retenu. La date limite est le 10 novembre à 18 h,
 heure de Paris ; cette PR ne crée pas le tag et ne vaut pas acceptation des ADR
 proposés. [Consignes d’évaluation](https://learn.glassworks.tech/fullstack-setup/hackathon/evaluation).
-
-Les vérifications précédentes sont conservées dans le
-[suivi de l’atelier 1](docs/SUIVI-MATIN.md), le
-[suivi de l’atelier 2](docs/SUIVI-APRES-MIDI.md), le
-[guide WSL](docs/WSL.md) et les
-[explications du dev container](docs/DEVCONTAINER.md).
