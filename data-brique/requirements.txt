@@ -3,10 +3,10 @@ requests
 python-dotenv
 fastapi==0.162.2
 uvicorn==0.54.0
-scikit-learn
+scikit-learn==1.9.1
 jupyter
 duckdb==2.0.0
 nbformat==5.11.1
 # tests
 pytest==9.2.0
-httpx2==2.16.0  # client de fastapi.testclient (httpx deprecie par Starlette)
+httpx==0.28.1  # client de fastapi.testclient (httpx2 non retenu : provenance PyPI non verifiable)
