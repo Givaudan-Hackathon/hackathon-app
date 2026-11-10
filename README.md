@@ -1,85 +1,158 @@
-# Hackathon HETIC × Givaudan 2026
+# Hackathon HETIC × Givaudan 2026 — Équipe 15
 
-Dépôt collaboratif de l'application développée dans le cadre du hackathon HETIC × Givaudan 2026.
+Nous développons une plateforme de commande IA pour les **petits clients qui
+souhaitent décrire un projet d’arômes alimentaires avec leurs propres mots**,
+clarifier leur besoin et déposer un brief structuré. Le parcours est à valider
+avec les Product et les utilisateurs : les hypothèses et les preuves métier
+restent dans le workbook d’équipe.
 
-Pour l'atelier, nous suivons la stack de test du cours :
+L’équipe comprend **deux Tech leads, deux Data et deux Product**. Le développement
+sert au prototype commun. Le [Spike #13](https://github.com/Givaudan-Hackathon/hackathon-app/issues/13)
+compare l’organisation des sources et conserve les essais. Les décisions durables
+se trouvent dans le [journal des ADR](docs/adr/README.md).
 
-- API : Express et TypeScript, avec PostgreSQL 17 et Node 24.
-- Front : Vite et TypeScript.
-- IA : Ollama sur Windows avec le modèle local `llama3.2:1b`.
+## État du code et choix proposés
 
-Le dev container démarre : Node 24, npm 11 et le client PostgreSQL 17 sont vérifiés.
-PostgreSQL est accessible et la conservation des données après reconstruction
-est validée. L'API Express et le front Vite de test sont en place.
-Consulter le [plan et les vérifications](docs/SUIVI-MATIN.md), le
-[guide WSL](docs/WSL.md), les [explications du dev container](docs/DEVCONTAINER.md)
-et le [journal des décisions (ADR)](docs/ADR/README.md).
+| Partie           | Code actuellement présent                                  | Proposition pour le produit                                 |
+| ---------------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
+| Interface `web/` | Vite et TypeScript, formulaire de test                     | React avec Vite et TypeScript, ADR 0008                     |
+| API `api/`       | Express/TypeScript, PostgreSQL et appel IA                 | NestJS/TypeScript, ADR 0009                                 |
+| Data             | Python/FastAPI, moteur et tests dans `feature/data-brique` | Service Python conservé ; intégration à relire avec la Data |
+| Organisation     | Workspaces npm `api/` et `web/`, base dans `db/`           | Dépôt commun par composant, ADR 0007                        |
 
-Le formulaire appelle maintenant `POST /api/questions`, qui interroge Ollama
-et enregistre l'échange en base. Installer le serveur et le modèle sur Windows
-avant de l'utiliser ; voir le [guide IA](docs/IA.md) pour les étapes et leur rôle.
+Les deux Tech leads maîtrisent React et NestJS. Les ADR 0007 à 0010 restent au
+statut **Proposée**. Cette branche prépare la documentation et le contrat de m1 ;
+les migrations React/NestJS et l’intégration de la branche Data ne sont pas
+réalisées par la présence de ces documents.
 
-La branche d'intégration est `develop`. Chaque branche de travail est mise à
-jour depuis `develop`, puis relue via une pull request vers cette branche.
-Une pull request de `develop` vers `main` prépare une version démontrable, selon le
-[GitFlow du cours](https://learn.glassworks.tech/fullstack-setup/collaboration/gitflow).
+Le socle de test actuel affiche l’état de PostgreSQL et les échanges enregistrés.
+Son formulaire appelle `POST /api/questions`, interroge Ollama puis conserve la
+réponse. Ce test technique ne démontre pas encore le parcours de brief client.
+Ollama Windows avec `llama3.2:1b` est le choix d’atelier décrit dans l’ADR 0002 ;
+le fournisseur et le modèle du produit restent à évaluer avec la Data.
 
-## Démarrer l'environnement
+## Organisation des composants
 
-La collaboration, les contrôles de qualité et l'ordre de revue des PR sont
-décrits dans le [suivi de l'atelier 2](docs/SUIVI-APRES-MIDI.md).
-Le [guide du tableau Hackathon](docs/TABLEAU-HACKATHON.md) décrit les colonnes,
-les critères Ready/Done, les accès et le parcours d'un ticket jusqu'à la démo.
+```text
+web/                     Interface et dépendances npm du front
+api/                     API applicative et dépendances npm du back
+  src/index.ts           Routes du socle Express actuel
+data-brique/             Source Data dans feature/data-brique, à intégrer
+  api/                   API FastAPI
+  src/                   Moteur Python
+  notebooks/             Expérimentations
+  scripts/               Préparation des données
+  tests/                 Tests Python
+  data/                  Échantillons utilisés par le moteur
+db/init/                 Schéma SQL et données initiales du socle
+scripts/                 Vérifications transversales
+docs/adr/                Décisions et alternatives
+.github/                 CI, formulaires et responsabilités de revue
+.devcontainer/           Environnement de référence
+compose.yaml             Dev container et PostgreSQL actuels
+openapi.yaml             Contrat des trois opérations de l’API actuelle
+AGENTS.md                Instructions adaptées aux assistants de code
+```
 
-1. Cloner le dépôt dans le système de fichiers Linux de WSL (sous Windows),
-   avec Docker Desktop et VS Code / Dev Containers disponibles.
-2. Ouvrir le dossier dans VS Code puis lancer `Dev Containers: Reopen in Container`.
-   Attendre la fin de l'installation automatique des dépendances et de la
-   création de `api/.env` depuis `api/.env.example` s'il n'existe pas déjà.
-   Après modification de Compose ou du dev container, lancer
-   `Dev Containers: Rebuild Container`.
-3. Dans le terminal du conteneur, à la racine du projet :
+Chaque service conserve ses dépendances. Les workspaces npm ne remplacent pas
+l’environnement virtuel Python. Les rôles servent à répartir les responsabilités
+et les revues ; les dossiers correspondent aux composants.
+
+Les consignes des assistants suivent la même organisation :
+
+```text
+AGENTS.md                  Règles communes au dépôt
+web/AGENTS.md              Consignes de l’interface, maintenues par les Tech leads
+api/AGENTS.md              Consignes de l’API, maintenues par les Tech leads
+data-brique/AGENTS.md      À rédiger et maintenir par les Data dans leur branche
+```
+
+Le fichier racine donne le contexte et les règles partagées. Chaque fichier local
+précise les chemins, commandes et contraintes de son composant, sans recopier le
+README ni les ADR. Les modifications du fichier Data sont relues par l’équipe
+`data` via CODEOWNERS ; cette règle de revue ne crée pas de droits d’accès séparés.
+
+## Démarrer le socle existant
+
+Prérequis : Git, Docker Desktop, VS Code et Dev Containers. Sous Windows,
+utiliser le système de fichiers Linux de WSL. L’image de référence fournit
+Node 24, npm 11 et le client PostgreSQL 17.
+
+1. Cloner le dépôt, puis ouvrir son dossier dans VS Code.
+2. Lancer **Dev Containers: Reopen in Container**. L’installation automatique
+   exécute `npm ci` et crée `api/.env` depuis `api/.env.example` seulement si le
+   fichier est absent. Après une modification du conteneur ou de Compose,
+   utiliser **Dev Containers: Rebuild Container**.
+3. Dans le terminal du conteneur, à la racine :
 
    ```bash
    npm run dev
    ```
 
-Ouvrir [le front](http://localhost:5173) : la page doit afficher « API OK »,
-la version PostgreSQL et les deux questions de test. VS Code transfère les ports
-3000 et 5173 ; vérifier l'onglet **Ports** si le navigateur ne répond pas.
-L'installation est exécutée par `postCreateCommand` à la création ou à la
-reconstruction du conteneur. Un fichier `api/.env` existant est conservé.
-Pour relancer manuellement la préparation depuis la racine du projet :
+Ouvrir [le front Vite](http://localhost:5173). Il doit afficher l’état de l’API,
+la version PostgreSQL et les derniers échanges. Les ports 3000 et 5173 sont
+transférés par VS Code ; vérifier l’onglet **Ports** si nécessaire. Ctrl+C arrête
+les serveurs. `npm run dev -w api` et `npm run dev -w web` les lancent séparément.
 
-```bash
-npm ci && (test -f api/.env || cp api/.env.example api/.env)
-```
-
-## Comprendre le test API et front
-
-L'organisation suit le [cours : tester la stack](https://learn.glassworks.tech/fullstack-setup/environnement/tester-la-stack).
-
-- `api/` contient Express et TypeScript. La connexion PostgreSQL vient de
-  `api/.env`, ignoré par Git ; les valeurs locales sont dans `api/.env.example`.
-- `web/` contient Vite et TypeScript. Les appels `/api` du navigateur passent
-  par le proxy Vite vers l'API sur le port 3000.
-- Le `package.json` racine relie les deux workspaces npm ; un seul
-  `package-lock.json` fixe toutes les versions installées par `npm ci`.
-- `npm run dev` démarre les deux serveurs ; **Ctrl+C** les arrête.
-  `npm run dev -w api` ou `npm run dev -w web` les démarre séparément.
-
-Dans un second terminal, vérifier l'API et compiler les deux workspaces :
+Pour utiliser le formulaire IA, démarrer Ollama sur l’hôte et installer le modèle
+indiqué dans `api/.env`. Le conteneur utilise `host.docker.internal` pour joindre
+l’hôte. Consulter le [guide IA](docs/IA.md). Les secrets et la configuration locale
+restent dans `api/.env`, ignoré par Git.
 
 ```bash
 curl --fail http://localhost:3000/api/health
 curl --fail http://localhost:3000/api/questions
+npm run lint
+npm run format:check
 npm run build
 ```
 
-`/api/health` interroge réellement PostgreSQL et renvoie sa version.
-`/api/questions` renvoie les dix dernières questions, de la plus récente à la
-plus ancienne. Le front affiche les questions et leurs réponses ; son formulaire
-permet de créer une question et sa réponse avec Ollama à l'étape 8.
+Le [contrat OpenAPI](openapi.yaml), référencé par l’[ADR 0010](docs/adr/0010-contrat-openapi.md),
+décrit les routes réellement implémentées. Une migration de framework doit
+préserver ce contrat ou rendre ses changements explicites.
 
-Voir le [guide PostgreSQL](docs/BASE-DE-DONNEES.md) pour les contrôles SQL et
-le test de persistance.
+`db/init/` n’est exécuté qu’à l’initialisation de PostgreSQL : changer un script
+ne modifie pas une base existante. Les données locales sont dans `db/data/`,
+ignoré par Git. Voir le [guide PostgreSQL](docs/BASE-DE-DONNEES.md).
+
+Le Compose actuel démarre `dev` et `db`, puis attend le lancement manuel des
+serveurs. Le démarrage complet avec `docker compose up` seul reste à préparer
+pour la tranche verticale m2.
+
+## Travail avec la Data
+
+La source Data examinée est `feature/data-brique` au commit `148f6e4`. Elle
+expose `/sante` et `/recommander`, avec son propre contrat et ses dépendances.
+Le script suivant vérifie un service Data déjà lancé :
+
+```bash
+node scripts/verifier-api-data.mjs http://127.0.0.1:8000
+```
+
+Les résultats de l’essai et la procédure de reproduction sont dans le ticket #13.
+L’intégration de l’API applicative vers Data relève du
+[Spike #12](https://github.com/Givaudan-Hackathon/hackathon-app/issues/12).
+Les contrôles Python et le démarrage commun seront ajoutés avec l’intégration
+Data ; la CI actuelle vérifie les workspaces TypeScript.
+
+## Collaboration et jalon m1
+
+Une branche par ticket part de `develop`, puis une PR relue vise `develop`.
+Les protections de branche et le check `qualite` restent applicables. Le tableau
+[Hackathon](https://github.com/orgs/Givaudan-Hackathon/projects/1), ses critères
+Ready/Done et le cycle ticket → PR sont décrits dans le
+[guide du tableau](docs/TABLEAU-HACKATHON.md).
+
+Pour m1, vérifier au commit retenu : au moins deux ADR dont un sur un composant,
+`AGENTS.md` à la racine d’au moins 400 octets, un fichier OpenAPI et un ADR qui le
+cite. Le Project doit contenir au moins trois tickets, être lié au dépôt et
+lisible par `evaluation`. Fusionner les livrables et vérifier la CI avant de
+publier le tag sur le `develop` retenu. La date limite est le 10 novembre à 18 h,
+heure de Paris ; cette PR ne crée pas le tag et ne vaut pas acceptation des ADR
+proposés. [Consignes d’évaluation](https://learn.glassworks.tech/fullstack-setup/hackathon/evaluation).
+
+Les vérifications précédentes sont conservées dans le
+[suivi de l’atelier 1](docs/SUIVI-MATIN.md), le
+[suivi de l’atelier 2](docs/SUIVI-APRES-MIDI.md), le
+[guide WSL](docs/WSL.md) et les
+[explications du dev container](docs/DEVCONTAINER.md).

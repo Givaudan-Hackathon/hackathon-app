@@ -1,14 +1,14 @@
 # Atelier 2 — Collaboration : étapes et preuves
 
 Source : [atelier de l'après-midi](https://learn.glassworks.tech/fullstack-setup/collaboration/atelier).
-Les choix sont expliqués dans l'[ADR 0005](ADR/0005-collaboration-et-depot-public.md).
+Les choix sont expliqués dans l'[ADR 0005](adr/0005-collaboration-et-depot-public.md).
 Une vérification technique ne vaut pas approbation humaine du code.
 
 **La PR #2 est fusionnée dans `develop` au commit `92cc465`. La branche de la
 PR #3 reprend ce résultat via `5ee4b68`, sans conflit. La CI de cette mise à jour
 est verte et le check `qualite` est à nouveau obligatoire sur `main` et `develop`.
 La revue de la PR #3 doit porter sur son dernier commit avec une CI verte.**
-Voir l'[ADR 0006](ADR/0006-integration-sequentielle.md).
+Voir l'[ADR 0006](adr/0006-integration-sequentielle.md).
 
 ## Organisation et dépôt
 

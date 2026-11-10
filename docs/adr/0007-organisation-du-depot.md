@@ -36,7 +36,7 @@ web/          Interface Vite/TypeScript
 api/          API applicative Express/TypeScript
 data-brique/  API FastAPI, moteur, notebooks, scripts et tests Python
 db/           Schéma SQL et données initiales
-docs/ADR/     Décisions communes
+docs/adr/     Décisions communes
 ```
 
 Chaque composant conserve son code, ses tests, sa configuration et ses dépendances.

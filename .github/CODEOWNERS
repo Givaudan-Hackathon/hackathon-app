@@ -3,3 +3,9 @@
 /compose.yaml        @Givaudan-Hackathon/tech-leads
 /eslint.config.mjs   @Givaudan-Hackathon/tech-leads
 package.json         @Givaudan-Hackathon/tech-leads
+
+# Les consignes locales sont relues par l’équipe qui les maintient.
+/AGENTS.md                   @Givaudan-Hackathon/tech-leads
+/web/AGENTS.md               @Givaudan-Hackathon/tech-leads
+/api/AGENTS.md               @Givaudan-Hackathon/tech-leads
+/data-brique/AGENTS.md        @Givaudan-Hackathon/data

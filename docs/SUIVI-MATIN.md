@@ -55,7 +55,7 @@ une réponse réelle et son enregistrement en base sont vérifiés pour l'étape
 La configuration reste dans `api/.env`, ignoré par Git.
 
 Christopher a confirmé la stack d'exemple et le fournisseur Ollama. Voir le
-[journal des décisions (ADR)](ADR/README.md) pour les raisons des choix
+[journal des décisions (ADR)](adr/README.md) pour les raisons des choix
 et le statut des propositions. Le barème ne réserve pas de bonus à l'IA locale.
 
 ## Comment suivre les modifications

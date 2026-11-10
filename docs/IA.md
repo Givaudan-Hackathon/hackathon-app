@@ -1,7 +1,7 @@
 # Étape 8 — Ollama sur Windows
 
 Source : [L'IA — cours HETIC](https://learn.glassworks.tech/fullstack-setup/environnement/ia).
-Décision : [ADR 0002](ADR/0002-fournisseur-ia.md).
+Décision : [ADR 0002](adr/0002-fournisseur-ia.md).
 
 ## La chaîne à comprendre
 
