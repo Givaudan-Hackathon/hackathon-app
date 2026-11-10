@@ -4,20 +4,27 @@ const health = document.querySelector<HTMLParagraphElement>('#health')!;
 const list = document.querySelector<HTMLUListElement>('#questions')!;
 const form = document.querySelector<HTMLFormElement>('form')!;
 const button = form.querySelector<HTMLButtonElement>('button')!;
-const submitStatus = document.querySelector<HTMLParagraphElement>('#submit-status')!;
+const submitStatus =
+  document.querySelector<HTMLParagraphElement>('#submit-status')!;
 
 async function readJson<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, options);
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(typeof data?.error === 'string' ? data.error : `Erreur HTTP ${response.status}`);
+    throw new Error(
+      typeof data?.error === 'string'
+        ? data.error
+        : `Erreur HTTP ${response.status}`,
+    );
   }
   return data;
 }
 
 async function refresh() {
   try {
-    const status = await readJson<{ status: string; db: string }>('/api/health');
+    const status = await readJson<{ status: string; db: string }>(
+      '/api/health',
+    );
     const questions = await readJson<Question[]>('/api/questions');
     health.textContent = `API OK · ${status.db}`;
     list.replaceChildren(
@@ -28,7 +35,8 @@ async function refresh() {
       }),
     );
   } catch (error) {
-    health.textContent = "Impossible de charger les questions. Vérifier que l'API et la base sont démarrées.";
+    health.textContent =
+      "Impossible de charger les questions. Vérifier que l'API et la base sont démarrées.";
     console.error(error);
   }
 }
@@ -44,7 +52,8 @@ form.addEventListener('submit', async (event) => {
 
   button.disabled = true;
   form.setAttribute('aria-busy', 'true');
-  submitStatus.textContent = 'Réponse en cours… Le premier appel peut prendre plus de temps.';
+  submitStatus.textContent =
+    'Réponse en cours… Le premier appel peut prendre plus de temps.';
   try {
     await readJson<Question>('/api/questions', {
       method: 'POST',
@@ -55,7 +64,10 @@ form.addEventListener('submit', async (event) => {
     submitStatus.textContent = 'Question et réponse enregistrées.';
     await refresh();
   } catch (error) {
-    submitStatus.textContent = error instanceof Error ? error.message : "Impossible d'obtenir une réponse.";
+    submitStatus.textContent =
+      error instanceof Error
+        ? error.message
+        : "Impossible d'obtenir une réponse.";
     console.error(error);
   } finally {
     button.disabled = false;

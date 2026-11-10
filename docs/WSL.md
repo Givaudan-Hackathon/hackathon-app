@@ -6,11 +6,11 @@ VS Code reste l'interface visible sous Windows et Docker fournit les conteneurs.
 
 ## Les chemins
 
-| Vue | Chemin |
-| --- | --- |
-| Copie Windows initiale | `C:\Users\Christopher\Desktop\hackathon-app` |
-| Même copie Windows, vue depuis Ubuntu | `/mnt/c/Users/Christopher/Desktop/hackathon-app` |
-| Nouvelle copie Linux, depuis Ubuntu | `/home/hristopherswl/projets/hackathon-app` |
+| Vue                                                | Chemin                                                            |
+| -------------------------------------------------- | ----------------------------------------------------------------- |
+| Copie Windows initiale                             | `C:\Users\Christopher\Desktop\hackathon-app`                      |
+| Même copie Windows, vue depuis Ubuntu              | `/mnt/c/Users/Christopher/Desktop/hackathon-app`                  |
+| Nouvelle copie Linux, depuis Ubuntu                | `/home/hristopherswl/projets/hackathon-app`                       |
 | Nouvelle copie Linux, depuis l'Explorateur Windows | `\\wsl.localhost\Ubuntu\home\hristopherswl\projets\hackathon-app` |
 
 `~` désigne ton répertoire personnel Linux, ici `/home/hristopherswl`.
