@@ -59,8 +59,9 @@ membre doit relire. L'équipe tech-leads compte actuellement Christopher seul ;
 ajouter les autres tech leads lorsqu'ils seront connus permettra les revues
 des futurs changements soumis à CODEOWNERS.
 
-Les résultats réels et les étapes humaines restantes sont dans le
-[suivi de l'atelier 2](../SUIVI-APRES-MIDI.md).
+Les changements d’environnement et de collaboration restent consultables dans
+les [PR #2](https://github.com/Givaudan-Hackathon/hackathon-app/pull/2) et
+[PR #3](https://github.com/Givaudan-Hackathon/hackathon-app/pull/3).
 
 Sources : [atelier](https://learn.glassworks.tech/fullstack-setup/collaboration/atelier),
 [GitFlow](https://learn.glassworks.tech/fullstack-setup/collaboration/gitflow),
