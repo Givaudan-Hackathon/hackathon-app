@@ -28,7 +28,9 @@ le framework applicatif.
 
 Retenir NestJS pour l’API applicative dans `api/`, compte tenu des compétences
 confirmées et du travail partagé sur plusieurs responsabilités métier. Conserver
-PostgreSQL et l’interface HTTP de la brique Data Python/FastAPI.
+la base PostgreSQL commune aux Data et aux Tech leads et l’interface HTTP de la
+brique Data Python/FastAPI. La connexion Data à PostgreSQL reste à intégrer et
+à vérifier dans sa branche.
 
 La migration doit préserver le contrat de test `openapi.yaml` ou en documenter
 explicitement les changements. Elle vérifiera les routes, codes d’erreur,

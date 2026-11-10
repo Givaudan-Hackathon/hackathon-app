@@ -16,7 +16,8 @@ et déposent un brief. Lire `README.md` pour l’état du socle et les choix pro
 - Avant de modifier `web/` ou `api/`, lire aussi leur `AGENTS.md` : la racine porte les règles communes et le fichier local précise son composant.
 - Les Data rédigent et maintiennent `data-brique/AGENTS.md` dans leur branche. Consulter ce fichier dès qu’il existe avant de modifier leur code ; son absence actuelle ne vaut pas validation des choix Data.
 - React et NestJS restent des propositions documentées dans `docs/adr/`, pas des dépendances déjà installées.
-- `db/init/` n’est joué qu’à l’initialisation de PostgreSQL ; modifier ses scripts ne met pas à jour une base existante.
+- `db/` définit la base PostgreSQL commune à l’API applicative et au service Data. Les Data et les Tech leads coordonnent ses évolutions de schéma et ses données initiales ; la connexion Data reste à intégrer et à vérifier.
+- `db/init/` n’est joué qu’à l’initialisation de PostgreSQL ; modifier ses scripts ne met pas à jour une base existante. Toute évolution doit préciser comment mettre à jour une base déjà initialisée.
 - Le fournisseur IA du socle est appelé par `ask()` dans `api/src/index.ts` ; ses valeurs viennent de `api/.env`.
 - Le script `scripts/verifier-api-data.mjs URL` vérifie le service Data par HTTP ; le dépôt commun ne confond pas dépendances Node et Python.
 - Une branche par ticket part de `develop` ; la PR vise `develop` et suit `.github/pull_request_template.md`.

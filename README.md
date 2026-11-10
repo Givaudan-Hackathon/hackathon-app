@@ -44,7 +44,8 @@ data-brique/             Source Data dans feature/data-brique, à intégrer
   scripts/               Préparation des données
   tests/                 Tests Python
   data/                  Échantillons utilisés par le moteur
-db/init/                 Schéma SQL et données initiales du socle
+db/                      PostgreSQL commun aux Data et aux Tech leads
+  init/                  Schéma SQL et données initiales partagés
 scripts/                 Vérifications transversales
 docs/adr/                Décisions et alternatives
 .github/                 CI, formulaires et responsabilités de revue
@@ -53,6 +54,13 @@ compose.yaml             Dev container et PostgreSQL actuels
 openapi.yaml             Contrat des trois opérations de l’API actuelle
 AGENTS.md                Instructions adaptées aux assistants de code
 ```
+
+La base PostgreSQL définie par `db/` et `compose.yaml` est commune à l’API
+applicative et au service Data. Les Data et les Tech leads coordonnent ses
+évolutions de schéma et ses données initiales ; les responsabilités de revue
+sont partagées. Chaque environnement de développement démarre son instance
+locale via Compose. La connexion du service Data à cette base reste à intégrer
+et à vérifier dans sa branche.
 
 Chaque service conserve ses dépendances. Les workspaces npm ne remplacent pas
 l’environnement virtuel Python. Les rôles servent à répartir les responsabilités

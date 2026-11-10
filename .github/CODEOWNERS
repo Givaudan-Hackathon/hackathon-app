@@ -9,3 +9,7 @@ package.json         @Givaudan-Hackathon/tech-leads
 /web/AGENTS.md               @Givaudan-Hackathon/tech-leads
 /api/AGENTS.md               @Givaudan-Hackathon/tech-leads
 /data-brique/AGENTS.md        @Givaudan-Hackathon/data
+
+# La base et sa documentation sont maintenues par les deux équipes.
+/db/                         @Givaudan-Hackathon/tech-leads @Givaudan-Hackathon/data
+/docs/BASE-DE-DONNEES.md      @Givaudan-Hackathon/tech-leads @Givaudan-Hackathon/data

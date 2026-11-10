@@ -1,6 +1,22 @@
-# PostgreSQL de développement
+# PostgreSQL commun aux Data et aux Tech leads
 
 Configuration reprise du [cours : la base de données](https://learn.glassworks.tech/fullstack-setup/environnement/base-de-donnees).
+
+## Responsabilité commune
+
+La base définie par `db/` et le service `db` de `compose.yaml` est destinée à
+l’API applicative et au service Data du même prototype. Les Data et les Tech
+leads maintiennent ensemble le schéma SQL et les données initiales. Les deux
+équipes sont identifiées dans CODEOWNERS pour `db/` et ce guide.
+
+Une évolution du schéma se coordonne entre les deux équipes et précise comment
+mettre à jour une base déjà initialisée. Les scripts `db/init/` ne constituent
+pas un mécanisme de migration pour une base existante.
+
+Chaque environnement de développement utilise son instance locale PostgreSQL
+lancée par Compose. L’API applicative s’y connecte déjà ; la connexion du service
+Data reste à intégrer et à vérifier dans sa branche. Les fichiers d’échantillons
+de `data-brique/data/` restent distincts du stockage PostgreSQL `db/data/`.
 
 ## Démarrer et vérifier
 

@@ -35,7 +35,7 @@ Conserver un dépôt `hackathon-app`, avec les composants regroupés ainsi :
 web/          Interface Vite/TypeScript
 api/          API applicative Express/TypeScript
 data-brique/  API FastAPI, moteur, notebooks, scripts et tests Python
-db/           Schéma SQL et données initiales
+db/           PostgreSQL commun aux Data et aux Tech leads
 docs/adr/     Décisions communes
 ```
 
@@ -44,8 +44,13 @@ Les workspaces npm couvrent `web/` et `api/` ; `data-brique/requirements.txt` et
 environnement virtuel couvrent Python. Compose, la CI et les instructions communes
 restent à la racine ou dans leurs dossiers existants.
 
+La base PostgreSQL définie par `db/` et Compose est commune à l’API applicative
+et au service Data. Les deux équipes coordonnent les modifications du schéma,
+les données initiales et la mise à jour des bases existantes. La connexion du
+service Data à PostgreSQL reste à intégrer et à vérifier dans sa branche.
+
 Les rôles se traduisent par les responsabilités de revue : Tech pour `web/` et
-`api/`, Data pour `data-brique/`, revue commune pour le contrat. CODEOWNERS ne
+`api/`, Data pour `data-brique/`, revue commune pour `db/` et le contrat. CODEOWNERS ne
 constitue pas une restriction d’accès aux dossiers. Une branche par ticket vise
 `develop` via PR.
 
