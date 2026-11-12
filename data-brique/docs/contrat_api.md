@@ -116,97 +116,169 @@ const resultat = await reponse.json();
   est inégale (bonne pour « sirop menthe » ou « yaourt à boire fraise », faible pour
   « boisson protéinée base pois »). Le `score` sert à trier, pas à afficher comme une note : les
   valeurs restent basses (souvent inférieures à 0,3) même pour de bons résultats.
-- **Stabilité** : les noms de champs ci-dessus ne changeront pas avec la V2 (jeudi). La V2 pourra
-  ajouter des champs (application, notes extraites) ; `version_modele` indiquera le modèle utilisé.
+- **Stabilité** : les noms de champs ci-dessus ne changent pas. La V2 est un endpoint séparé
+  (`POST /conversation`, ci-dessous).
 - **Catalogue** : 2 193 produits vendus en France. Pas de données de prix, de stock ni de clients.
 
 ---
 
-# Contrat V2 — assistant conversationnel V2.2
+# Contrat V2 — assistant conversationnel (`POST /conversation`)
 
-> **Statut : en ligne** sur la même API (port 8000, même URL ngrok), à côté de la V1. Il reprend
-> la sortie de `AssistantV22.repondre()` (`src/moteur_v22.py`). `/sante` et `/recommander`
-> ne changent pas : `/sante` renvoie toujours `baseline-v1`.
+> **Statut : en ligne** sur la même API (port 8000, même URL ngrok), à côté de la V1.
+> `/sante` et `/recommander` ne changent pas : `/sante` renvoie toujours `baseline-v1`. Les noms
+> de champs ci-dessous sont ceux du contrat envoyé à l'équipe Tech ; ils ne changeront pas.
 
-## `POST /conversation`
+Le client envoie un message par appel. Le serveur garde l'état de la session (ce qui a été
+compris, pistes proposées, piste choisie) par `session_id`. Chaque réponse contient **l'objet
+complet**, jamais un delta : le front peut remplacer tout son état par la dernière réponse.
 
-Un message du client par appel. Le serveur garde l'état de la conversation (projet, pistes,
-piste choisie) par `conversation_id`, en mémoire.
+## Requête
 
-- Au plus 500 conversations ; chacune est oubliée après 2 h sans message.
-- Un redémarrage du serveur efface toutes les conversations.
-- Un `conversation_id` inconnu ou expiré ouvre une nouvelle conversation, sous cet identifiant.
-
-Temps de réponse (mode rapide, catalogue complet, via ngrok) : 0,3 à 1,2 s. Il faut environ 5 s
-quand le message demande le modèle (arôme hors liste, ex. « durian »).
-
-### Requête
-
-| Champ             | Type    | Obligatoire        | Description                                                            |
-| ----------------- | ------- | ------------------ | ---------------------------------------------------------------------- |
-| `conversation_id` | string  | non                | Absent : nouvelle conversation (l'identifiant est renvoyé)             |
-| `message`         | string  | oui                | 1 à 500 caractères, en français                                        |
-| `reformuler`      | boolean | non (défaut false) | `true` : réponse reformulée par llama3.2:3b (environ 5 fois plus lent) |
+| Champ        | Type           | Obligatoire | Description                                                                                                      |
+| ------------ | -------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
+| `session_id` | string \| null | non         | `null`, absent ou inconnu : nouvelle session. L'identifiant est renvoyé ; le renvoyer à chaque message suivant.  |
+| `message`    | string         | oui\*       | Message du client, en français, 500 caractères au plus. \*Peut être vide (`""`) si `piste_id` est fourni.        |
+| `piste_id`   | string \| null | non         | `id` d'une piste de la dernière réponse : vaut choix de cette piste, quel que soit le message (bouton du front). |
 
 ```json
-{
-  "conversation_id": "c-42",
-  "message": "je prends la piste 1",
-  "reformuler": false
-}
+{ "session_id": "3f9c2a7b1d04", "message": "", "piste_id": "citron-vert" }
 ```
 
-### Réponse `200`
+## Réponse `200`
 
-| Champ                                    | Type             | Description                                                                                             |
-| ---------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------- |
-| `conversation_id`                        | string           | À renvoyer au message suivant                                                                           |
-| `intention`                              | string           | `nouvelle_demande`, `precision`, `question_piste`, `choix_piste`, `demande_echantillons`, `hors_sujet`  |
-| `texte`                                  | string           | Réponse à afficher au client (paragraphes séparés par `\n`)                                             |
-| `projet`                                 | objet            | `division`, `type_de_produit`, `arome_principal`, `profil_recherche[]`, `contraintes[]`                 |
-| `pistes`                                 | liste (0 à 3)    | Pistes d'arômes, sans produit ni marque du commerce                                                     |
-| `pistes[].numero`                        | integer          | 1, 2 ou 3                                                                                               |
-| `pistes[].aromes`                        | string           | Ex. `"citron vert"`, `"citron vert + citron"`                                                           |
-| `pistes[].explication`                   | string           | Phrase d'explication                                                                                    |
-| `pistes[].origine`                       | string           | D'où vient la piste : nombre de produits, association observée, ou « à valider en dégustation »         |
-| `pistes[].references`                    | liste            | Références de la banque de démo (vide si aucune ne correspond)                                          |
-| `pistes[].references[].code`             | string           | Code fictif `DEMO-001` à `DEMO-030`                                                                     |
-| `pistes[].references[].nom`              | string           | Ex. `"Citron vert bio"`                                                                                 |
-| `pistes[].references[].profil_sensoriel` | string           | Ex. `"citron vert juteux, frais, légèrement amer"`                                                      |
-| `pistes[].references[].forme`            | string           | `soluble eau`, `huile` ou `poudre`                                                                      |
-| `pistes[].references[].labels`           | liste de strings | Parmi `naturel`, `vegan`, `bio`, `halal`, `casher`, `sans allergène`                                    |
-| `pistes[].sans_reference`                | liste de strings | Arômes sans référence proche : création sur mesure à proposer                                           |
-| `solutions`                              | liste            | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness), même format que `references` |
-| `piste_choisie`                          | objet \| null    | `{ "numero", "aromes" }`                                                                                |
-| `brief_final`                            | objet \| null    | Après le choix d'une piste, voir ci-dessous                                                             |
-| `demande_echantillons`                   | objet \| null    | Récapitulatif à afficher : `brief_final` + `statut` (`"brouillon, non envoyé (prototype)"`) + `date`    |
-| `version_modele`                         | string           | `v2.2.1-references`                                                                                     |
-| `attribution`                            | string           | Mention ODbL **à afficher**                                                                             |
+| Champ            | Type                | Description                                                                                     |
+| ---------------- | ------------------- | ----------------------------------------------------------------------------------------------- |
+| `session_id`     | string              | Identifiant de la session, à renvoyer au message suivant                                        |
+| `etape`          | string              | État de la session **après** ce message (valeurs ci-dessous)                                    |
+| `intention`      | string              | Intention du **dernier** message du client (valeurs ci-dessous)                                 |
+| `reponse`        | string              | Texte à afficher au client ; paragraphes séparés par `\n`                                       |
+| `compris`        | objet               | Ce que l'assistant a compris du projet (voir ci-dessous)                                        |
+| `pistes`         | liste (0 à 3)       | Pistes d'arômes proposées, triées par `rang` ; vide tant qu'il en manque pour étudier le marché |
+| `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon          |
+| `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                       |
+| `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                  |
+| `version_modele` | string              | `v2.2.1-references`                                                                             |
+| `attribution`    | string              | Mention ODbL **à afficher**                                                                     |
 
-`brief_final` : `division`, `type_de_produit`, `piste`, `aromes[]`, `profil[]`, `contraintes[]`,
-`codes_references[]` (codes DEMO de la piste), `codes_solutions[]` (codes DEMO des solutions),
-`creation_sur_mesure[]` (arômes sans référence), `brief_du_client` (messages du client).
+### `compris`
 
-Exemple après « je prends la piste 1 » (texte et explications abrégés) :
+| Champ          | Type                                 | Description                                         |
+| -------------- | ------------------------------------ | --------------------------------------------------- |
+| `division`     | `"flavors"` \| `"fragrance"` \| null | `null` tant que le produit n'est pas identifié      |
+| `type_produit` | string \| null                       | Ex. `"boisson pétillante"`, `"glace"`, `"yaourt"`   |
+| `arome`        | string \| null                       | Arôme principal                                     |
+| `aromes`       | string[]                             | Arômes cités par le client, le principal en premier |
+| `contraintes`  | string[]                             | Ex. `["peu sucré", "bio"]`                          |
+
+### `pistes[]`
+
+| Champ                | Type                | Description                                                                                                                              |
+| -------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                 | string              | Identifiant tiré des arômes (`"citron-vert"`, `"citron-vert+citron"`) : **stable** d'un message à l'autre tant que la piste est proposée |
+| `rang`               | integer             | 1, 2 ou 3                                                                                                                                |
+| `nom`                | string              | Ex. `"Citron vert + citron"`                                                                                                             |
+| `description`        | string              | Type de piste : `"L'arôme seul"`, `"L'association la plus courante"` ou `"L'association originale"`                                      |
+| `explication`        | string              | Pourquoi cette piste : nombre de produits du marché, association observée ou « à valider en dégustation »                                |
+| `aromes`             | string[]            | Arômes de la piste                                                                                                                       |
+| `nb_produits_marche` | integer             | Produits du marché étudié qui justifient la piste : produits avec l'arôme (piste 1) ou avec l'association (pistes 2 et 3)                |
+| `references`         | liste de références | Références de la banque de démo (vide si aucune ne correspond)                                                                           |
+| `sans_reference`     | string[]            | Arômes sans référence proche : création sur mesure à proposer                                                                            |
+| `image`              | null                | Toujours `null` en V2 (pas d'images dans nos données) : le front affiche un visuel par défaut                                            |
+
+### Références (`pistes[].references[]` et `solutions[]`)
+
+| Champ              | Type     | Description                                                          |
+| ------------------ | -------- | -------------------------------------------------------------------- |
+| `code`             | string   | Code **fictif** `DEMO-001` à `DEMO-030`                              |
+| `nom`              | string   | Ex. `"Citron vert bio"`                                              |
+| `profil_sensoriel` | string   | Ex. `"citron vert juteux, frais, légèrement amer"`                   |
+| `forme`            | string   | `"soluble eau"`, `"huile"` ou `"poudre"`                             |
+| `labels`           | string[] | Parmi `naturel`, `vegan`, `bio`, `halal`, `casher`, `sans allergène` |
+
+### `brief` (après le choix d'une piste)
+
+| Champ                 | Type           | Description                                 |
+| --------------------- | -------------- | ------------------------------------------- |
+| `type_produit`        | string \| null | Type de produit du projet                   |
+| `piste_id`            | string         | `id` de la piste choisie                    |
+| `aromes`              | string[]       | Arômes de la piste choisie                  |
+| `contraintes`         | string[]       | Contraintes du client                       |
+| `codes_references`    | string[]       | Codes DEMO des références de la piste       |
+| `codes_solutions`     | string[]       | Codes DEMO des solutions                    |
+| `creation_sur_mesure` | string[]       | Arômes sans référence : création sur mesure |
+
+### `echantillons`
+
+Mêmes champs que `brief`, plus :
+
+| Champ          | Type   | Description                                   |
+| -------------- | ------ | --------------------------------------------- |
+| `statut`       | string | Toujours `"brouillon_non_envoye"`             |
+| `date`         | string | Date du brouillon, `AAAA-MM-JJ`               |
+| `brief_client` | string | Messages du client qui ont construit le brief |
+
+Rien n'est envoyé par la brique Data : l'enregistrement réel de la demande relève de l'API
+applicative (équipe Tech).
+
+### Valeurs de `etape` (état après le message)
+
+| Valeur          | Signification                                                                          | `pistes` | `brief` | `echantillons` |
+| --------------- | -------------------------------------------------------------------------------------- | -------- | ------- | -------------- |
+| `relance`       | Il manque une information (type de produit, goût) ; `reponse` pose au plus 2 questions | vide     | null    | null           |
+| `pistes`        | Les pistes sont proposées ; le client peut préciser, poser une question ou choisir     | 1 à 3    | null    | null           |
+| `recapitulatif` | Une piste est choisie ; `reponse` récapitule le brief et propose des échantillons      | 1 à 3    | objet   | null           |
+| `echantillons`  | Le brouillon de demande d'échantillons est prêt (non envoyé)                           | 1 à 3    | objet   | objet          |
+
+Un nouveau message de précision (« elle doit être bio ») après un choix relance l'étude : retour
+à `pistes`, `brief` et `echantillons` repassent à `null`.
+
+### Valeurs de `intention` (dernier message du client)
+
+| Valeur                 | Signification                                                   | Exemple                                                  |
+| ---------------------- | --------------------------------------------------------------- | -------------------------------------------------------- |
+| `nouvelle_demande`     | Premier projet, ou projet différent du projet en cours          | « je voudrais créer une boisson »                        |
+| `precision`            | Complète ou corrige le projet en cours (type, goût, contrainte) | « pétillante, goût citron vert », « elle doit être bio » |
+| `question`             | Question générale, sans rapport avec les pistes                 | « c'est combien la livraison ? »                         |
+| `question_piste`       | Question sur les pistes ou un arôme                             | « pourquoi vous proposez cette association ? »           |
+| `choix_piste`          | Choix d'une piste (message ou `piste_id`)                       | « je prends la piste 1 »                                 |
+| `demande_echantillons` | Demande d'échantillons                                          | « comment je reçois des échantillons ? »                 |
+| `hors_sujet`           | Salutation, remerciement, message sans rapport                  | « Bonjour », « merci »                                   |
+
+## Erreurs
+
+| Code  | Cas                                                       | Corps                                                                           |
+| ----- | --------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `422` | `message` vide sans `piste_id`, ou `message` trop long    | Format FastAPI : `{ "detail": [{ "loc": [...], "msg": "...", ... }] }`          |
+| `422` | `piste_id` qui ne correspond à aucune piste de la session | `{ "detail": "piste_id inconnu : 'durian+fraise' (pistes actuelles : [...])" }` |
+
+## Exemple de réponse complète
+
+Après « comment je reçois des échantillons ? », 5e message du parcours « je voudrais créer une
+boisson » → « pétillante, goût citron vert, pas trop sucrée » → « elle doit être bio » → « je
+prends la piste 1 ». Réponse réelle (catalogue complet) :
 
 ```json
 {
-  "conversation_id": "c-42",
-  "intention": "choix_piste",
-  "texte": "Excellent choix : la piste 1, citron vert. Votre brief : boisson pétillante, arôme citron vert, contraintes : peu sucré et bio. Références retenues : DEMO-004 et DEMO-028. …",
-  "projet": {
-    "division": "arôme alimentaire",
-    "type_de_produit": "boisson pétillante",
-    "arome_principal": "citron vert",
-    "profil_recherche": [],
+  "session_id": "3f9c2a7b1d04",
+  "etape": "echantillons",
+  "intention": "demande_echantillons",
+  "reponse": "Voici le récapitulatif de votre demande d'échantillons (DEMO-004 et DEMO-028), juste en dessous. Dans ce prototype, la demande n'est pas envoyée : transmettez ce récapitulatif à un conseiller Givaudan. Je ne connais ni les délais, ni les quantités, ni le prix : le conseiller vous les donnera.",
+  "compris": {
+    "division": "flavors",
+    "type_produit": "boisson pétillante",
+    "arome": "citron vert",
+    "aromes": ["citron vert"],
     "contraintes": ["peu sucré", "bio"]
   },
   "pistes": [
     {
-      "numero": 1,
-      "aromes": "citron vert",
-      "explication": "Citron vert seul : un goût franc, facile à reconnaître. …",
-      "origine": "l'arôme citron vert est utilisé par … boissons pétillantes étudiées",
+      "id": "citron-vert",
+      "rang": 1,
+      "nom": "Citron vert",
+      "description": "L'arôme seul",
+      "explication": "Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.",
+      "aromes": ["citron vert"],
+      "nb_produits_marche": 36,
       "references": [
         {
           "code": "DEMO-004",
@@ -216,7 +288,55 @@ Exemple après « je prends la piste 1 » (texte et explications abrégés) :
           "labels": ["naturel", "bio", "vegan"]
         }
       ],
-      "sans_reference": []
+      "sans_reference": [],
+      "image": null
+    },
+    {
+      "id": "citron-vert+citron",
+      "rang": 2,
+      "nom": "Citron vert + citron",
+      "description": "L'association la plus courante",
+      "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+      "aromes": ["citron vert", "citron"],
+      "nb_produits_marche": 22,
+      "references": [
+        {
+          "code": "DEMO-004",
+          "nom": "Citron vert bio",
+          "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+          "forme": "soluble eau",
+          "labels": ["naturel", "bio", "vegan"]
+        },
+        {
+          "code": "DEMO-002",
+          "nom": "Citron jaune bio",
+          "profil_sensoriel": "citron jaune juteux, notes de zeste, acidulé",
+          "forme": "soluble eau",
+          "labels": ["naturel", "bio", "vegan"]
+        }
+      ],
+      "sans_reference": [],
+      "image": null
+    },
+    {
+      "id": "citron-vert+pamplemousse",
+      "rang": 3,
+      "nom": "Citron vert + pamplemousse",
+      "description": "L'association originale",
+      "explication": "Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+      "aromes": ["citron vert", "pamplemousse"],
+      "nb_produits_marche": 1,
+      "references": [
+        {
+          "code": "DEMO-004",
+          "nom": "Citron vert bio",
+          "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+          "forme": "soluble eau",
+          "labels": ["naturel", "bio", "vegan"]
+        }
+      ],
+      "sans_reference": [],
+      "image": null
     }
   ],
   "solutions": [
@@ -228,30 +348,57 @@ Exemple après « je prends la piste 1 » (texte et explications abrégés) :
       "labels": ["naturel", "vegan", "halal", "casher"]
     }
   ],
-  "piste_choisie": { "numero": 1, "aromes": "citron vert" },
-  "brief_final": {
-    "division": "arôme alimentaire",
-    "type_de_produit": "boisson pétillante",
-    "piste": 1,
+  "brief": {
+    "type_produit": "boisson pétillante",
+    "piste_id": "citron-vert",
     "aromes": ["citron vert"],
-    "profil": [],
+    "contraintes": ["peu sucré", "bio"],
+    "codes_references": ["DEMO-004"],
+    "codes_solutions": ["DEMO-028"],
+    "creation_sur_mesure": []
+  },
+  "echantillons": {
+    "type_produit": "boisson pétillante",
+    "piste_id": "citron-vert",
+    "aromes": ["citron vert"],
     "contraintes": ["peu sucré", "bio"],
     "codes_references": ["DEMO-004"],
     "codes_solutions": ["DEMO-028"],
     "creation_sur_mesure": [],
-    "brief_du_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio"
+    "statut": "brouillon_non_envoye",
+    "date": "2026-11-12",
+    "brief_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio"
   },
-  "demande_echantillons": null,
   "version_modele": "v2.2.1-references",
   "attribution": "Étude de marché réalisée sur des données d'Open Food Facts (ODbL)"
 }
 ```
 
-### Obligations et limites (V2)
+## Exemple d'appel (TypeScript)
+
+```ts
+const reponse = await fetch(`${API_DATA_URL}/conversation`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  },
+  body: JSON.stringify({ session_id: sessionId, message, piste_id: null }),
+});
+if (!reponse.ok) throw new Error(`API Data : HTTP ${reponse.status}`);
+const etat = await reponse.json(); // objet complet : remplace l'état du front
+sessionId = etat.session_id;
+```
+
+## Obligations et limites (V2)
 
 - **Références fictives** : les codes `DEMO-xxx` viennent de
   `data/processed/banque_references_demo.csv`, un exemple inventé pour la démo (voir son
   `.meta.json`). Ce ne sont pas de vraies références Givaudan : l'interface doit l'indiquer.
-- **Aucun envoi** : `demande_echantillons` est un récapitulatif à afficher ; rien n'est transmis.
-- **Ni produit ni marque du commerce** dans `texte` et `pistes` (vérifié par les tests).
-- **Temps de réponse** : voir `docs/v2_notes.md` (mode rapide par défaut).
+- **Aucun envoi** : `echantillons` est un brouillon à afficher ; l'enregistrement réel relève de
+  l'API applicative.
+- **Ni produit ni marque du commerce** dans `reponse` et `pistes` (vérifié par les tests).
+- **Sessions en mémoire** : au plus 500, oubliées après 2 h sans message ; un redémarrage du
+  serveur les efface (le front repart alors avec une nouvelle session).
+- **Temps de réponse** : 0,3 à 1,2 s via ngrok ; environ 5 s quand le message demande le modèle
+  (arôme hors liste, ex. « durian »).

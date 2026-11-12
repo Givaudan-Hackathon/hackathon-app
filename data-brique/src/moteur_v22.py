@@ -188,8 +188,9 @@ def _produits(n: int) -> str:
 
 
 # --- Analyse du message (intention + extraction) -------------------------------------------------
-INTENTIONS = ["nouvelle_demande", "precision", "question_piste", "choix_piste",
+INTENTIONS = ["nouvelle_demande", "precision", "question", "question_piste", "choix_piste",
               "demande_echantillons", "hors_sujet"]
+ETAPES = ["relance", "pistes", "recapitulatif", "echantillons"]
 SCHEMA_ANALYSE = {
     "type": "object",
     "properties": {"intention": {"type": "string", "enum": INTENTIONS},
@@ -204,7 +205,8 @@ arômes de Givaudan (arômes alimentaires : division "flavors" ; parfums pour l'
 cosmétique : division "fragrance"). Le client crée son propre produit. Réponds uniquement par un \
 objet JSON avec les clés :
 - "intention" : "nouvelle_demande" (il décrit un projet, le premier ou un projet différent), \
-"precision" (il complète ou corrige le projet en cours), "question_piste" (il pose une question \
+"precision" (il complète ou corrige le projet en cours), "question" (question générale, sans \
+rapport avec les pistes : prix, délais, fonctionnement…), "question_piste" (il pose une question \
 sur les pistes ou un arôme), "choix_piste" (il choisit une piste), "demande_echantillons" (il veut \
 des échantillons), "hors_sujet" (salutation, remerciement, message sans rapport) ;
 - "numero_piste" : le numéro de la piste choisie pour "choix_piste", sinon 0 ;
@@ -288,6 +290,11 @@ def corriger(texte: str) -> str:
         texte = motif.sub(lambda m: (lambda r: r[0].upper() + r[1:] if m.group(0)[0].isupper()
                                      else r)(m.expand(remplacement)), texte)
     return texte
+
+
+def id_piste(aromes: list[str]) -> str:
+    """Identifiant stable d'une piste, tire de ses aromes : "citron-vert+citron"."""
+    return "+".join(re.sub(r"[^a-z0-9]+", "-", normaliser(a)).strip("-") for a in aromes)
 
 
 def libelle_piste(piste: dict) -> str:
@@ -594,7 +601,7 @@ class AssistantV22:
 
     def reinitialiser(self) -> None:
         self.projet = {"division": None, "type": None, "produit": None, "arome": None, "profil": [],
-                       "contraintes": [], "messages": []}
+                       "contraintes": [], "aromes_cites": [], "messages": []}
         self.etude: dict | None = None  # derniere sortie de MoteurV22.etude (ou relance)
         self.etudes_precedentes: list[tuple[str, dict]] = []  # (resume, frequence des aromes)
         self.piste_choisie: dict | None = None
@@ -660,6 +667,11 @@ class AssistantV22:
             texte = motif.sub(" ", texte)
         return texte
 
+    def _sur_les_pistes(self, message: str) -> bool:
+        """La question porte-t-elle sur les pistes (numero, arome cite, « cette association ») ?"""
+        return bool(numero_cite(message) or extraire_aromes(message, self.projet["division"] or "flavors")
+                    or ASSOCIATION.search(normaliser(message)))
+
     def analyser(self, message: str) -> dict:
         """{intention, numero, division, type, arome, application, contraintes, profil, trace}."""
         texte = _mots_normalises(message)
@@ -680,8 +692,10 @@ class AssistantV22:
             a["intention"], a["numero"] = "choix_piste", cite
         elif POLITESSE.search(texte.replace(" ?", "")):
             a["intention"] = "hors_sujet"
-        elif self.pistes and QUESTION.search(texte) and not (a["type"] or a["contraintes"]):
-            a["intention"] = "question_piste"
+        elif QUESTION.search(texte) and not (a["type"] or a["contraintes"]) and (
+                self.pistes or not (a["arome"] or a["profil"])):
+            a["intention"] = ("question_piste" if self.pistes and self._sur_les_pistes(message)
+                              else "question")
         elif (a["type"] or a["arome"] or a["contraintes"] or a["profil"]) and not (
                 not a["arome"] and SENSORIEL.search(self._sans_reconnus(texte))):
             # tout est reconnu par les listes de reference : pas besoin du modele
@@ -720,7 +734,8 @@ class AssistantV22:
         if intention in (None, "nouvelle_demande", "precision"):
             intention = (("precision" if projet_en_cours and intention != "nouvelle_demande"
                           else "nouvelle_demande") if reconnu else
-                         "question_piste" if self.pistes and QUESTION.search(texte) else "hors_sujet")
+                         ("question_piste" if self.pistes and self._sur_les_pistes(message) else
+                          "question") if QUESTION.search(texte) else "hors_sujet")
         if intention == "nouvelle_demande" and projet_en_cours and not (a["type"] or a["application"]):
             intention = "precision"  # pas de nouveau produit : complete le projet
         a["intention"], a["numero"] = intention, llm["numero"] if intention == "choix_piste" else None
@@ -742,6 +757,8 @@ class AssistantV22:
             projet["arome"] = reference[0] if reference else analyse["arome"].lower()
         _ajouter(projet["profil"], analyse["profil"])
         _ajouter(projet["contraintes"], analyse["contraintes"])
+        _ajouter(projet["aromes_cites"], ([projet["arome"]] if analyse["arome"] else [])
+                 + extraire_aromes(message, projet["division"] or "flavors"))
         if "sans sucre" in projet["contraintes"] and "peu sucré" in projet["contraintes"]:
             projet["contraintes"].remove("peu sucré")
         projet["messages"].append(message)
@@ -846,10 +863,25 @@ class AssistantV22:
         return texte.strip()
 
     def _pistes_affichees(self) -> list[dict]:
-        return [{"numero": i, "aromes": libelle_piste(p), "explication": p["explication"],
+        return [{"numero": i, "id": id_piste(p["aromes"]), "type": p["type"],
+                 "aromes": libelle_piste(p), "liste_aromes": list(p["aromes"]),
+                 "nb_produits": int(p.get("nb_produits") or 0), "explication": p["explication"],
                  "origine": self.origine(p), "references": p.get("references", []),
                  "sans_reference": p.get("sans_reference", [])}
                 for i, p in enumerate(self.pistes, 1)]
+
+    def numero_de_piste(self, piste_id: str) -> int | None:
+        """Numero (1 a 3) de la piste d'identifiant piste_id parmi les pistes actuelles."""
+        return next((i for i, p in enumerate(self.pistes, 1) if id_piste(p["aromes"]) == piste_id), None)
+
+    @property
+    def etape(self) -> str:
+        """Etat de la conversation apres le dernier message (voir ETAPES)."""
+        if self.demande_echantillons:
+            return "echantillons"
+        if self.piste_choisie:
+            return "recapitulatif"
+        return "pistes" if self.pistes else "relance"
 
     def _rappel_pistes(self) -> str:
         return _et([f"{i}. {libelle_piste(p)}" for i, p in enumerate(self.pistes, 1)], "ou")
@@ -1000,11 +1032,15 @@ class AssistantV22:
     def brouillon(self, intention: str, message: str) -> str:
         """Reponse factuelle ecrite par le code : seule source autorisee pour la reformulation."""
         p = self.projet
-        if intention == "hors_sujet":
+        if intention in ("hors_sujet", "question"):
+            accueil = ("Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous "
+                       "créer, et quel goût imaginez-vous ?")
             if not p["messages"]:
-                return ("Bonjour ! Je vous aide à trouver l'arôme de votre futur produit. Quel produit "
-                        "voulez-vous créer, et quel goût imaginez-vous ?")
-            debut = ("Avec plaisir !" if POLITESSE.search(_mots_normalises(message).replace(" ?", ""))
+                return (f"Bonjour ! {accueil}" if intention == "hors_sujet" else
+                        f"Je n'ai pas l'information sur ce point : un conseiller Givaudan pourra vous "
+                        f"répondre. {accueil}")
+            debut = ("Avec plaisir !" if intention == "hors_sujet"
+                     and POLITESSE.search(_mots_normalises(message).replace(" ?", ""))
                      else "Je n'ai pas l'information sur ce point : un conseiller Givaudan pourra "
                           "vous répondre.")
             suite = (f"Revenons à votre projet : laquelle de mes pistes vous tente, "
@@ -1148,10 +1184,22 @@ class AssistantV22:
         self.demande_echantillons = {"statut": "brouillon, non envoyé (prototype)",
                                      "date": date.today().isoformat(), **self.brief_final()}
 
-    def repondre(self, message: str, reformuler: bool | None = None) -> dict:
-        """reformuler : None = reglage de l'assistant ; True/False pour ce message seulement."""
+    def repondre(self, message: str, reformuler: bool | None = None,
+                 piste_id: str | None = None) -> dict:
+        """reformuler : None = reglage de l'assistant ; True/False pour ce message seulement.
+        piste_id : choix de cette piste, quel que soit le message (bouton du front) ; leve
+        ValueError si aucune piste actuelle n'a cet identifiant."""
         reformuler = self.reformuler if reformuler is None else reformuler
-        analyse = self.analyser(message)
+        if piste_id is not None:
+            numero = self.numero_de_piste(piste_id)
+            if numero is None:
+                raise ValueError(f"piste_id inconnu : {piste_id!r} (pistes actuelles : "
+                                 f"{[id_piste(p['aromes']) for p in self.pistes]})")
+            analyse = {"intention": "choix_piste", "numero": numero,
+                       "trace": {"modele_appele": False, "intention": "choix_piste (piste_id)"}}
+            message = message or f"je choisis la piste {numero}"
+        else:
+            analyse = self.analyser(message)
         intention = analyse["intention"]
         if intention == "nouvelle_demande":
             self.reinitialiser()
@@ -1171,7 +1219,13 @@ class AssistantV22:
                                                           "source": "brouillon (mode rapide)"}
         self.historique += [{"role": "user", "content": message},
                             {"role": "assistant", "content": texte}]
-        return {"intention": intention, "texte": texte, "projet": self._projet_affiche(),
+        p = self.projet
+        compris = {"division": p["division"], "type_produit": p["produit"], "arome": p["arome"],
+                   "aromes": ([p["arome"]] if p["arome"] else [])
+                   + [a for a in p["aromes_cites"] if a != p["arome"]],
+                   "contraintes": list(p["contraintes"])}
+        return {"intention": intention, "etape": self.etape, "compris": compris,
+                "texte": texte, "projet": self._projet_affiche(),
                 "pistes": self._pistes_affichees(), "solutions": (self.etude or {}).get("solutions", []),
                 "piste_choisie": self.piste_choisie, "brief_final": self.brief_final(),
                 "demande_echantillons": contexte.get("demande_echantillons"),

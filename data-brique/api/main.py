@@ -2,7 +2,7 @@
 
 - POST /recommander : brief client -> top k produits (baseline V1, inchange).
 - POST /conversation : assistant conversationnel V2.2 (pistes d'aromes, references DEMO,
-  demande d'echantillons), un message par appel, etat garde par conversation_id.
+  demande d'echantillons), un message par appel, etat garde par session_id.
 
 Lancement (depuis data-brique/) : .venv/Scripts/uvicorn api.main:app --port 8000
 Swagger : http://127.0.0.1:8000/docs
@@ -14,9 +14,9 @@ from contextlib import asynccontextmanager
 from typing import Literal
 
 import pandas as pd
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from src.moteur_v1 import CATALOGUE_DEFAUT, VERSION_MODELE, MoteurV1
 from src.moteur_v2 import CATALOGUE_COMPLET
@@ -57,17 +57,17 @@ moteur: MoteurV1 | None = None
 moteur_v22: MoteurV22 | None = None
 noms_du_commerce: NomsDuCommerce | None = None
 
-# conversations en memoire (prototype) : au plus MAX_CONVERSATIONS, oubliees apres DUREE_CONVERSATION
-MAX_CONVERSATIONS = 500
-DUREE_CONVERSATION = 2 * 3600  # secondes d'inactivite
-conversations: dict[str, dict] = {}  # id -> {"assistant", "verrou", "vu"}
-verrou_conversations = threading.Lock()
+# sessions en memoire (prototype) : au plus MAX_SESSIONS, oubliees apres DUREE_SESSION
+MAX_SESSIONS = 500
+DUREE_SESSION = 2 * 3600  # secondes d'inactivite
+sessions: dict[str, dict] = {}  # session_id -> {"assistant", "verrou", "vu"}
+verrou_sessions = threading.Lock()
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     # index TF-IDF construit une fois au demarrage (~1 s) ; moteur V2.2 partage entre les
-    # conversations, modeles et vecteurs precharges (sans Ollama, l'assistant passe en repli)
+    # sessions, modeles et vecteurs precharges (sans Ollama, l'assistant passe en repli)
     global moteur, moteur_v22, noms_du_commerce
     moteur = MoteurV1()
     moteur_v22 = MoteurV22()
@@ -146,12 +146,26 @@ EXEMPLES_DEMANDE = {
 
 
 class MessageConversation(BaseModel):
-    conversation_id: str | None = Field(
+    session_id: str | None = Field(
         default=None, max_length=64,
-        description="Absent ou inconnu : nouvelle conversation (l'identifiant est renvoyé).")
-    message: str = Field(min_length=1, max_length=500, description="Message du client, en français.")
-    reformuler: bool = Field(
-        default=False, description="Expérimental : réponse reformulée par llama3.2:3b (~33 s).")
+        description="null, absent ou inconnu : nouvelle session (l'identifiant est renvoyé).")
+    message: str = Field(default="", max_length=500,
+                         description="Message du client, en français. Peut être vide si piste_id est fourni.")
+    piste_id: str | None = Field(
+        default=None, max_length=200,
+        description="Optionnel : choix de cette piste (id d'une piste de la dernière réponse), "
+                    "quel que soit le message.")
+
+    @model_validator(mode="after")
+    def _message_ou_piste(self):
+        if not self.message.strip() and not self.piste_id:
+            raise ValueError("message vide : fournir un message ou un piste_id")
+        return self
+
+
+Etape = Literal["relance", "pistes", "recapitulatif", "echantillons"]
+Intention = Literal["nouvelle_demande", "precision", "question", "question_piste", "choix_piste",
+                    "demande_echantillons", "hors_sujet"]
 
 
 class Reference(BaseModel):
@@ -162,85 +176,112 @@ class Reference(BaseModel):
     labels: list[str]
 
 
+class Compris(BaseModel):
+    division: Literal["flavors", "fragrance"] | None
+    type_produit: str | None = Field(examples=["boisson pétillante"])
+    arome: str | None = Field(description="Arôme principal.", examples=["citron vert"])
+    aromes: list[str] = Field(description="Arômes cités par le client, le principal en premier.")
+    contraintes: list[str] = Field(examples=[["peu sucré", "bio"]])
+
+
 class Piste(BaseModel):
-    numero: int
-    aromes: str = Field(examples=["citron vert + citron"])
+    id: str = Field(description="Stable d'un message à l'autre tant que la piste est proposée.",
+                    examples=["citron-vert+citron"])
+    rang: int = Field(ge=1, le=3)
+    nom: str = Field(examples=["Citron vert + citron"])
+    description: str = Field(examples=["L'association la plus courante"])
     explication: str
-    origine: str = Field(description="Nombre de produits, association observée ou à valider.")
+    aromes: list[str]
+    nb_produits_marche: int = Field(description="Produits du marché étudié qui justifient la piste.")
     references: list[Reference]
     sans_reference: list[str] = Field(description="Arômes sans référence : création sur mesure.")
+    image: None = Field(default=None, description="Toujours null en V2 : visuel par défaut côté front.")
 
 
-class Projet(BaseModel):
-    division: str | None
-    type_de_produit: str | None
-    arome_principal: str | None
-    profil_recherche: list[str]
-    contraintes: list[str]
-
-
-class BriefFinal(BaseModel):
-    division: str | None
-    type_de_produit: str | None
-    piste: int
+class Brief(BaseModel):
+    type_produit: str | None
+    piste_id: str
     aromes: list[str]
-    profil: list[str]
     contraintes: list[str]
     codes_references: list[str]
     codes_solutions: list[str]
     creation_sur_mesure: list[str]
-    brief_du_client: str
 
 
-class DemandeEchantillons(BriefFinal):
-    statut: str = Field(examples=["brouillon, non envoyé (prototype)"])
-    date: str
-
-
-class PisteChoisie(BaseModel):
-    numero: int
-    aromes: str
+class Echantillons(Brief):
+    statut: Literal["brouillon_non_envoye"]
+    date: str = Field(examples=["2026-11-12"])
+    brief_client: str = Field(description="Messages du client qui ont construit le brief.")
 
 
 class ReponseConversation(BaseModel):
-    conversation_id: str
-    intention: Literal["nouvelle_demande", "precision", "question_piste", "choix_piste",
-                       "demande_echantillons", "hors_sujet"]
-    texte: str = Field(description="Réponse à afficher (paragraphes séparés par \n).")
-    projet: Projet
+    session_id: str
+    etape: Etape = Field(description="État de la session après ce message.")
+    intention: Intention = Field(description="Intention du dernier message du client.")
+    reponse: str = Field(description="Texte à afficher (paragraphes séparés par \\n).")
+    compris: Compris
     pistes: list[Piste]
     solutions: list[Reference]
-    piste_choisie: PisteChoisie | None
-    brief_final: BriefFinal | None
-    demande_echantillons: DemandeEchantillons | None = Field(
-        description="Récapitulatif à afficher ; rien n'est envoyé.")
+    brief: Brief | None = Field(description="null tant qu'aucune piste n'est choisie.")
+    echantillons: Echantillons | None = Field(
+        description="Brouillon de demande d'échantillons ; rien n'est envoyé.")
     version_modele: str
     attribution: str
 
 
+DESCRIPTIONS_PISTE = {"principal": "L'arôme seul", "association_frequente": "L'association la plus courante",
+                      "association_originale": "L'association originale"}
 EXEMPLES_CONVERSATION = {
-    "debut": {"summary": "Nouvelle conversation",
-              "value": {"message": "je voudrais créer une boisson"}},
-    "suite": {"summary": "Suite d'une conversation",
-              "value": {"conversation_id": "remplacer-par-l-id-recu",
+    "debut": {"summary": "Nouvelle session",
+              "value": {"session_id": None, "message": "je voudrais créer une boisson"}},
+    "suite": {"summary": "Suite d'une session",
+              "value": {"session_id": "remplacer-par-l-id-recu",
                         "message": "pétillante, goût citron vert, pas trop sucrée"}},
+    "choix": {"summary": "Choix d'une piste (bouton)",
+              "value": {"session_id": "remplacer-par-l-id-recu", "message": "",
+                        "piste_id": "citron-vert"}},
 }
 
 
-def _conversation(conversation_id: str | None) -> tuple[str, dict]:
-    """Conversation existante, ou nouvelle si l'identifiant est absent, inconnu ou expire."""
+def _session(session_id: str | None) -> tuple[str, dict]:
+    """Session existante, ou nouvelle si l'identifiant est absent, inconnu ou expire."""
     maintenant = time.time()
-    with verrou_conversations:
-        for cle in [c for c, v in conversations.items() if maintenant - v["vu"] > DUREE_CONVERSATION]:
-            del conversations[cle]
-        if conversation_id not in conversations:
-            if len(conversations) >= MAX_CONVERSATIONS:
-                del conversations[min(conversations, key=lambda c: conversations[c]["vu"])]
-            conversation_id = conversation_id or uuid.uuid4().hex[:12]
-            conversations[conversation_id] = {"assistant": AssistantV22(moteur_v22, noms_du_commerce),
-                                              "verrou": threading.Lock()}
-        conversations[conversation_id]["vu"] = maintenant
-        return conversation_id, conversations[conversation_id]
+    with verrou_sessions:
+        for cle in [c for c, v in sessions.items() if maintenant - v["vu"] > DUREE_SESSION]:
+            del sessions[cle]
+        if session_id not in sessions:
+            if len(sessions) >= MAX_SESSIONS:
+                del sessions[min(sessions, key=lambda c: sessions[c]["vu"])]
+            session_id = session_id or uuid.uuid4().hex[:12]
+            sessions[session_id] = {"assistant": AssistantV22(moteur_v22, noms_du_commerce),
+                                    "verrou": threading.Lock()}
+        sessions[session_id]["vu"] = maintenant
+        return session_id, sessions[session_id]
+
+
+def vers_contrat(session_id: str, r: dict) -> ReponseConversation:
+    """Sortie de AssistantV22.repondre() -> contrat V2 envoye aux Tech (objet complet)."""
+    pistes = [Piste(id=p["id"], rang=p["numero"], nom=p["aromes"][0].upper() + p["aromes"][1:],
+                    description=DESCRIPTIONS_PISTE[p["type"]], explication=p["explication"],
+                    aromes=p["liste_aromes"], nb_produits_marche=p["nb_produits"],
+                    references=p["references"], sans_reference=p["sans_reference"])
+              for p in r["pistes"]]
+    brief = None
+    if r["brief_final"]:
+        b = r["brief_final"]
+        brief = {"type_produit": b["type_de_produit"], "piste_id": pistes[b["piste"] - 1].id,
+                 "aromes": b["aromes"], "contraintes": b["contraintes"],
+                 "codes_references": b["codes_references"], "codes_solutions": b["codes_solutions"],
+                 "creation_sur_mesure": b["creation_sur_mesure"]}
+    echantillons = None
+    if r["demande_echantillons"] and brief:
+        echantillons = {**brief, "statut": "brouillon_non_envoye",
+                        "date": r["demande_echantillons"]["date"],
+                        "brief_client": r["demande_echantillons"]["brief_du_client"]}
+    return ReponseConversation(
+        session_id=session_id, etape=r["etape"], intention=r["intention"], reponse=r["texte"],
+        compris=r["compris"], pistes=pistes, solutions=r["solutions"], brief=brief,
+        echantillons=echantillons, version_modele=VERSION_V22, attribution=ATTRIBUTION_V22)
 
 
 def _valeur(v):
@@ -273,16 +314,14 @@ def recommander(demande: Demande = Body(openapi_examples=EXEMPLES_DEMANDE)) -> R
 
 
 @app.post("/conversation", response_model=ReponseConversation, tags=["conversation"],
-          summary="Assistant V2.2 : un message du client, la réponse et l'état du brief")
+          summary="Assistant V2.2 : un message du client, la réponse et l'état complet de la session",
+          responses={422: {"description": "message vide sans piste_id, ou piste_id inconnu"}})
 def conversation(demande: MessageConversation = Body(openapi_examples=EXEMPLES_CONVERSATION)
                  ) -> ReponseConversation:
-    conversation_id, session = _conversation(demande.conversation_id)
-    with session["verrou"]:  # messages d'une meme conversation traites dans l'ordre
-        r = session["assistant"].repondre(demande.message, reformuler=demande.reformuler)
-    return ReponseConversation(
-        conversation_id=conversation_id, intention=r["intention"], texte=r["texte"],
-        projet=r["projet"], pistes=r["pistes"], solutions=r["solutions"],
-        piste_choisie=r["piste_choisie"], brief_final=r["brief_final"],
-        demande_echantillons=r["demande_echantillons"], version_modele=VERSION_V22,
-        attribution=ATTRIBUTION_V22,
-    )
+    session_id, session = _session(demande.session_id)
+    with session["verrou"]:  # messages d'une meme session traites dans l'ordre
+        try:
+            r = session["assistant"].repondre(demande.message.strip(), piste_id=demande.piste_id)
+        except ValueError as erreur:
+            raise HTTPException(status_code=422, detail=str(erreur)) from erreur
+    return vers_contrat(session_id, r)
