@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { ClientBrief, ServiceOptions } from './conversation-service.ts';
+import type { PaymentReceipt } from './payment-service.ts';
 
 export const contactSchema = z.object({
   name: z
@@ -30,18 +31,29 @@ export const contactSchema = z.object({
   }),
 });
 export type Contact = z.infer<typeof contactSchema>;
+export type ContactDraft = Record<keyof Contact, string>;
+export const emptyContact: ContactDraft = {
+  name: '',
+  company: '',
+  email: '',
+  phone: '',
+  projectStage: '',
+  monthlyVolume: '',
+};
 export type RequestInput = {
   idempotencyKey: string;
   kind: 'sample' | 'expert';
   contact: Contact;
   brief: ClientBrief | null;
   projectDescription: string;
+  payment?: PaymentReceipt | null;
 };
 export type RequestReceipt = {
   id: string;
   status: 'submitted_demo';
   createdAt: string;
   kind: RequestInput['kind'];
+  payment: PaymentReceipt | null;
 };
 export interface RequestService {
   submit(

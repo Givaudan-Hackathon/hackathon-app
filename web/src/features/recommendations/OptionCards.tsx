@@ -32,7 +32,10 @@ export function OptionCards({
         {snapshot.pistes
           .toSorted((a, b) => a.rang - b.rang)
           .map((piste) => (
-            <article className="option-card" key={piste.id}>
+            <article
+              className={`option-card ${snapshot.brief?.piste_id === piste.id ? 'option-selected' : ''}`}
+              key={piste.id}
+            >
               <div className="option-image">
                 <IngredientImage
                   ingredient={resolveIngredient(
@@ -49,20 +52,33 @@ export function OptionCards({
                 </span>
                 <h3>{piste.nom}</h3>
                 <p className="option-explanation">{piste.explication}</p>
-                <div className="option-profile">
-                  {piste.references[0]?.profil_sensoriel ??
-                    'Un profil à préciser avec un expert.'}
-                </div>
-                <div className="option-codes">
-                  {piste.references.map((ref) => ref.code).join(' / ') ||
-                    'Sans référence proche'}
-                </div>
+                <details className="option-details">
+                  <summary>Explorer le profil et les références</summary>
+                  <ul>
+                    {piste.references.map((reference) => (
+                      <li key={reference.code}>
+                        <strong>{reference.nom}</strong>
+                        <span>{reference.profil_sensoriel}</span>
+                        <small>
+                          {reference.code} · {reference.forme}
+                        </small>
+                      </li>
+                    ))}
+                  </ul>
+                  {piste.references.length === 0 ? (
+                    <p>Un profil à préciser avec un expert.</p>
+                  ) : null}
+                </details>
                 <Button
                   variant={piste.rang === 1 ? 'primary' : 'secondary'}
                   disabled={pending}
                   onClick={() => onSelect(piste)}
+                  aria-pressed={snapshot.brief?.piste_id === piste.id}
                 >
-                  Choisir cet arôme <ArrowRight size={16} aria-hidden="true" />
+                  {snapshot.brief?.piste_id === piste.id
+                    ? 'Arôme sélectionné'
+                    : 'Choisir cet arôme'}{' '}
+                  <ArrowRight size={16} aria-hidden="true" />
                 </Button>
               </div>
             </article>
@@ -80,7 +96,11 @@ export function OptionCards({
       <p className="attribution">
         {snapshot.attribution} Les références DEMO sont fictives.
       </p>
-      <button className="text-button expert-inline" onClick={onExpert}>
+      <button
+        className="text-button expert-inline"
+        disabled={pending}
+        onClick={onExpert}
+      >
         Vous préférez en parler avec un expert ?{' '}
         <ArrowRight size={14} aria-hidden="true" />
       </button>

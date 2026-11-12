@@ -37,6 +37,19 @@ réalise le parcours invité : décrire un projet, préciser son besoin, compare
 jusqu’à trois pistes illustrées, relire et simuler une demande. Cinq ingrédients
 sont couverts : citron vert, citron jaune, pamplemousse, vanille et fraise.
 
+Le parcours affiche cinq étapes nommées et navigables : Votre idée, Affiner,
+Choisir, Paiement et Votre demande. Les propositions précèdent la conversation
+à l’étape Choisir. Revenir en arrière conserve la description, le message en
+cours et les coordonnées ; modifier le brief invalide sa sélection et son
+paiement fictif.
+
+Une demande d’échantillon est précédée d’un **paiement fictif de 10 €**, montant
+de démonstration choisi par Christopher. Aucune donnée bancaire n’est saisie,
+aucun prestataire n’est appelé et aucun débit n’a lieu. Le panneau permet de
+tester un paiement accepté ou refusé. Un paiement réussi débloque le formulaire,
+puis le client confirme explicitement sa demande. Une demande de contact avec
+un expert reste accessible sans paiement.
+
 ```bash
 npm ci
 npm run dev -w web

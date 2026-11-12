@@ -4,21 +4,25 @@ import type { ConversationSnapshot } from '../../services/conversation-service.t
 export function ProjectSummary({
   snapshot,
   onEdit,
+  compact = false,
 }: {
   snapshot: ConversationSnapshot | null;
   onEdit: () => void;
+  compact?: boolean;
 }) {
   const understood = snapshot?.compris;
   const selected = snapshot?.pistes.find(
     (piste) => piste.id === snapshot.brief?.piste_id,
   );
   return (
-    <aside className="project-summary">
-      <details open>
+    <aside className={`project-summary ${compact ? 'is-compact' : ''}`}>
+      <details open={!compact}>
         <summary>
           <span>
-            <Leaf size={18} strokeWidth={1.5} aria-hidden="true" /> Votre idée
-            prend forme
+            <Leaf size={18} strokeWidth={1.5} aria-hidden="true" />{' '}
+            {compact
+              ? `Votre projet : ${understood?.type_produit ?? 'à préciser'} · ${understood?.aromes.join(', ') || 'arôme à préciser'}`
+              : 'Votre idée prend forme'}
           </span>
           <ChevronDown size={17} aria-hidden="true" />
         </summary>

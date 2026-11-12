@@ -1,10 +1,4 @@
-import {
-  useId,
-  useRef,
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-} from 'react';
+import { useId, useRef, type FormEvent, type KeyboardEvent } from 'react';
 import {
   ArrowUp,
   Check,
@@ -17,18 +11,23 @@ import type { ConversationState } from './model.ts';
 export function ConversationPanel({
   state,
   onSend,
+  draft,
+  onDraftChange,
+  compact = false,
 }: {
   state: ConversationState;
   onSend: (message: string) => Promise<boolean>;
+  draft: string;
+  onDraftChange: (value: string) => void;
+  compact?: boolean;
 }) {
-  const [draft, setDraft] = useState('');
   const id = useId();
   const ref = useRef<HTMLTextAreaElement>(null);
   async function submit(event?: FormEvent) {
     event?.preventDefault();
     const text = draft.trim();
     if (!text || state.pending) return;
-    if (await onSend(text)) setDraft('');
+    if (await onSend(text)) onDraftChange('');
   }
   function keyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (
@@ -120,7 +119,7 @@ export function ConversationPanel({
       ) : null}
       <details
         className="chat-composer-disclosure"
-        open={state.snapshot?.etape !== 'pistes' || Boolean(state.error)}
+        open={!compact || Boolean(state.error)}
       >
         <summary>
           Une précision ou une question ? <span aria-hidden="true">+</span>
@@ -140,7 +139,7 @@ export function ConversationPanel({
               id={id}
               name="message"
               value={draft}
-              onChange={(event) => setDraft(event.target.value)}
+              onChange={(event) => onDraftChange(event.target.value)}
               onKeyDown={keyDown}
               rows={2}
               maxLength={500}

@@ -1,6 +1,7 @@
 import { ArrowRight, Check, FileText, MessageCircle } from 'lucide-react';
 import type { RequestReceipt } from '../../services/request-service.ts';
 import { Button } from '../../components/ui/Button.tsx';
+import { formatDemoAmount } from '../../services/payment-service.ts';
 
 export function Confirmation({
   receipt,
@@ -45,6 +46,13 @@ export function Confirmation({
           Votre demande ne constitue pas une commande.
         </p>
       </div>
+      {receipt.payment ? (
+        <p className="confirmation-payment">
+          Paiement d’engagement simulé :{' '}
+          <strong>{formatDemoAmount(receipt.payment.amountCents)}</strong>.
+          Aucun débit réel.
+        </p>
+      ) : null}
       <Button onClick={onRestart}>
         Explorer une autre idée <ArrowRight size={17} aria-hidden="true" />
       </Button>

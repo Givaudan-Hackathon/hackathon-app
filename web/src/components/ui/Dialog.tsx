@@ -16,10 +16,13 @@ export function Dialog({
   const titleId = useId();
   useEffect(() => {
     const dialog = ref.current;
-    if (open && !dialog?.open) dialog?.showModal();
-    if (!open && dialog?.open) dialog.close();
+    if (!open || !dialog) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    if (!dialog.open) dialog.showModal();
     return () => {
-      if (dialog?.open) dialog.close();
+      document.body.style.overflow = previousOverflow;
+      if (dialog.open) dialog.close();
     };
   }, [open]);
   return (
@@ -27,7 +30,10 @@ export function Dialog({
       ref={ref}
       className="dialog"
       aria-labelledby={titleId}
-      onCancel={onClose}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}

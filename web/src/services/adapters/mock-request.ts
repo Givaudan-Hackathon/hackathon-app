@@ -4,6 +4,7 @@ import {
   type RequestService,
 } from '../request-service.ts';
 import { ServiceError, wait } from '../conversation-service.ts';
+import { paymentMatchesBrief } from '../payment-service.ts';
 
 export function createMockRequestService({
   delay = 500,
@@ -28,6 +29,16 @@ export function createMockRequestService({
             'Choisissez un arôme et relisez votre demande avant de continuer.',
           ),
         );
+      if (
+        input.kind === 'sample' &&
+        !paymentMatchesBrief(input.payment, input.brief)
+      )
+        return Promise.reject(
+          new ServiceError(
+            'PAYMENT_REQUIRED',
+            'Simulez le paiement pour le brief actuel avant de confirmer votre demande.',
+          ),
+        );
       const existing = requests.get(input.idempotencyKey);
       if (existing) return existing;
       const pending = wait(delay, options?.signal)
@@ -44,6 +55,7 @@ export function createMockRequestService({
             status: 'submitted_demo',
             createdAt: new Date().toISOString(),
             kind: input.kind,
+            payment: input.kind === 'sample' ? (input.payment ?? null) : null,
           };
         })
         .catch((error: unknown) => {

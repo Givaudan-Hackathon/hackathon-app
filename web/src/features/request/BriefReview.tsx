@@ -11,11 +11,13 @@ export function BriefReview({
   pending,
   onContinue,
   onEdit,
+  paid = false,
 }: {
   snapshot: ConversationSnapshot;
   pending: boolean;
   onContinue: () => void;
   onEdit: () => void;
+  paid?: boolean;
 }) {
   const selected = snapshot.pistes.find(
     (piste) => piste.id === snapshot.brief?.piste_id,
@@ -36,7 +38,9 @@ export function BriefReview({
         <span className="eyebrow">
           <Check size={14} aria-hidden="true" /> Votre choix
         </span>
-        <h2 id="brief-title">{selected.nom}</h2>
+        <h2 id="brief-title" tabIndex={-1}>
+          {selected.nom}
+        </h2>
         <p>{selected.references[0]?.profil_sensoriel}</p>
         <dl>
           <div>
@@ -56,14 +60,16 @@ export function BriefReview({
         </span>
         <div className="review-actions">
           <Button loading={pending} onClick={onContinue}>
-            Préparer ma demande <ArrowRight size={17} aria-hidden="true" />
+            {paid ? 'Compléter ma demande' : 'Passer au paiement fictif'}{' '}
+            <ArrowRight size={17} aria-hidden="true" />
           </Button>
           <button className="text-button" disabled={pending} onClick={onEdit}>
             <PencilLine size={14} aria-hidden="true" /> Ajuster mon idée
           </button>
         </div>
         <small>
-          Une demande sans engagement. Un expert examinera ensuite votre projet.
+          Un paiement fictif précède la demande. Aucun débit ni envoi réel dans
+          cette démonstration.
         </small>
       </div>
     </section>

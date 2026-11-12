@@ -141,7 +141,21 @@ export function createMockConversationService({
                 : /dessert|creme/.test(text)
                   ? 'dessert'
                   : null;
-        const flavor = flavors.find((item) => item.match.test(text));
+        // La simulation reconnaît un vocabulaire limité ; elle explicite les
+        // arômes non couverts plutôt que de réutiliser un ancien choix.
+        const desiredText = /remplac\w*.*\bpar\b/.test(text)
+          ? text.split(/\bpar\b/).at(-1)!
+          : text;
+        const flavorText = desiredText.replace(
+          /\b(?:sans|pas de|plus de)\s+(?:citron(?:\s+vert|\s+jaune)?|pamplemousse|vanille|fraise)\b/g,
+          '',
+        );
+        const unsupportedFlavor =
+          /\b(mangue|menthe|chocolat|pistache|coco|peche|framboise|ananas|kiwi|banane|cafe)\b/.exec(
+            flavorText,
+          )?.[1];
+        const flavor = flavors.find((item) => item.match.test(flavorText));
+        const removesFlavor = flavorText !== desiredText;
         const isNewProject = Boolean(
           previous &&
           product &&
@@ -159,16 +173,38 @@ export function createMockConversationService({
           };
         snapshot.compris.type_produit =
           product ?? snapshot.compris.type_produit;
-        if (flavor) {
+        if (unsupportedFlavor) {
+          snapshot.compris.arome = unsupportedFlavor;
+          snapshot.compris.aromes = [unsupportedFlavor];
+        } else if (flavor) {
           snapshot.compris.arome = flavor.label;
           snapshot.compris.aromes = [flavor.label];
+        } else if (removesFlavor) {
+          snapshot.compris.arome = null;
+          snapshot.compris.aromes = [];
         }
-        for (const [pattern, label] of [
-          [/peu sucre|pas trop sucre|moins sucre/, 'peu sucré'],
-          [/\bbio\b/, 'bio'],
-          [/vegetal|vegan/, 'végétal'],
+        for (const [pattern, removal, label] of [
+          [
+            /peu sucre|pas trop sucre|moins sucre/,
+            /(?:retir\w*|enlev\w*).{0,30}(?:peu sucre|moins sucre)/,
+            'peu sucré',
+          ],
+          [
+            /\bbio\b/,
+            /\b(?:sans|pas(?: de)?|plus(?: de)?|non)\s+bio\b|\b(?:retir\w*|enlev\w*).{0,20}\bbio\b/,
+            'bio',
+          ],
+          [
+            /vegetal|vegan/,
+            /\b(?:sans|pas(?: de)?|plus(?: de)?|non)\s+(?:vegetal|vegan)\b/,
+            'végétal',
+          ],
         ] as const) {
-          if (
+          if (removal.test(text))
+            snapshot.compris.contraintes = snapshot.compris.contraintes.filter(
+              (constraint) => constraint !== label,
+            );
+          else if (
             pattern.test(text) &&
             !snapshot.compris.contraintes.includes(label)
           )
@@ -200,8 +236,9 @@ export function createMockConversationService({
         } else if (!knownFlavor) {
           snapshot.etape = 'relance';
           snapshot.pistes = [];
-          snapshot.reponse =
-            'Quel goût imaginez-vous ? Cette démonstration permet d’explorer le citron vert, le citron jaune, le pamplemousse, la vanille et la fraise.';
+          snapshot.reponse = unsupportedFlavor
+            ? `L’arôme « ${unsupportedFlavor} » n’est pas couvert par cette démonstration. Choisissez citron vert, citron jaune, pamplemousse, vanille ou fraise, ou préparez une demande de contact avec un expert.`
+            : 'Quel goût imaginez-vous ? Cette démonstration permet d’explorer le citron vert, le citron jaune, le pamplemousse, la vanille et la fraise.';
         } else {
           snapshot.etape = 'pistes';
           snapshot.pistes = createOptions(knownFlavor.key);

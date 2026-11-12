@@ -6,8 +6,13 @@ import {
   type RequestInput,
   type RequestReceipt,
   type RequestService,
+  type ContactDraft,
 } from '../../services/request-service.ts';
 import type { ClientBrief } from '../../services/conversation-service.ts';
+import {
+  formatDemoAmount,
+  type PaymentReceipt,
+} from '../../services/payment-service.ts';
 
 type Props = {
   service: RequestService;
@@ -16,6 +21,10 @@ type Props = {
   kind: 'sample' | 'expert';
   onComplete: (receipt: RequestReceipt) => void;
   onBack: () => void;
+  values: ContactDraft;
+  onValuesChange: (values: ContactDraft) => void;
+  payment: PaymentReceipt | null;
+  onPendingChange: (pending: boolean) => void;
 };
 export function RequestForm({
   service,
@@ -24,16 +33,12 @@ export function RequestForm({
   kind,
   onComplete,
   onBack,
+  values,
+  onValuesChange,
+  payment,
+  onPendingChange,
 }: Props) {
   const id = useId();
-  const [values, setValues] = useState({
-    name: '',
-    company: '',
-    email: '',
-    phone: '',
-    projectStage: '',
-    monthlyVolume: '',
-  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -62,12 +67,14 @@ export function RequestForm({
     setError(null);
     setPending(true);
     busy.current = true;
+    onPendingChange(true);
     const input: RequestInput = {
       idempotencyKey: key.current,
       kind,
       contact: parsed.data,
       brief,
       projectDescription,
+      payment,
     };
     const current = new AbortController();
     controller.current = current;
@@ -83,11 +90,12 @@ export function RequestForm({
       );
     } finally {
       busy.current = false;
+      onPendingChange(false);
       if (!current.signal.aborted) setPending(false);
     }
   }
   function change(name: keyof typeof values, value: string) {
-    setValues((current) => ({ ...current, [name]: value }));
+    onValuesChange({ ...values, [name]: value });
     setErrors((current) => ({ ...current, [name]: '' }));
   }
   const field = (
@@ -147,8 +155,8 @@ export function RequestForm({
             confirmées avec vous
           </span>
           <span>
-            <Check size={16} aria-hidden="true" /> Votre demande reste sans
-            engagement
+            <Check size={16} aria-hidden="true" /> Votre demande reste soumise à
+            validation
           </span>
         </div>
         <div className="request-demo">
@@ -159,6 +167,19 @@ export function RequestForm({
             Aucune coordonnée ne sera transmise.
           </p>
         </div>
+        {kind === 'sample' && payment ? (
+          <div className="request-payment-status">
+            <Check size={18} aria-hidden="true" />
+            <div>
+              <strong>
+                Paiement fictif validé : {formatDemoAmount(payment.amountCents)}
+              </strong>
+              <span>
+                Aucun débit réel. Relisez votre demande avant de confirmer.
+              </span>
+            </div>
+          </div>
+        ) : null}
         <button className="text-button" onClick={onBack} disabled={pending}>
           Revenir à mon projet
         </button>
