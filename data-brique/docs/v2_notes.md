@@ -432,3 +432,24 @@ Limites :
 - **Rattachement de type :** il dépend des produits présents au catalogue (Flavors : boissons et
   desserts).
 - **Temps :** environ 4 à 6 s pour un message qui appelle le modèle ; moins de 1,5 s sinon.
+
+## V2.2.4 — 3e revue Codex (commit 75d259d)
+
+Version `v2.2.4-revue`. Contrat inchangé. Tests : `tests/test_revue_codex_3.py` (14 tests). 71
+tests au total. Validation : 26/30, aucun cas perdu.
+
+1. **« maintenant je voudrais… »** ne réinitialise le projet que si un autre type ou produit est
+   cité (type différent, ou produit reconnu différent du produit en cours). Sinon c'est une
+   précision : « maintenant je voudrais moins de sucre » garde le type, le goût et le bio, ajoute
+   « peu sucré » et relance l'étude.
+2. **Exclusion ≠ retrait.**
+   - « pas de gluten », « pas de lactose » (et « aucun », « zéro ») sont reconnus comme les
+     contraintes « sans gluten » et « sans lactose ».
+   - Seules les phrases d'acceptation les retirent : « finalement avec du gluten », « on peut
+     mettre du gluten », « le gluten n'est plus un problème », « plus besoin d'être sans gluten ».
+3. **Refus d'échantillons.**
+   - La négation est vérifiée avant la règle « échantillon » : « non merci, je ne veux pas
+     d'échantillons », « pas d'échantillon pour l'instant », ou « non merci » après le choix d'une
+     piste.
+   - Résultat : pas de brouillon (un brouillon existant est retiré), `etape` reste
+     `recapitulatif`, brief conservé, réponse polie.

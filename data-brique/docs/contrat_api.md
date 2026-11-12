@@ -162,7 +162,7 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon          |
 | `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                       |
 | `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                  |
-| `version_modele` | string              | `v2.2.3-mecanismes`                                                                             |
+| `version_modele` | string              | `v2.2.4-revue`                                                                                  |
 | `attribution`    | string              | Mention ODbL **à afficher**                                                                     |
 
 ### `compris`
@@ -251,9 +251,19 @@ applicative (équipe Tech).
   « protéiné » s'ajoute aux contraintes.
 - **Contrainte retirée.** « finalement pas bio », « sans le bio », « pas besoin de bio » retirent
   la contrainte, et les références sont recalculées.
+- **Exclusions.** Pour « sans gluten » et « sans lactose », « pas de gluten » ou « pas de
+  lactose » **confirment** la contrainte. Seule l'acceptation la retire : « finalement avec du
+  gluten », « on peut mettre du gluten », « le gluten n'est plus un problème ».
 - **Changement de projet.** Un changement explicite (« une autre boisson », « un autre produit »,
-  « nouveau projet », « maintenant je voudrais… ») donne `nouvelle_demande` et repart d'un projet
-  vide.
+  « nouveau projet ») donne `nouvelle_demande` et repart d'un projet vide. « maintenant je
+  voudrais… » ne change de projet **que si un autre type ou produit est cité**.
+  - « maintenant je voudrais un yaourt » : nouveau projet.
+  - « maintenant je voudrais moins de sucre » : `precision`, qui garde type, goût et contraintes,
+    et relance l'étude.
+- **Refus d'échantillons.** « non merci, je ne veux pas d'échantillons » ou « pas d'échantillon
+  pour l'instant » donnent `intention: hors_sujet` et une réponse polie. Aucun brouillon n'est
+  créé (un brouillon existant est retiré : `echantillons` = `null`). `etape` reste
+  `recapitulatif`, et `brief` est conservé.
 - **Piste inexistante.** « je prends la piste 9 » avec 3 pistes donne `intention: choix_piste`
   et `etape: pistes`, rien n'est choisi, `reponse` = « Je n'ai que 3 pistes : 1. … ». Pas
   d'erreur HTTP ; seul un `piste_id` inconnu donne 422.
@@ -428,7 +438,7 @@ banque.
     "date": "2026-11-12",
     "brief_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio / Peut-être 5 000 bouteilles pour tester"
   },
-  "version_modele": "v2.2.3-mecanismes",
+  "version_modele": "v2.2.4-revue",
   "attribution": "Étude de marché réalisée sur des données d'Open Food Facts (ODbL)"
 }
 ```

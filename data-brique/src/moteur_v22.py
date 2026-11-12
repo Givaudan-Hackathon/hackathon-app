@@ -39,7 +39,7 @@ from src.moteur_v2 import (CATALOGUE_COMPLET, CACHE_DEFAUT, MODELE_EMBEDDING, MO
                            N_MARCHE, OLLAMA_DEFAUT, PRODUITS, RACINE, SENSORIEL, MoteurV21,
                            OllamaIndisponible, a_la, ancre, extraire_aromes)
 
-VERSION_V22 = "v2.2.3-mecanismes"
+VERSION_V22 = "v2.2.4-revue"
 BANQUE_DEFAUT = RACINE / "data" / "processed" / "banque_references_demo.csv"
 MIN_FILTRE = 10  # produits conformes requis pour appliquer une contrainte a l'etude
 KEEP_ALIVE = "2h"  # modeles gardes en memoire entre deux messages
@@ -125,8 +125,9 @@ CONTRAINTES = {
                 r"vegan|100-vegetable|no-milk|plant-based|dairy-substitutes|non-dairy|soy|almond"
                 r"|oat-based|coconut|soja|vegetal", "vegan"),
     "bio": (r"\bbio\b|biologique|organic", r"organic|ab-agriculture-biologique|eu-organic|-bio-", "bio"),
-    "sans gluten": (r"sans gluten|gluten.free", r"no-gluten|gluten-free", None),
-    "sans lactose": (r"sans lactose|lactose.free", r"no-lactose|lactose-free|plant-based|vegan", None),
+    "sans gluten": (r"sans gluten|gluten.free|(?:pas|aucun|zero) (?:de |d )?gluten", r"no-gluten|gluten-free", None),
+    "sans lactose": (r"sans lactose|lactose.free|(?:pas|aucun|zero) (?:de |d )?lactose",
+                     r"no-lactose|lactose-free|plant-based|vegan", None),
     "naturel": (r"\bnaturel|sans additif|sans colorant|sans conservateur|clean label",
                 r"natural-flavors|no-artificial-flavors|no-colorings|no-additives|no-preservatives",
                 "naturel"),
@@ -185,15 +186,26 @@ def extraire_contraintes(texte: str) -> list[str]:
 # contraintes qu'un client peut retirer (« finalement pas bio ») : nom -> mot dans le message
 RETIRABLES = {"bio": r"bio(?:logique)?", "végétal": r"vegan|vegetal\w*|vegetaux", "naturel": r"naturel\w*",
               "halal": r"halal", "casher": r"casher|kasher|kosher", "protéiné": r"proteine\w*",
-              "pour enfants": r"(?:pour )?(?:les )?enfants?", "sans gluten": r"(?:sans )?gluten",
-              "sans lactose": r"(?:sans )?lactose",
+              "pour enfants": r"(?:pour )?(?:les )?enfants?",
               "peu sucré": r"peu sucr\w*|reduire le sucre|moins de sucre"}
+# contraintes d'exclusion (« sans X ») : « pas de X » les CONFIRME ; seule l'acceptation de X les
+# retire (« finalement avec du gluten », « on peut mettre du gluten », « le gluten n'est plus un
+# probleme »)
+EXCLUSIONS_RETIRABLES = {"sans gluten": "gluten", "sans lactose": "lactose"}
 _RETRAITS = {nom: re.compile(
     rf"\b(?:(?:finalement|en fait|au final) )?(?:pas|plus) (?:besoin (?:de |d |du )|forcement "
     rf"|obligatoirement |necessairement )?(?:de |du |le |la |l |en )?(?:{mot})\b"
     rf"|\bsans (?:le |la |les |l )(?:{mot})\b"
     rf"|\b(?:oublie[rz]?|retire[rz]?|enleve[rz]?|supprime[rz]?) (?:le |la |les |l )?(?:{mot})\b")
     for nom, mot in RETIRABLES.items()}
+_RETRAITS.update({nom: re.compile(
+    rf"\b(?:(?:finalement|en fait|au final) )?avec (?:du |le |de la |l )?{mot}\b"
+    rf"|\b(?:on|je|vous|nous) (?:peut|peux|pouvez|pouvons) (?:mettre|ajouter|utiliser|garder|avoir)"
+    rf" (?:du |le |de la |l )?{mot}\b"
+    rf"|\b{mot} (?:n )?est plus (?:un )?(?:probleme|souci)\b"
+    rf"|\b{mot} (?:est )?(?:accepte|autorise|permis)\b"
+    rf"|\b(?:plus|pas) besoin (?:d etre |que ce soit )?sans (?:le |la |l )?{mot}\b")
+    for nom, mot in EXCLUSIONS_RETIRABLES.items()})
 
 
 def extraire_retraits(texte: str) -> tuple[list[str], str]:
@@ -226,8 +238,15 @@ def extraire_volume(texte: str) -> str | None:
 NOUVEAU_PROJET = re.compile(
     r"\b(?:une? autres? (?!pistes?|associations?|idees?|questions?|references?|choix|aromes?|gouts?"
     r"|contraintes?|versions?|fois|chose)\w+|nouveau projet|nouvelle demande|autre projet"
-    r"|nouveau produit|nouvelle boisson|nouveau dessert|maintenant je (?:voudrais|veux|souhaite"
-    r"|cherche|voudrai|aimerais)|on (?:change|passe) (?:de projet|a autre chose)|je change de projet)\b")
+    r"|nouveau produit|nouvelle boisson|nouveau dessert"
+    r"|on (?:change|passe) (?:de projet|a autre chose)|je change de projet)\b")
+# « maintenant je voudrais… » : nouveau projet SEULEMENT si un autre type ou produit est cite
+# (« maintenant je voudrais moins de sucre » complete le projet en cours)
+MAINTENANT = re.compile(r"\bmaintenant je (?:voudrais|veux|souhaite|cherche|voudrai|aimerais)\b")
+# refus d'echantillons : verifie AVANT la regle « echantillon »
+REFUS_ECHANTILLON = re.compile(r"\b(?:pas|plus|aucun) (?:d |de |des )?echantillons?\b"
+                               r"|\bne (?:veux|voudrais|souhaite) (?:pas|plus)\b[^.?!]{0,20}echantillon"
+                               r"|\bnon merci\b")
 
 
 def extraire_profil(texte: str) -> list[str]:
@@ -736,6 +755,7 @@ class AssistantV22:
         self.hors_bornes: int | None = None  # numero de piste demande mais inexistant
         self.type_hors_catalogue = False  # produit cite sans categorie proche au catalogue
         self.marque_citee = False  # le dernier message citait une marque
+        self.refus_echantillons = False  # le dernier message refusait les echantillons
 
     def _chat(self, messages: list[dict], format_json: dict | None = None,
               num_predict: int = 300) -> str:
@@ -816,10 +836,17 @@ class AssistantV22:
         moteur = self.moteur
         marques = moteur.marques.trouvees(texte)
         texte = moteur.marques.masquer(texte)  # jamais d'arome tire d'un nom de marque
-        nouveau_projet = projet_en_cours and bool(NOUVEAU_PROJET.search(mots_q))
         retraits, sans_retraits = extraire_retraits(texte) if projet_en_cours else ([], texte)
         retraits = [r for r in retraits if r in self.projet["contraintes"]]
         type_nom, type_span = type_et_span(texte)
+        type_projet = self.projet["type"]
+        autre_type = bool(type_nom) and type_nom != type_projet and type_nom != generique(type_projet)
+        autre_produit = autre_type or (type_nom is None and PRODUITS.search(texte) is not None
+                                       and not ancre_dans(PRODUITS.search(texte).group(0),
+                                                          [self.projet["produit"] or ""]))
+        maintenant = projet_en_cours and bool(MAINTENANT.search(mots_q))
+        nouveau_projet = projet_en_cours and (bool(NOUVEAU_PROJET.search(mots_q))
+                                              or (maintenant and autre_produit))
         texte_aromes = _masquer(texte, [type_span])  # le mot du type n'est jamais l'arome
         cites = moteur.vocabulaire.extraire(texte_aromes)
         spans = [type_span, *moteur.vocabulaire.spans(texte_aromes),
@@ -847,7 +874,10 @@ class AssistantV22:
             or (produit_cite and not self.projet["type"])
 
         # regles qui suffisent
-        if ECHANTILLON.search(mots_q) and COUT.search(mots_q):
+        refus = REFUS_ECHANTILLON.search(mots_q) and (ECHANTILLON.search(mots_q) or self.piste_choisie)
+        if refus:
+            a["intention"], a["refus_echantillons"] = "hors_sujet", True  # « non merci, pas d'echantillon »
+        elif ECHANTILLON.search(mots_q) and COUT.search(mots_q):
             a["intention"] = "question"  # « c'est combien un echantillon ? » : question de service
         elif ECHANTILLON.search(mots_q) and not nouveau_projet:
             a["intention"] = "demande_echantillons"
@@ -924,8 +954,10 @@ class AssistantV22:
             intention = "question_piste"
         else:
             intention = self._vague_ou_hors_sujet(mots_q, projet_en_cours)
+        if maintenant and a["application"] and not ancre_dans(a["application"], [self.projet["produit"] or ""]):
+            nouveau_projet = True  # « maintenant je voudrais des gaufres » : autre produit (modele)
         if nouveau_projet and intention in ("precision", "question", "question_piste", "hors_sujet"):
-            intention = "nouvelle_demande"  # « une autre boisson », « maintenant je voudrais… »
+            intention = "nouvelle_demande"  # « une autre boisson », « maintenant je voudrais un sirop »
         a["intention"], a["numero"] = intention, llm["numero"] if intention == "choix_piste" else None
         a["trace"]["intention"] = intention
         return a
@@ -1259,6 +1291,11 @@ class AssistantV22:
                   "recherchez (fruité, vanillé, acidulé…) et le type de produit.")
         if intention == "hors_sujet" and self.marque_citee and not p["messages"]:
             return marque
+        if self.refus_echantillons:
+            return ("Entendu, je ne prépare pas de demande d'échantillons. "
+                    + ("Votre brief est conservé : vous pourrez la demander plus tard, ou ajuster "
+                       "votre projet." if self.piste_choisie else
+                       "Dites-moi si vous souhaitez ajuster votre projet."))
         if intention in ("hors_sujet", "question"):
             accueil = ("Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous "
                        "créer, et quel goût imaginez-vous ?")
@@ -1444,6 +1481,9 @@ class AssistantV22:
         else:
             analyse = self.analyser(message)
             self.marque_citee = bool(analyse.get("marques"))
+        self.refus_echantillons = bool(analyse.get("refus_echantillons"))
+        if self.refus_echantillons:
+            self.demande_echantillons = None  # pas de brouillon ; piste et brief conserves
         intention = analyse["intention"]
         self.hors_bornes = None
         seulement_volume = intention == "precision" and analyse.get("volume") and not any(

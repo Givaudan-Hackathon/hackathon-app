@@ -18,8 +18,8 @@ Mesure du 2026-11-12. Les cas (`benchmark/cas_reference_30.csv`) ont été écri
 | Cas réussis — boisson_agrumes | 11/15 (73%)    | 13/15 (87%)               |
 | Cas réussis — autre_produit   | 7/10 (70%)     | 8/10 (80%)                |
 | Cas réussis — flou_hors_sujet | 0/5 (0%)       | 5/5 (100%)                |
-| Temps moyen par cas           | 0.80 s         | 1.37 s                    |
-| Temps médian par cas          | 0.60 s         | 0.73 s                    |
+| Temps moyen par cas           | 0.80 s         | 1.27 s                    |
+| Temps médian par cas          | 0.60 s         | 0.64 s                    |
 
 Cas gagnés : C10, C14, C22, C26, C27, C28, C29, C30. Cas perdus : aucun.
 
@@ -51,7 +51,7 @@ Cas gagnés : C10, C14, C22, C26, C27, C28, C29, C30. Cas perdus : aucun.
 | Aucun prix inventé            | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
 | **Cas entièrement réussi**    | 26/30 (87%)  | 13/15 (87%)     | 8/10 (80%)    | 5/5 (100%)      |
 
-Temps de réponse V2.2 : moyenne 1.37 s, médiane 0.73 s, max 6.17 s ; modèle appelé pour 5 cas sur 30 (moyenne 5.31 s ces fois-là, 0.59 s sinon).
+Temps de réponse V2.2 : moyenne 1.27 s, médiane 0.64 s, max 5.72 s ; modèle appelé pour 5 cas sur 30 (moyenne 5.06 s ces fois-là, 0.51 s sinon).
 
 ## Comparaison V1 / V2.1 / V2.2
 
@@ -62,7 +62,7 @@ Temps de réponse V2.2 : moyenne 1.37 s, médiane 0.73 s, max 6.17 s ; modèle a
 | Arôme(s) attendus dans les 5 produits recommandés (V1) | 13/23 (57%)                  | —            | —            |
 | Pistes ou relance, cas qui l'attendent                 | —                            | 25/26 (96%)  | 26/26 (100%) |
 | Aucune marque citée                                    | (produits du commerce : non) | 30/30 (100%) | 30/30 (100%) |
-| Temps moyen par cas                                    | < 0,1 s                      | 5.13 s       | 1.37 s       |
+| Temps moyen par cas                                    | < 0,1 s                      | 5.13 s       | 1.27 s       |
 
 ## Échecs (réponse obtenue)
 
