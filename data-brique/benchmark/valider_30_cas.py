@@ -193,6 +193,33 @@ def taux(serie: pd.Series) -> str:
     return f"{serie.sum()}/{len(serie)} ({serie.mean():.0%})" if len(serie) else "—"
 
 
+AVANT = RACINE / "benchmark" / "sorties" / "validation_30_cas_avant.csv"
+
+
+def avant_apres(df: pd.DataFrame) -> list[str]:
+    """Tableau AVANT (V2.2.2, mesure du 2026-11-12 avant correction) / APRES (cette mesure)."""
+    if not AVANT.exists():
+        return []
+    avant = pd.read_csv(AVANT)
+    lignes = ["", "## Avant / après les corrections par mécanismes", "",
+              "| Critère | Avant (V2.2.2) | Après (" + VERSION_V22 + ") |", "|---|---|---|"]
+    for cle, nom in [("type_ok", "Type de produit"), ("aromes_ok", "Arôme(s), tous trouvés"),
+                     ("arome_principal_ok", "Arôme principal"), ("contraintes_ok", "Contraintes"),
+                     ("comportement_ok", "Comportement"), ("sans_marque", "Aucune marque"),
+                     ("sans_chiffre_invente", "Aucun chiffre inventé"), ("sans_prix", "Aucun prix inventé"),
+                     ("cas_reussi", "**Cas entièrement réussi**")]:
+        lignes.append(f"| {nom} | {taux(avant[cle])} | {taux(df[cle])} |")
+    for cat in CATEGORIES:
+        lignes.append(f"| Cas réussis — {cat} | {taux(avant[avant.categorie == cat].cas_reussi)} | "
+                      f"{taux(df[df.categorie == cat].cas_reussi)} |")
+    lignes.append(f"| Temps moyen par cas | {avant.secondes.mean():.2f} s | {df.secondes.mean():.2f} s |")
+    lignes.append(f"| Temps médian par cas | {avant.secondes.median():.2f} s | {df.secondes.median():.2f} s |")
+    gagnes = sorted(set(df[df.cas_reussi].id) - set(avant[avant.cas_reussi].id))
+    perdus = sorted(set(avant[avant.cas_reussi].id) - set(df[df.cas_reussi].id))
+    lignes += ["", f"Cas gagnés : {', '.join(gagnes) or 'aucun'}. Cas perdus : {', '.join(perdus) or 'aucun'}."]
+    return lignes
+
+
 def rapport(df: pd.DataFrame, ignorees: list[str]) -> str:
     criteres = [("type_ok", "Type de produit"), ("aromes_ok", "Arôme(s), tous trouvés"),
                 ("arome_principal_ok", "Arôme principal"), ("contraintes_ok", "Contraintes (égalité stricte)"),
@@ -200,8 +227,10 @@ def rapport(df: pd.DataFrame, ignorees: list[str]) -> str:
                 ("sans_chiffre_invente", "Aucun chiffre inventé"), ("sans_prix", "Aucun prix inventé"),
                 ("cas_reussi", "**Cas entièrement réussi**")]
     l = [f"# Validation sur les 30 cas de référence (V2.2, `{VERSION_V22}`)", "",
-         f"Mesure du {date.today().isoformat()}, **avant toute correction**. Les cas "
-         "(`benchmark/cas_reference_30.csv`) ont été écrits avant le test et n'ont pas été modifiés.",
+         f"Mesure du {date.today().isoformat()}. Les cas (`benchmark/cas_reference_30.csv`) ont été "
+         "écrits avant le test et n'ont pas été modifiés. Le résultat **avant correction** (V2.2.2, "
+         "18/30) est conservé dans `benchmark/sorties/validation_30_cas_avant.csv`.",
+         *avant_apres(df),
          "", "## Méthode", "",
          "- Chaque cas est le **premier message d'une nouvelle session**.",
          "- V2.2 : `AssistantV22` en mode rapide (défaut), catalogue Flavors complet (8 943 "

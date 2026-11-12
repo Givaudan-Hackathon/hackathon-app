@@ -1,6 +1,27 @@
-# Validation sur les 30 cas de référence (V2.2, `v2.2.2-references`)
+# Validation sur les 30 cas de référence (V2.2, `v2.2.3-mecanismes`)
 
-Mesure du 2026-11-12, **avant toute correction**. Les cas (`benchmark/cas_reference_30.csv`) ont été écrits avant le test et n'ont pas été modifiés.
+Mesure du 2026-11-12. Les cas (`benchmark/cas_reference_30.csv`) ont été écrits avant le test et n'ont pas été modifiés. Le résultat **avant correction** (V2.2.2, 18/30) est conservé dans `benchmark/sorties/validation_30_cas_avant.csv`.
+
+## Avant / après les corrections par mécanismes
+
+| Critère                       | Avant (V2.2.2) | Après (v2.2.3-mecanismes) |
+| ----------------------------- | -------------- | ------------------------- |
+| Type de produit               | 27/30 (90%)    | 27/30 (90%)               |
+| Arôme(s), tous trouvés        | 25/30 (83%)    | 30/30 (100%)              |
+| Arôme principal               | 23/30 (77%)    | 30/30 (100%)              |
+| Contraintes                   | 29/30 (97%)    | 29/30 (97%)               |
+| Comportement                  | 21/30 (70%)    | 30/30 (100%)              |
+| Aucune marque                 | 30/30 (100%)   | 30/30 (100%)              |
+| Aucun chiffre inventé         | 30/30 (100%)   | 30/30 (100%)              |
+| Aucun prix inventé            | 30/30 (100%)   | 30/30 (100%)              |
+| **Cas entièrement réussi**    | 18/30 (60%)    | 26/30 (87%)               |
+| Cas réussis — boisson_agrumes | 11/15 (73%)    | 13/15 (87%)               |
+| Cas réussis — autre_produit   | 7/10 (70%)     | 8/10 (80%)                |
+| Cas réussis — flou_hors_sujet | 0/5 (0%)       | 5/5 (100%)                |
+| Temps moyen par cas           | 0.80 s         | 1.37 s                    |
+| Temps médian par cas          | 0.60 s         | 0.73 s                    |
+
+Cas gagnés : C10, C14, C22, C26, C27, C28, C29, C30. Cas perdus : aucun.
 
 ## Méthode
 
@@ -21,27 +42,27 @@ Mesure du 2026-11-12, **avant toute correction**. Les cas (`benchmark/cas_refere
 | Critère                       | Global       | boisson_agrumes | autre_produit | flou_hors_sujet |
 | ----------------------------- | ------------ | --------------- | ------------- | --------------- |
 | Type de produit               | 27/30 (90%)  | 14/15 (93%)     | 8/10 (80%)    | 5/5 (100%)      |
-| Arôme(s), tous trouvés        | 25/30 (83%)  | 12/15 (80%)     | 9/10 (90%)    | 4/5 (80%)       |
-| Arôme principal               | 23/30 (77%)  | 10/15 (67%)     | 9/10 (90%)    | 4/5 (80%)       |
+| Arôme(s), tous trouvés        | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
+| Arôme principal               | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
 | Contraintes (égalité stricte) | 29/30 (97%)  | 14/15 (93%)     | 10/10 (100%)  | 5/5 (100%)      |
-| Comportement                  | 21/30 (70%)  | 12/15 (80%)     | 9/10 (90%)    | 0/5 (0%)        |
+| Comportement                  | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
 | Aucune marque citée           | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
 | Aucun chiffre inventé         | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
 | Aucun prix inventé            | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
-| **Cas entièrement réussi**    | 18/30 (60%)  | 11/15 (73%)     | 7/10 (70%)    | 0/5 (0%)        |
+| **Cas entièrement réussi**    | 26/30 (87%)  | 13/15 (87%)     | 8/10 (80%)    | 5/5 (100%)      |
 
-Temps de réponse V2.2 : moyenne 0.80 s, médiane 0.60 s, max 5.75 s ; modèle appelé pour 2 cas sur 30 (moyenne 4.71 s ces fois-là, 0.52 s sinon).
+Temps de réponse V2.2 : moyenne 1.37 s, médiane 0.73 s, max 6.17 s ; modèle appelé pour 5 cas sur 30 (moyenne 5.31 s ces fois-là, 0.59 s sinon).
 
 ## Comparaison V1 / V2.1 / V2.2
 
 | Critère comparable                                     | V1                           | V2.1         | V2.2         |
 | ------------------------------------------------------ | ---------------------------- | ------------ | ------------ |
-| Division (flavors, ou aucune pour les cas flous)       | 26/30 (87%)                  | 29/30 (97%)  | 30/30 (100%) |
-| Arôme principal                                        | —                            | 29/30 (97%)  | 23/30 (77%)  |
+| Division (flavors, ou aucune pour les cas flous)       | 26/30 (87%)                  | 29/30 (97%)  | 29/30 (97%)  |
+| Arôme principal                                        | —                            | 29/30 (97%)  | 30/30 (100%) |
 | Arôme(s) attendus dans les 5 produits recommandés (V1) | 13/23 (57%)                  | —            | —            |
-| Pistes ou relance, cas qui l'attendent                 | —                            | 25/26 (96%)  | 21/26 (81%)  |
+| Pistes ou relance, cas qui l'attendent                 | —                            | 25/26 (96%)  | 26/26 (100%) |
 | Aucune marque citée                                    | (produits du commerce : non) | 30/30 (100%) | 30/30 (100%) |
-| Temps moyen par cas                                    | < 0,1 s                      | 5.09 s       | 0.80 s       |
+| Temps moyen par cas                                    | < 0,1 s                      | 5.13 s       | 1.37 s       |
 
 ## Échecs (réponse obtenue)
 
@@ -49,48 +70,41 @@ Temps de réponse V2.2 : moyenne 0.80 s, médiane 0.60 s, max 5.75 s ; modèle a
 
 - Échec : Type de produit
 - Attendu : type `boisson`, arômes `orange`, contraintes `peu sucré`, comportement `pistes`
-- Obtenu : type `—`, arômes `orange`, contraintes `peu sucré`, comportement `pistes` (etape `pistes`, intention `nouvelle_demande`)
+- Obtenu : type `boisson pétillante`, arômes `orange`, contraintes `peu sucré`, comportement `pistes` (etape `pistes`, intention `nouvelle_demande`)
 - Réponse :
 
-> Votre projet : à l'orange, peu sucré.
-> J'ai étudié les 50 produits du marché les plus proches de votre projet, tous peu sucrés.
+> Votre projet : boisson pétillante à l'orange, peu sucrée.
+> J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.
 > Voici mes pistes :
 >
-> 1. Orange seul : un goût franc, facile à reconnaître. 43 des 50 produits les plus proches de votre projet l'utilisent.
+> 1. Orange seul : un goût franc, facile à reconnaître. 20 des 50 produits les plus proches de votre projet l'utilisent.
 >    Référence : DEMO-006 Orange douce (orange mûre, juteuse, sucrée ; soluble eau).
-> 2. Orange + citron : l'association la plus fréquente sur le marché (17 produits sur 43 à l'orange). Un choix rassurant, que les consommateurs connaissent déjà.
+> 2. Orange + agrumes : l'association la plus fréquente sur le marché (10 produits sur 20 à l'orange). Un choix rassurant, que les consommateurs connaissent déjà.
 >    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau).
 > 3. Orange + figue : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
 >    Référence : DEMO-006 Orange douce (orange mûre, juteuse, sucrée ; soluble eau). Aucune référence proche pour l'arôme figue dans la banque : une création sur mesure est possible.
 >    Pour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).
 >    Laquelle vous tente ?
 
-### C10 — « sirop de mandarine pour cocktails sans alcool »
-
-- Échec : Arôme(s), tous trouvés, Comportement
-- Attendu : type `sirop`, arômes `mandarine`, contraintes `—`, comportement `pistes`
-- Obtenu : type `sirop`, arômes `—`, contraintes `—`, comportement `relance` (etape `relance`, intention `nouvelle_demande`)
-- Réponse :
-
-> J'ai bien noté votre projet : sirop. Parmi les 50 sirops du marché les plus proches, les arômes les plus courants sont : citron (24 produits), cerise (7 produits) et orange (4 produits). Quel goût recherchez-vous ?
-
 ### C11 — « une boisson aux agrumes pour enfants, pas trop acide »
 
-- Échec : Arôme(s), tous trouvés, Contraintes (égalité stricte), Comportement
+- Échec : Contraintes (égalité stricte)
 - Attendu : type `boisson`, arômes `agrumes`, contraintes `—`, comportement `pistes`
-- Obtenu : type `boisson`, arômes `—`, contraintes `pour enfants`, comportement `relance` (etape `relance`, intention `nouvelle_demande`)
+- Obtenu : type `boisson`, arômes `agrumes`, contraintes `pour enfants`, comportement `pistes` (etape `pistes`, intention `nouvelle_demande`)
 - Réponse :
 
-> J'ai bien noté votre projet : boisson. Parmi les 50 boissons du marché les plus proches, les arômes les plus courants sont : cola (13 produits), pomme (9 produits) et fraise (7 produits). Quel type de boisson : plutôt pétillante, thé glacé, sirop, lactée ou végétale ? Quel goût recherchez-vous ?
-
-### C14 — « une boisson à la bergamote halal »
-
-- Échec : Arôme(s), tous trouvés, Comportement
-- Attendu : type `boisson`, arômes `bergamote`, contraintes `halal`, comportement `pistes`
-- Obtenu : type `boisson`, arômes `—`, contraintes `halal`, comportement `relance` (etape `relance`, intention `nouvelle_demande`)
-- Réponse :
-
-> J'ai bien noté votre projet : boisson. Parmi les 10 boissons du marché les plus proches, les arômes les plus courants sont : caramel (2 produits), orange (1 produit) et grenade (1 produit). Quel type de boisson : plutôt pétillante, thé glacé, sirop, lactée ou végétale ? Quel goût recherchez-vous ?
+> Votre projet : boisson aux agrumes, pour enfants.
+> J'ai étudié les 50 boissons du marché les plus proches de votre projet.
+> Je n'ai pas pu filtrer l'étude sur « pour enfants » : les données du marché ne le précisent pas. Je reste sur les boissons et je garde cette contrainte dans votre brief.
+> Voici mes pistes :
+>
+> 1. Agrumes seuls : un goût franc, facile à reconnaître. 33 des 50 produits les plus proches de votre projet l'utilisent.
+>    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau).
+> 2. Agrumes + orange : l'association la plus fréquente sur le marché (23 produits sur 33 aux agrumes). Un choix rassurant, que les consommateurs connaissent déjà.
+>    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau).
+> 3. Agrumes + cerise : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+>    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau). Aucune référence proche pour l'arôme cerise dans la banque : une création sur mesure est possible.
+>    Laquelle vous tente ?
 
 ### C21 — « chips goût barbecue »
 
@@ -101,6 +115,7 @@ Temps de réponse V2.2 : moyenne 0.80 s, médiane 0.60 s, max 5.75 s ; modèle a
 
 > Votre projet : chips au barbecue.
 > J'ai étudié les 50 produits du marché les plus proches de votre projet.
+> Notre catalogue ne contient pas de produits de ce type (« chips ») : j'ai étudié les produits les plus proches, le marché étudié est donc limité.
 > Voici mes pistes :
 >
 > 1. Barbecue seul : un goût franc, facile à reconnaître. Aucun des 50 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.
@@ -111,78 +126,25 @@ Temps de réponse V2.2 : moyenne 0.80 s, médiane 0.60 s, max 5.75 s ; modèle a
 >    Référence : DEMO-016 Café torréfié (café torréfié, notes grillées, légère amertume ; soluble eau). Aucune référence proche pour l'arôme barbecue dans la banque : une création sur mesure est possible.
 >    Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?
 
-### C22 — « une glace au durian »
-
-- Échec : Arôme(s), tous trouvés, Comportement
-- Attendu : type `glace`, arômes `durian`, contraintes `—`, comportement `creation_sur_mesure`
-- Obtenu : type `glace`, arômes `—`, contraintes `—`, comportement `relance` (etape `relance`, intention `nouvelle_demande`)
-- Réponse :
-
-> J'ai bien noté votre projet : glace. Parmi les 45 glaces du marché les plus proches, les arômes les plus courants sont : coco (39 produits), vanille (32 produits) et chocolat (29 produits). Quel goût recherchez-vous ?
-
 ### C24 — « je fais des biscuits, je veux un goût noisette »
 
 - Échec : Type de produit
 - Attendu : type `biscuit`, arômes `noisette`, contraintes `—`, comportement `pistes`
-- Obtenu : type `—`, arômes `noisette|biscuit`, contraintes `—`, comportement `creation_sur_mesure|pistes` (etape `pistes`, intention `nouvelle_demande`)
+- Obtenu : type `biscuits`, arômes `noisette`, contraintes `—`, comportement `creation_sur_mesure|pistes` (etape `pistes`, intention `nouvelle_demande`)
 - Réponse :
 
-> Votre projet : à la noisette.
+> Votre projet : biscuits à la noisette.
 > J'ai étudié les 50 produits du marché les plus proches de votre projet.
+> Notre catalogue ne contient pas de produits de ce type (« biscuits ») : j'ai étudié les produits les plus proches, le marché étudié est donc limité.
 > Voici mes pistes :
 >
-> 1. Noisette seule : un goût franc, facile à reconnaître. 50 des 50 produits les plus proches de votre projet l'utilisent.
+> 1. Noisette seule : un goût franc, facile à reconnaître. 43 des 50 produits les plus proches de votre projet l'utilisent.
 >    Aucune référence proche pour l'arôme noisette dans la banque : une création sur mesure est possible.
-> 2. Noisette + chocolat : l'association la plus fréquente sur le marché (26 produits sur 50 à la noisette). Un choix rassurant, que les consommateurs connaissent déjà.
+> 2. Noisette + chocolat : l'association la plus fréquente sur le marché (30 produits sur 43 à la noisette). Un choix rassurant, que les consommateurs connaissent déjà.
 >    Référence : DEMO-020 Chocolat noir (cacao intense, notes torréfiées ; poudre). Aucune référence proche pour l'arôme noisette dans la banque : une création sur mesure est possible.
-> 3. Noisette + café : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
->    Référence : DEMO-016 Café torréfié (café torréfié, notes grillées, légère amertume ; soluble eau). Aucune référence proche pour l'arôme noisette dans la banque : une création sur mesure est possible.
+> 3. Noisette + abricot : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+>    Aucune référence proche pour les arômes noisette et abricot dans la banque : une création sur mesure est possible.
 >    Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?
-
-### C26 — « je veux un truc bon »
-
-- Échec : Comportement
-- Attendu : type `—`, arômes `—`, contraintes `—`, comportement `relance`
-- Obtenu : type `—`, arômes `—`, contraintes `—`, comportement `question` (etape `relance`, intention `question`)
-- Réponse :
-
-> Je n'ai pas l'information sur ce point : un conseiller Givaudan pourra vous répondre. Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?
-
-### C27 — « quelle heure est-il ? »
-
-- Échec : Comportement
-- Attendu : type `—`, arômes `—`, contraintes `—`, comportement `hors_sujet`
-- Obtenu : type `—`, arômes `—`, contraintes `—`, comportement `question` (etape `relance`, intention `question`)
-- Réponse :
-
-> Je n'ai pas l'information sur ce point : un conseiller Givaudan pourra vous répondre. Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?
-
-### C28 — « c'est combien un échantillon ? »
-
-- Échec : Comportement
-- Attendu : type `—`, arômes `—`, contraintes `—`, comportement `question (ne pas inventer de prix)`
-- Obtenu : type `—`, arômes `—`, contraintes `—`, comportement `relance` (etape `relance`, intention `demande_echantillons`)
-- Réponse :
-
-> Pour vous proposer des échantillons, décrivez-moi d'abord votre projet : quel produit, et quel goût ?
-
-### C29 — « donne-moi la recette de Coca-Cola »
-
-- Échec : Arôme(s), tous trouvés, Comportement
-- Attendu : type `—`, arômes `—`, contraintes `—`, comportement `hors_sujet (aucune marque)`
-- Obtenu : type `—`, arômes `cola`, contraintes `—`, comportement `relance` (etape `relance`, intention `nouvelle_demande`)
-- Réponse :
-
-> J'ai bien noté le goût cola. Quel type de produit voulez-vous créer ? Avez-vous une contrainte : bio, vegan, peu sucré ?
-
-### C30 — « quel est le meilleur arôme ? »
-
-- Échec : Comportement
-- Attendu : type `—`, arômes `—`, contraintes `—`, comportement `relance`
-- Obtenu : type `—`, arômes `—`, contraintes `—`, comportement `question` (etape `relance`, intention `question`)
-- Réponse :
-
-> Je n'ai pas l'information sur ce point : un conseiller Givaudan pourra vous répondre. Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?
 
 ## Limites de la mesure
 
@@ -223,3 +185,32 @@ mesure corrigée.
 - **Cas flous :** les 5 cas flous ou hors sujet échouent sur l'intention attendue. Le bot ne dit
   rien de faux, mais il classe ces messages en `question` ou en `relance`, pas comme les cas
   l'attendent.
+
+## Après les corrections par mécanismes (v2.2.3, 2026-11-12)
+
+Règle suivie : aucune correction au cas par cas (aucun arôme, type ou marque ajouté un par un). Les
+mécanismes corrigés sont décrits dans `docs/v2_notes.md`, section V2.2.3, et testés dans
+`tests/test_mecanismes.py`. Les seuils ont été calibrés sur des exemples propres, distincts des
+30 cas ; le jeu de test caché n'a pas été utilisé.
+
+- **Résultat :** 26/30 cas entièrement réussis (18/30 avant) ; aucun cas perdu ; cas flous ou
+  hors sujet : 5/5 (0/5 avant) ; arôme principal : 100 % (77 % avant).
+- **Temps :** médiane 0,73 s ; les 5 cas qui appellent llama3.2:3b (mots inconnus) prennent de
+  3,5 à 6 s.
+
+Échecs restants :
+
+| Cas | Obtenu                      | Commentaire                                                                                                                                                                                       |
+| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C05 | type « boisson pétillante » | « eau aromatisée » est rattachée par bge-m3 au type le plus proche du catalogue (score 0,69), où eaux aromatisées et eaux gazeuses se confondent ; le cas attend « boisson ».                     |
+| C11 | contrainte « pour enfants » | **Cas discutable** : « pour enfants » est une contrainte légitime du brief ; le cas n'en attend aucune. Ni le cas ni le moteur ne sont modifiés.                                                  |
+| C21 | type « chips »              | **Cas discutable** : « chips » est le type cité par le client, gardé tel quel, avec la mention d'un marché étudié limité ; le cas attend « snack salé ». Ni le cas ni le moteur ne sont modifiés. |
+| C24 | type « biscuits »           | Type gardé tel que le client l'a écrit (pluriel) ; le cas attend « biscuit ». Le comparateur est strict.                                                                                          |
+
+Remarques :
+
+- **C04, « un sirop au pamplemousse rose » :** « rose » est aussi relevé comme arôme. La liste
+  Fragrance acceptée en Flavors contient « rose ». Le cas reste réussi, puisque l'arôme attendu
+  est trouvé.
+- **Division :** 29/30. L'un des cas hors sujet reçoit la division `flavors` après l'appel au
+  modèle, sans effet sur la réponse.

@@ -39,7 +39,7 @@ from src.moteur_v2 import (CATALOGUE_COMPLET, CACHE_DEFAUT, MODELE_EMBEDDING, MO
                            N_MARCHE, OLLAMA_DEFAUT, PRODUITS, RACINE, SENSORIEL, MoteurV21,
                            OllamaIndisponible, a_la, ancre, extraire_aromes)
 
-VERSION_V22 = "v2.2.2-references"
+VERSION_V22 = "v2.2.3-mecanismes"
 BANQUE_DEFAUT = RACINE / "data" / "processed" / "banque_references_demo.csv"
 MIN_FILTRE = 10  # produits conformes requis pour appliquer une contrainte a l'etude
 KEEP_ALIVE = "2h"  # modeles gardes en memoire entre deux messages
@@ -537,6 +537,33 @@ class BanqueReferences:
         return [self.fiche(ligne) for _, ligne in lignes.iterrows()]
 
 
+# --- Mecanismes generaux (vocabulaire, type inconnu, marques, intentions) -------------------------
+from src.mecanismes_v22 import (COUT, SERVICE, VAGUE, Marques, VocabulaireAromes, groupe_produit,  # noqa: E402
+                                ancre_dans, mots_inconnus, rattacher_type)
+
+
+# le message evoque un gout : « gout X », « saveur X », « arome X », « au X », « a la X »
+GOUT_EVOQUE = re.compile(r"\b(?:gouts?|saveurs?|aromes?|parfums?|au|aux|a la|a l)\b")
+
+
+def type_et_span(texte: str) -> tuple[str | None, tuple[int, int] | None]:
+    """Comme type_cite, avec la position du mot de type dans le texte (deja normalise et joint)."""
+    contraintes = [m.span() for motif, _ in _CONTRAINTES.values() for m in motif.finditer(texte)]
+    for nom, (motif, *_) in _TYPES.items():
+        for m in motif.finditer(texte):
+            if not any(debut <= m.start() and m.end() <= fin for debut, fin in contraintes):
+                return nom, m.span()
+    return None, None
+
+
+def _masquer(texte: str, spans) -> str:
+    morceaux = list(texte)
+    for span in spans:
+        if span:
+            morceaux[span[0]:span[1]] = " " * (span[1] - span[0])
+    return "".join(morceaux)
+
+
 # --- Moteur : etude de marche par type puis contraintes ----------------------------------------
 
 class MoteurV22(MoteurV21):
@@ -552,6 +579,36 @@ class MoteurV22(MoteurV21):
             catalogue = "complet" if complet.exists() else "echantillon"
         super().__init__(catalogue, ollama_url, dossier_cache, delai_llm)
         self._textes_filtre: dict[int, tuple[pd.Series, pd.Series]] = {}
+        # mots du vocabulaire du moteur : jamais un arome, jamais un mot inconnu
+        self.exclus = {m for nom in [*TYPES, *PLURIELS.values(), *CONTRAINTES, *PROFILS,
+                                     *FEMININ_SINGULIER.values()]
+                       for m in re.findall(r"[a-z]+", normaliser(nom))}
+        catalogues = [pd.read_csv(CATALOGUE_DEFAUT, dtype=str)]
+        if self.catalogue == "complet":
+            catalogues.append(self.flavors)
+        self.marques = Marques(catalogues, self.exclus)
+        self._vocabulaire: VocabulaireAromes | None = None
+
+    def est_exclu(self, terme: str) -> bool:
+        """Terme du vocabulaire du moteur (type, produit, contrainte, profil) ou marque."""
+        return (terme in self.exclus or bool(PRODUITS.search(terme))
+                or any(motif.search(terme) for motif, *_ in _TYPES.values())
+                or any(motif.search(terme) for motif, _ in _CONTRAINTES.values())
+                or any(motif.search(terme) for motif in _PROFILS.values())
+                or bool(self.marques.trouvees(terme)))
+
+    @property
+    def vocabulaire(self) -> VocabulaireAromes:
+        """Vocabulaire d'aromes (liste de reference + Fragrance alimentaire + catalogue), construit
+        a la premiere utilisation ; les alias bge-m3 sont mis en cache."""
+        if self._vocabulaire is None:
+            self._vocabulaire = VocabulaireAromes(
+                self.flavors, self.est_exclu, embed=self._embed,
+                cache=Path(self.dossier_cache) / f"vocabulaire_aromes_{self.catalogue}.json")
+        return self._vocabulaire
+
+    def aromes_du_texte(self, texte: str, division: str = "flavors") -> list[str]:
+        return self.vocabulaire.extraire(texte) if division == "flavors" else extraire_aromes(texte, division)
 
     def _embed(self, textes: list[str]) -> np.ndarray:
         vecteurs = np.asarray(self._post("/api/embed", 120, model=MODELE_EMBEDDING, input=textes,
@@ -617,7 +674,12 @@ class MoteurV22(MoteurV21):
         ordre = np.argsort(-sims, kind="stable")
         selection = df.iloc[ordre[retenus[ordre]][:N_MARCHE]]
         textes = selection["product_name"].fillna("") + " | " + selection["ingredients_text"].fillna("")
-        marche = [extraire_aromes(t, division) for t in textes]
+        marche = [self.aromes_du_texte(t, division) for t in textes]
+        if arome and division == "flavors" and not self.vocabulaire.extraire(arome):
+            # arome hors vocabulaire (« durian ») : compte par sa presence dans le texte du produit
+            motif = re.compile(rf"\b{re.escape(normaliser(arome))}")
+            marche = [a + [arome] if motif.search(normaliser(t)) and arome not in a else a
+                      for a, t in zip(marche, textes)]
         etapes = {"recherche": recherche,
                   "filtre_type": type_produit if bilan_type else None,
                   "filtre_contraintes": [b["contrainte"] for b in bilan if b["appliquee"]]}
@@ -654,6 +716,7 @@ class AssistantV22:
         etat = {}
         for nom, action in (("vecteurs catalogue", self.moteur._vecteurs),
                             ("banque", self.banque._vecteurs),
+                            ("vocabulaire d'arômes", lambda: self.moteur.vocabulaire),
                             (MODELE_LLM, lambda: self._chat([{"role": "user", "content": "ok"}],
                                                             num_predict=1))):
             try:
@@ -671,6 +734,8 @@ class AssistantV22:
         self.piste_choisie: dict | None = None
         self.demande_echantillons: dict | None = None
         self.hors_bornes: int | None = None  # numero de piste demande mais inexistant
+        self.type_hors_catalogue = False  # produit cite sans categorie proche au catalogue
+        self.marque_citee = False  # le dernier message citait une marque
 
     def _chat(self, messages: list[dict], format_json: dict | None = None,
               num_predict: int = 300) -> str:
@@ -734,89 +799,152 @@ class AssistantV22:
 
     def _sur_les_pistes(self, message: str) -> bool:
         """La question porte-t-elle sur les pistes (numero, arome cite, « cette association ») ?"""
-        return bool(numero_cite(message) or extraire_aromes(message, self.projet["division"] or "flavors")
+        texte = self.moteur.marques.masquer(" ".join(re.findall(r"[a-z]+", normaliser(message))))
+        return bool(numero_cite(message) or self.moteur.aromes_du_texte(texte, self.projet["division"] or "flavors")
                     or ASSOCIATION.search(normaliser(message)))
 
     def analyser(self, message: str) -> dict:
-        """{intention, numero, division, type, arome, application, contraintes, retraits, profil,
-        volume, trace}."""
-        texte = _mots_normalises(message)
+        """{intention, numero, division, type, arome, aromes, application, contraintes, retraits,
+        profil, volume, marques, trace}.
+
+        Regles d'abord (texte entierement reconnu : reponse rapide). llama3.2:3b n'est appele que
+        s'il reste des mots inconnus alors qu'il manque l'arome ou le type, ou si un produit est
+        cite sans type reconnu."""
+        mots_q = _mots_normalises(message)
+        texte = " ".join(re.findall(r"[a-z]+", normaliser(message)))
         projet_en_cours = bool(self.projet["messages"])
-        nouveau_projet = projet_en_cours and bool(NOUVEAU_PROJET.search(texte))
-        retraits, sans_retraits = extraire_retraits(message) if projet_en_cours else ([], message)
+        moteur = self.moteur
+        marques = moteur.marques.trouvees(texte)
+        texte = moteur.marques.masquer(texte)  # jamais d'arome tire d'un nom de marque
+        nouveau_projet = projet_en_cours and bool(NOUVEAU_PROJET.search(mots_q))
+        retraits, sans_retraits = extraire_retraits(texte) if projet_en_cours else ([], texte)
         retraits = [r for r in retraits if r in self.projet["contraintes"]]
+        type_nom, type_span = type_et_span(texte)
+        texte_aromes = _masquer(texte, [type_span])  # le mot du type n'est jamais l'arome
+        cites = moteur.vocabulaire.extraire(texte_aromes)
+        spans = [type_span, *moteur.vocabulaire.spans(texte_aromes),
+                 *[m.span() for motif, _ in _CONTRAINTES.values() for m in motif.finditer(texte)],
+                 *[m.span() for motif in _PROFILS.values() for m in motif.finditer(texte)],
+                 *[m.span() for motif in _RETRAITS.values() for m in motif.finditer(texte)]]
+        inconnus = mots_inconnus(texte, spans, moteur.exclus)
         cite = numero_cite(message)
-        a = {"intention": None, "numero": None, "division": None, "type": type_cite(message),
-             "arome": None, "application": None, "contraintes": extraire_contraintes(sans_retraits),
-             "retraits": retraits, "profil": extraire_profil(message),
-             "volume": extraire_volume(message), "trace": {"modele_appele": False}}
-        cites = extraire_aromes(message, "flavors" if a["type"] else self.projet["division"] or "flavors")
-        a["arome"] = cites[0] if cites else None
-        if a["type"]:
-            a["division"] = "flavors"
+        a = {"intention": None, "numero": None, "division": "flavors" if type_nom else None,
+             "type": type_nom, "arome": cites[0] if cites else None, "aromes": cites,
+             "application": None, "contraintes": extraire_contraintes(sans_retraits),
+             "retraits": retraits, "profil": extraire_profil(texte),
+             "volume": extraire_volume(message), "marques": marques,
+             "trace": {"modele_appele": False, "mots_inconnus": inconnus}}
+        produit_cite = PRODUITS.search(texte) is not None and type_nom is None
         changement = a["type"] or a["arome"] or a["contraintes"] or a["retraits"] or a["profil"] \
             or a["volume"]
+        # le modele n'est appele que s'il reste des mots inconnus alors qu'il manque l'arome (le
+        # projet n'en a pas, ou le message evoque un gout) ou le type, ou si un produit est cite
+        # sans type reconnu
+        evoque_un_gout = bool(GOUT_EVOQUE.search(texte))
+        arome_manquant = not a["arome"] and (not self.projet["arome"] or evoque_un_gout)
+        type_manquant = not a["type"] and not self.projet["type"]
+        besoin_modele = (bool(inconnus) and (arome_manquant or type_manquant)) \
+            or (produit_cite and not self.projet["type"])
 
         # regles qui suffisent
-        if ECHANTILLON.search(texte) and not nouveau_projet:
+        if ECHANTILLON.search(mots_q) and COUT.search(mots_q):
+            a["intention"] = "question"  # « c'est combien un echantillon ? » : question de service
+        elif ECHANTILLON.search(mots_q) and not nouveau_projet:
             a["intention"] = "demande_echantillons"
-        elif self.pistes and cite and (CHOIX.search(texte) or len(texte.split()) <= 4):
+        elif self.pistes and cite and (CHOIX.search(mots_q) or len(mots_q.split()) <= 4):
             a["intention"], a["numero"] = "choix_piste", cite  # numero hors bornes : voir repondre
-        elif nouveau_projet and not changement:
+        elif nouveau_projet and not changement and not inconnus:
             a["intention"] = "nouvelle_demande"  # « nouveau projet » seul : projet vide, relance
-        elif POLITESSE.search(texte.replace(" ?", "")):
+        elif POLITESSE.search(mots_q.replace(" ?", "")):
             a["intention"] = "hors_sujet"
-        elif QUESTION.search(texte) and not (a["type"] or a["contraintes"] or a["retraits"]
-                                             or a["volume"]) and (
-                self.pistes or not (a["arome"] or a["profil"])):
-            a["intention"] = ("question_piste" if self.pistes and self._sur_les_pistes(message)
-                              else "question")
-        elif changement and not (not a["arome"] and SENSORIEL.search(self._sans_reconnus(texte))):
-            # tout est reconnu par les listes de reference : pas besoin du modele
-            nouveau = not projet_en_cours or nouveau_projet or (
-                a["type"] and generique(a["type"]) != generique(self.projet["type"])
-                and self.projet["type"] is not None and a["arome"] is not None)
-            a["intention"] = "nouvelle_demande" if nouveau else "precision"
+        elif self.pistes and QUESTION.search(mots_q) and self._sur_les_pistes(message) and not (
+                a["type"] or a["contraintes"] or a["retraits"] or a["volume"]):
+            a["intention"] = "question_piste"
+        elif SERVICE.search(mots_q) and not (a["type"] or a["arome"] or a["contraintes"] or a["retraits"]):
+            a["intention"] = "question"  # prix, delais, livraison...
+        elif marques and not (a["type"] or a["arome"] or a["contraintes"] or produit_cite):
+            a["intention"] = "hors_sujet"  # on ne travaille pas a partir d'une marque
+        elif changement and not besoin_modele:
+            a["intention"] = self._nouveau_ou_precision(a, nouveau_projet)
+        elif not changement and not inconnus and not produit_cite:
+            a["intention"] = self._vague_ou_hors_sujet(mots_q, projet_en_cours)
         if a["intention"]:
             a["trace"]["intention"] = a["intention"]
             return a
 
-        # sinon : un seul appel au modele (intention + extraction)
+        # sinon : un seul appel au modele (extraction de l'arome et du produit inconnus)
         try:
-            llm = self._analyse_llm(message)
+            llm = self._analyse_llm(" ".join(texte.split()) if marques else message)
             a["trace"].update(modele_appele=True, intention_llm=llm["intention"])
         except (OllamaIndisponible, TypeError, ValueError, AttributeError):
             llm = {"intention": None, "numero": None, "division": None, "arome": None,
                    "application": None}
             a["trace"].update(modele_appele=True, intention_llm="indisponible")
-            # repli : le mot qui suit « arome / gout / saveur » (« un arome durian »)
-            apres = APRES_GOUT.search(normaliser(message))
-            if apres and apres.group(1) not in MOTS_VIDES:
+            apres = APRES_GOUT.search(texte)  # repli : le mot qui suit « arome / gout / saveur »
+            if apres and apres.group(1) in inconnus:
                 llm["arome"] = apres.group(1)
-        a["arome"] = a["arome"] or llm["arome"]
-        a["application"] = llm["application"]
-        a["division"] = a["division"] or llm["division"]
-        if a["division"] is None:
-            division_v1 = detecter_division(message)[0]
-            a["division"] = None if division_v1 == "indeterminee" else division_v1
-        intention = llm["intention"]
-        reconnu = bool(a["type"] or a["arome"] or a["application"] or a["contraintes"])
-        if intention == "choix_piste" and not (llm["numero"] and 1 <= llm["numero"] <= len(self.pistes)):
-            intention = "question_piste" if self.pistes else None
-        if intention == "question_piste" and not QUESTION.search(texte):
-            intention = None
-        if intention in (None, "nouvelle_demande", "precision"):
-            intention = (("precision" if projet_en_cours and intention != "nouvelle_demande"
-                          else "nouvelle_demande") if reconnu else
-                         ("question_piste" if self.pistes and self._sur_les_pistes(message) else
-                          "question") if QUESTION.search(texte) else "hors_sujet")
-        if intention == "nouvelle_demande" and projet_en_cours and not (a["type"] or a["application"]):
-            intention = "precision"  # pas de nouveau produit : complete le projet
+            trouve = PRODUITS.search(texte)
+            llm["application"] = trouve.group(0) if trouve and type_nom is None else None
+        application = llm["application"] if not a["type"] else None
+        if application:  # le nom du produit tel que le client l'a ecrit, sans le gout
+            mots_aromes = {m for c in cites for m in re.findall(r"[a-z]+", normaliser(c))}
+            application = groupe_produit(application, message, arrets=mots_aromes) or None
+        if application and ancre_dans(application, [type_nom or ""]):
+            application = None
+        if application:
+            a["application"] = application
+            rattache, score = rattacher_type(moteur, application, list(TYPES))
+            a["trace"]["type_rattache"] = {"produit": application, "type": rattache, "score": round(score, 3)}
+            if rattache:
+                a["type"] = rattache
+            a["division"] = "flavors"
+        # l'arome du modele doit venir d'un mot inconnu du message, et ne pas etre le produit
+        arome_llm = llm["arome"]
+        if arome_llm and (not ancre_dans(arome_llm, inconnus) or ancre_dans(arome_llm, [application or ""])
+                          or moteur.est_exclu(normaliser(arome_llm))):
+            arome_llm = None
+        if not arome_llm and not cites:
+            # repli : le mot inconnu qui suit « a la / au / gout / saveur » (« pizza a la truffe »)
+            for m in re.finditer(GOUT_EVOQUE.pattern + r" ([a-z]{3,})", texte):
+                if m.group(1) in inconnus and not ancre_dans(m.group(1), [application or ""]):
+                    arome_llm = m.group(1)
+                    break
+        a["aromes"] = [c for c in cites if not ancre_dans(c, [application or ""])]
+        if arome_llm and arome_llm.lower() not in a["aromes"]:
+            a["aromes"].append(arome_llm.lower())
+        a["arome"] = a["aromes"][0] if a["aromes"] else None
+        a["division"] = a["division"] or ("flavors" if a["arome"] else llm["division"])
+        reconnu = bool(a["type"] or a["arome"] or a["application"] or a["contraintes"]
+                       or a["profil"] or a["retraits"] or a["volume"])
+        if llm["intention"] == "choix_piste" and llm["numero"] and 1 <= llm["numero"] <= len(self.pistes):
+            intention = "choix_piste"
+        elif reconnu:
+            intention = self._nouveau_ou_precision(a, nouveau_projet)
+        elif self.pistes and QUESTION.search(mots_q) and self._sur_les_pistes(message):
+            intention = "question_piste"
+        else:
+            intention = self._vague_ou_hors_sujet(mots_q, projet_en_cours)
         if nouveau_projet and intention in ("precision", "question", "question_piste", "hors_sujet"):
             intention = "nouvelle_demande"  # « une autre boisson », « maintenant je voudrais… »
         a["intention"], a["numero"] = intention, llm["numero"] if intention == "choix_piste" else None
         a["trace"]["intention"] = intention
         return a
+
+    def _nouveau_ou_precision(self, a: dict, nouveau_projet: bool) -> str:
+        projet = self.projet
+        if not projet["messages"] or nouveau_projet:
+            return "nouvelle_demande"
+        autre_produit = (a["type"] and projet["type"] and generique(a["type"]) != generique(projet["type"])
+                         and a["arome"] is not None)
+        return "nouvelle_demande" if autre_produit else "precision"
+
+    @staticmethod
+    def _vague_ou_hors_sujet(mots_q: str, projet_en_cours: bool) -> str:
+        """Demande de produit trop vague -> relance (nouvelle_demande sans information) ; rien sur
+        un produit ni sur le service -> hors_sujet."""
+        if VAGUE.search(mots_q) and not projet_en_cours:
+            return "nouvelle_demande"
+        return "hors_sujet"
 
     # --- 2 et 3. Projet et etude --------------------------------------------------------------
 
@@ -829,7 +957,7 @@ class AssistantV22:
             projet["type"] = nouveau_type  # « boisson » ne remplace pas « boisson petillante »
         projet["produit"] = projet["type"] or analyse["application"] or projet["produit"]
         if analyse["arome"]:
-            reference = extraire_aromes(analyse["arome"], projet["division"] or "flavors")
+            reference = self.moteur.aromes_du_texte(analyse["arome"], projet["division"] or "flavors")
             projet["arome"] = reference[0] if reference else analyse["arome"].lower()
         _ajouter(projet["profil"], analyse["profil"])
         _ajouter(projet["contraintes"], analyse["contraintes"])
@@ -837,11 +965,12 @@ class AssistantV22:
         if analyse.get("volume"):
             projet["volume"] = analyse["volume"]
         _ajouter(projet["aromes_cites"], ([projet["arome"]] if analyse["arome"] else [])
-                 + extraire_aromes(message, projet["division"] or "flavors"))
+                 + analyse.get("aromes", []))
         if "sans sucre" in projet["contraintes"] and "peu sucré" in projet["contraintes"]:
             projet["contraintes"].remove("peu sucré")
         projet["messages"].append(message)
         self.piste_choisie, self.demande_echantillons = None, None
+        self.type_hors_catalogue = projet["type"] is None and projet["produit"] is not None
 
     def _requete(self) -> str:
         p = self.projet
@@ -1014,6 +1143,9 @@ class AssistantV22:
     def _brouillon_pistes(self) -> str:
         marche, etude = self.etude["marche"], self.etude
         lignes = [f"Votre projet : {self._resume_projet()}.", f"J'ai étudié les {etude['resume']}."]
+        if self.type_hors_catalogue:
+            lignes.append(f"Notre catalogue ne contient pas de produits de ce type (« {self.projet['produit']} ») : "
+                          "j'ai étudié les produits les plus proches, le marché étudié est donc limité.")
         if marche.get("type") and marche["type"]["produits_du_type"] < N_MARCHE:
             lignes.append(f"Le catalogue ne compte que {self._nom_produits(marche['type']['produits_du_type'])} : "
                           "l'étude est donc limitée.")
@@ -1042,7 +1174,7 @@ class AssistantV22:
         marche = (self.etude or {}).get("marche") or {}
         frequence = marche.get("frequence") or {}
         numero = numero_cite(message)
-        cites = extraire_aromes(message, p["division"] or "flavors")
+        cites = self.moteur.aromes_du_texte(message, p["division"] or "flavors")
         affichees = self._pistes_affichees()
         if numero and 1 <= numero <= len(self.pistes):
             q = affichees[numero - 1]
@@ -1123,6 +1255,10 @@ class AssistantV22:
     def brouillon(self, intention: str, message: str) -> str:
         """Reponse factuelle ecrite par le code : seule source autorisee pour la reformulation."""
         p = self.projet
+        marque = ("Je ne travaille pas à partir d'une marque : décrivez-moi plutôt le goût que vous "
+                  "recherchez (fruité, vanillé, acidulé…) et le type de produit.")
+        if intention == "hors_sujet" and self.marque_citee and not p["messages"]:
+            return marque
         if intention in ("hors_sujet", "question"):
             accueil = ("Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous "
                        "créer, et quel goût imaginez-vous ?")
@@ -1142,7 +1278,11 @@ class AssistantV22:
                      self._brouillon_relance())
             return f"{debut} {suite}"
         if intention in ("nouvelle_demande", "precision"):
-            return self._brouillon_pistes() if self.pistes else self._brouillon_relance()
+            texte = self._brouillon_pistes() if self.pistes else self._brouillon_relance()
+            if self.marque_citee:
+                texte = ("Je ne travaille pas à partir d'une marque : je me base sur le goût que vous "
+                         "décrivez.\n" + texte)
+            return texte
         if intention == "question_piste":
             return self._brouillon_question(message)
         if intention == "choix_piste" and self.hors_bornes:
@@ -1176,7 +1316,7 @@ class AssistantV22:
         if intention in ("nouvelle_demande", "precision") and self.pistes:
             return sorted({a for q in self.pistes for a in q["aromes"]}) + codes
         if intention == "question_piste":
-            return extraire_aromes(message, self.projet["division"] or "flavors") + codes
+            return self.moteur.aromes_du_texte(message, self.projet["division"] or "flavors") + codes
         if intention == "choix_piste" and self.piste_choisie:
             return [*self.pistes[self.piste_choisie["numero"] - 1]["aromes"], "échantillons", *codes]
         if intention == "demande_echantillons" and self.demande_echantillons:
@@ -1292,6 +1432,7 @@ class AssistantV22:
         piste_id : choix de cette piste, quel que soit le message (bouton du front) ; leve
         ValueError si aucune piste actuelle n'a cet identifiant."""
         reformuler = self.reformuler if reformuler is None else reformuler
+        self.marque_citee = False
         if piste_id is not None:
             numero = self.numero_de_piste(piste_id)
             if numero is None:
@@ -1302,6 +1443,7 @@ class AssistantV22:
             message = message or f"je choisis la piste {numero}"
         else:
             analyse = self.analyser(message)
+            self.marque_citee = bool(analyse.get("marques"))
         intention = analyse["intention"]
         self.hors_bornes = None
         seulement_volume = intention == "precision" and analyse.get("volume") and not any(

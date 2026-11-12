@@ -162,7 +162,7 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon          |
 | `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                       |
 | `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                  |
-| `version_modele` | string              | `v2.2.2-references`                                                                             |
+| `version_modele` | string              | `v2.2.3-mecanismes`                                                                             |
 | `attribution`    | string              | Mention ODbL **à afficher**                                                                     |
 
 ### `compris`
@@ -263,15 +263,15 @@ applicative (équipe Tech).
 
 ### Valeurs de `intention` (dernier message du client)
 
-| Valeur                 | Signification                                                                             | Exemple                                                  |
-| ---------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `nouvelle_demande`     | Premier projet, ou changement explicite de projet (projet vide)                           | « je voudrais créer une boisson », « une autre boisson » |
-| `precision`            | Complète ou corrige le projet (type, goût, contrainte ajoutée ou retirée, profil, volume) | « pétillante, goût citron vert », « finalement pas bio » |
-| `question`             | Question générale, sans rapport avec les pistes                                           | « c'est combien la livraison ? »                         |
-| `question_piste`       | Question sur les pistes ou un arôme                                                       | « pourquoi vous proposez cette association ? »           |
-| `choix_piste`          | Choix d'une piste (message ou `piste_id`) ; numéro inexistant : rien n'est choisi         | « je prends la piste 1 »                                 |
-| `demande_echantillons` | Demande d'échantillons                                                                    | « comment je reçois des échantillons ? »                 |
-| `hors_sujet`           | Salutation, remerciement, message sans rapport                                            | « Bonjour », « merci »                                   |
+| Valeur                 | Signification                                                                                                                                         | Exemple                                                                           |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `nouvelle_demande`     | Premier projet, changement explicite de projet (projet vide), ou demande de produit trop vague (`etape` = `relance`)                                  | « je voudrais créer une boisson », « une autre boisson », « je veux un truc bon » |
+| `precision`            | Complète ou corrige le projet (type, goût, contrainte ajoutée ou retirée, profil, volume)                                                             | « pétillante, goût citron vert », « finalement pas bio »                          |
+| `question`             | Question sur le service : prix, délais, livraison, coût d'un échantillon (un « ? » seul ne suffit pas)                                                | « c'est combien un échantillon ? », « vous livrez sous combien de temps ? »       |
+| `question_piste`       | Question sur les pistes ou un arôme                                                                                                                   | « pourquoi vous proposez cette association ? »                                    |
+| `choix_piste`          | Choix d'une piste (message ou `piste_id`) ; numéro inexistant : rien n'est choisi                                                                     | « je prends la piste 1 »                                                          |
+| `demande_echantillons` | Demande d'échantillons                                                                                                                                | « comment je reçois des échantillons ? »                                          |
+| `hors_sujet`           | Salutation, remerciement, message sans rapport avec un produit ou le service, ou demande à partir d'une marque (réponse : décrivez le goût recherché) | « Bonjour », « quelle heure est-il ? », « la recette de Coca-Cola »               |
 
 ## Erreurs
 
@@ -428,7 +428,7 @@ banque.
     "date": "2026-11-12",
     "brief_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio / Peut-être 5 000 bouteilles pour tester"
   },
-  "version_modele": "v2.2.2-references",
+  "version_modele": "v2.2.3-mecanismes",
   "attribution": "Étude de marché réalisée sur des données d'Open Food Facts (ODbL)"
 }
 ```

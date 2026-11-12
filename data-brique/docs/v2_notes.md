@@ -379,3 +379,56 @@ Scénario Product « kombucha d'été », avant / après :
   réponse. Un volume seul ne relance ni l'étude ni le choix.
 - **Limite :** la banque de démo n'a pas de référence fruit de la passion, d'où une création
   sur mesure.
+
+## V2.2.3 — corrections par mécanismes (validation 30 cas)
+
+Version : `v2.2.3-mecanismes`. Code : `src/mecanismes_v22.py`. Tests :
+`tests/test_mecanismes.py`. Contrat d'API inchangé (aucun champ ajouté, renommé ou supprimé).
+Validation : 26/30 cas (18/30 avant), voir `docs/validation_30_cas.md`.
+
+1. **Arômes inconnus.**
+   - **Vocabulaire tiré du catalogue :** les mots qui suivent « arôme », « goût » ou « saveur »
+     dans au moins 3 produits Flavors, sans liste écrite à la main (fleur de sureau, limette,
+     quinine, romarin…). Mots techniques des listes d'ingrédients, marques et vocabulaire du moteur
+     exclus.
+   - **Arômes Fragrance :** acceptés en Flavors quand au moins 5 produits alimentaires les citent,
+     en mot entier (mandarine, bergamote, agrumes, violette…).
+   - **Variantes d'écriture :** rattachées seulement si le sens (bge-m3) et l'orthographe sont tous
+     deux proches.
+   - **Appel au modèle :** llama3.2:3b n'est appelé que s'il reste des mots inconnus alors qu'il
+     manque l'arôme ou le type. L'arôme qu'il renvoie doit venir d'un de ces mots. Repli : le mot
+     inconnu qui suit « à la / au / goût ».
+   - **Étude de marché :** elle compte aussi ces arômes, et un arôme hors vocabulaire (« durian »)
+     par sa présence dans le texte des produits.
+2. **Le type n'est pas l'arôme.** Le mot du type est masqué avant l'extraction des arômes (« thé
+   glacé à la pêche » → pêche, pas thé). Un arôme qui est le produit cité est retiré (« biscuits »).
+3. **Types inconnus.**
+   - **Nom du produit :** llama3.2:3b extrait le produit, ramené à ce que le client a écrit
+     (« eau » → « eau aromatisée », « pizza à la truffe » → « pizza »).
+   - **Rattachement :** vote des 20 produits du catalogue les plus proches (bge-m3). Seuil de 0,60,
+     calibré sur 18 produits présents et 20 absents, hors cas de validation.
+   - **Rien d'assez proche :** le type reste tel que le client l'a dit, et le bot annonce un marché
+     étudié limité.
+4. **Intentions.** Un « ? » ne suffit plus à faire une question.
+   - `question` : le service (prix, délais, livraison, coût d'un échantillon).
+   - Relance : demande de produit trop vague (« je veux un truc bon », « quel est le meilleur
+     arôme ? »).
+   - `hors_sujet` : rien sur un produit ni sur le service.
+5. **Marques.**
+   - **Détection :** marques du catalogue présentes sur au moins 2 produits, hors mots courants et
+     vocabulaire du moteur. Elles sont masquées avant toute extraction : jamais d'arôme tiré d'une
+     marque.
+   - **Réponse :** polie, « je ne travaille pas à partir d'une marque, décrivez le goût
+     recherché ».
+6. **Non-régression (2e revue Codex) :**
+   - « une glace au durian » → durian ;
+   - « une boisson à la bergamote » → bergamote ;
+   - « un thé glacé à la pêche et au citron » → pêche et citron.
+
+Limites :
+
+- **Vocabulaire limité au catalogue :** un terme rare n'y entre pas, et passe alors par le modèle.
+- **Bruit du vocabulaire :** quelques termes discutables (« rocher », « panaché », « malt »).
+- **Rattachement de type :** il dépend des produits présents au catalogue (Flavors : boissons et
+  desserts).
+- **Temps :** environ 4 à 6 s pour un message qui appelle le modèle ; moins de 1,5 s sinon.
