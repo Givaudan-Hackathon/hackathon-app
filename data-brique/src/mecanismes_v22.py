@@ -257,14 +257,34 @@ class Marques:
         return self._motif.sub(lambda m: " " * len(m.group(0)), texte) if self._motif else texte
 
 
+# mots de lieu, de moment ou de maniere : jamais un arome (« au bord de l'eau », « a la maison »,
+# « une edition d'ete », « facon mojito »)
+MOTS_DE_CONTEXTE = set("""
+bord bords cote coeur place maison plage mer ocean lac riviere montagne campagne ville jardin
+terrasse soleil vacances voyage ete hiver printemps automne saison soir matin midi nuit journee
+moment fois debut fin facon maniere mode style base niveau fond centre milieu lieu pays region
+monde enfance famille fete noel edition impression ambiance esprit envie idee occasion
+""".split())
+
+
+def mot_de_contexte(mot: str, texte: str) -> bool:
+    """Le mot decrit-il un lieu ou un contexte plutot qu'un gout ? Vrai pour un mot de
+    MOTS_DE_CONTEXTE, ou un mot suivi de « de » dans le message (« au bord de », « au coeur de »,
+    « a la place de »). texte : message normalise."""
+    mot = normaliser(mot)
+    return mot in MOTS_DE_CONTEXTE or bool(re.search(rf"\b{re.escape(mot)} (?:de|d|du|des)\b", texte))
+
+
 def mots_inconnus(texte: str, spans: list[tuple[int, int]], exclus: set[str]) -> list[str]:
-    """Mots du message qui ne sont ni reconnus (spans), ni vides, ni du vocabulaire du moteur."""
+    """Mots du message qui ne sont ni reconnus (spans), ni vides, ni du vocabulaire du moteur, ni
+    des mots de lieu ou de contexte."""
     texte = normaliser(texte)
     masque = list(texte)
     for debut, fin in (span for span in spans if span):
         masque[debut:fin] = " " * (fin - debut)
     return [m for m in re.findall(r"[a-z]+", "".join(masque))
-            if len(m) >= 3 and m not in MOTS_VIDES and m not in TECHNIQUES and m not in exclus]
+            if len(m) >= 3 and m not in MOTS_VIDES and m not in TECHNIQUES and m not in exclus
+            and m not in MOTS_DE_CONTEXTE]
 
 
 def ancre_dans(terme: str | None, mots_cibles: list[str]) -> bool:

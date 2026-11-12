@@ -453,3 +453,16 @@ tests au total. Validation : 26/30, aucun cas perdu.
      piste.
    - Résultat : pas de brouillon (un brouillon existant est retiré), `etape` reste
      `recapitulatif`, brief conservé, réponse polie.
+
+## V2.2.5 — mots de lieu et de contexte (« au bord de l'eau »)
+
+Version `v2.2.5-contexte`. Contrat inchangé. Défaut constaté en démo : « …en vacances au bord de
+l'eau » donnait l'arôme « bord ». Le repli « mot inconnu après au / à la » ne s'applique plus :
+
+- à un mot suivi de « de » (« au bord de », « au cœur de », « à la place de ») ;
+- aux mots de lieu, de moment ou de manière (`MOTS_DE_CONTEXTE` : bord, plage, maison, été,
+  vacances, façon…).
+
+Ces mots ne comptent plus comme mots inconnus, et un arôme proposé par le modèle est refusé s'il
+en fait partie. Tests : `tests/test_revue_codex_3.py`, dont la phrase kombucha complète (aucun
+arôme, relance sur le goût). 77 tests au total. Validation : 26/30, aucun cas perdu.

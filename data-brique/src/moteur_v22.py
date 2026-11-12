@@ -39,7 +39,7 @@ from src.moteur_v2 import (CATALOGUE_COMPLET, CACHE_DEFAUT, MODELE_EMBEDDING, MO
                            N_MARCHE, OLLAMA_DEFAUT, PRODUITS, RACINE, SENSORIEL, MoteurV21,
                            OllamaIndisponible, a_la, ancre, extraire_aromes)
 
-VERSION_V22 = "v2.2.4-revue"
+VERSION_V22 = "v2.2.5-contexte"
 BANQUE_DEFAUT = RACINE / "data" / "processed" / "banque_references_demo.csv"
 MIN_FILTRE = 10  # produits conformes requis pour appliquer une contrainte a l'etude
 KEEP_ALIVE = "2h"  # modeles gardes en memoire entre deux messages
@@ -558,7 +558,7 @@ class BanqueReferences:
 
 # --- Mecanismes generaux (vocabulaire, type inconnu, marques, intentions) -------------------------
 from src.mecanismes_v22 import (COUT, SERVICE, VAGUE, Marques, VocabulaireAromes, groupe_produit,  # noqa: E402
-                                ancre_dans, mots_inconnus, rattacher_type)
+                                ancre_dans, mot_de_contexte, mots_inconnus, rattacher_type)
 
 
 # le message evoque un gout : « gout X », « saveur X », « arome X », « au X », « a la X »
@@ -931,12 +931,15 @@ class AssistantV22:
         # l'arome du modele doit venir d'un mot inconnu du message, et ne pas etre le produit
         arome_llm = llm["arome"]
         if arome_llm and (not ancre_dans(arome_llm, inconnus) or ancre_dans(arome_llm, [application or ""])
-                          or moteur.est_exclu(normaliser(arome_llm))):
+                          or moteur.est_exclu(normaliser(arome_llm))
+                          or (" " not in arome_llm.strip() and mot_de_contexte(arome_llm, texte))):
             arome_llm = None
         if not arome_llm and not cites:
-            # repli : le mot inconnu qui suit « a la / au / gout / saveur » (« pizza a la truffe »)
+            # repli : le mot inconnu qui suit « a la / au / gout / saveur » (« pizza a la truffe »),
+            # sauf un mot de lieu ou de contexte (« au bord de l'eau », « a la place de »)
             for m in re.finditer(GOUT_EVOQUE.pattern + r" ([a-z]{3,})", texte):
-                if m.group(1) in inconnus and not ancre_dans(m.group(1), [application or ""]):
+                if m.group(1) in inconnus and not ancre_dans(m.group(1), [application or ""]) \
+                        and not mot_de_contexte(m.group(1), texte):
                     arome_llm = m.group(1)
                     break
         a["aromes"] = [c for c in cites if not ancre_dans(c, [application or ""])]

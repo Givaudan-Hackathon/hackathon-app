@@ -162,7 +162,7 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon          |
 | `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                       |
 | `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                  |
-| `version_modele` | string              | `v2.2.4-revue`                                                                                  |
+| `version_modele` | string              | `v2.2.5-contexte`                                                                               |
 | `attribution`    | string              | Mention ODbL **à afficher**                                                                     |
 
 ### `compris`
@@ -438,7 +438,7 @@ banque.
     "date": "2026-11-12",
     "brief_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio / Peut-être 5 000 bouteilles pour tester"
   },
-  "version_modele": "v2.2.4-revue",
+  "version_modele": "v2.2.5-contexte",
   "attribution": "Étude de marché réalisée sur des données d'Open Food Facts (ODbL)"
 }
 ```

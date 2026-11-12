@@ -100,3 +100,39 @@ def test_demande_d_echantillons_toujours_reconnue(assistant):
     assistant.repondre("je prends la piste 1")
     resultat = assistant.repondre("comment je reçois des échantillons ?")
     assert resultat["intention"] == "demande_echantillons" and resultat["etape"] == "echantillons"
+
+
+# « au bord de l'eau » : un mot de lieu ou suivi de « de » n'est jamais un arome
+KOMBUCHA_1 = ("J'ai une marque de kombucha et je veux sortir une édition d'été. Un truc frais, un peu "
+              "exotique, qui donne l'impression d'être en vacances au bord de l'eau.")
+
+
+def test_kombucha_premier_message_sans_arome(assistant):
+    resultat = assistant.repondre(KOMBUCHA_1)  # sans Ollama : repli par regles
+    assert resultat["compris"]["type_produit"] == "kombucha"
+    assert resultat["compris"]["arome"] is None and resultat["compris"]["aromes"] == []
+    assert resultat["etape"] == "relance" and "Quel goût recherchez-vous ?" in resultat["texte"]
+
+
+def test_mot_de_contexte_refuse_meme_venant_du_modele(assistant):
+    assistant._analyse_llm = lambda message: {"intention": "nouvelle_demande", "numero": None,
+                                              "division": "flavors", "arome": "bord", "application": None}
+    resultat = assistant.repondre(KOMBUCHA_1)
+    assert resultat["compris"]["arome"] is None and resultat["etape"] == "relance"
+
+
+@pytest.mark.parametrize("message", ["une glace au cœur de l'été", "un sirop à la place de la grenadine du coin",
+                                     "une boisson pour la plage"])
+def test_mot_suivi_de_de_ou_de_lieu(message):
+    from src.mecanismes_v22 import mot_de_contexte
+    from src.moteur_v1 import normaliser
+    texte = " ".join(__import__("re").findall(r"[a-z]+", normaliser(message)))
+    mot = {"une glace au cœur de l'été": "coeur", "un sirop à la place de la grenadine du coin": "place",
+           "une boisson pour la plage": "plage"}[message]
+    assert mot_de_contexte(mot, texte)
+    assert not mot_de_contexte("truffe", "pizza a la truffe")
+
+
+def test_repli_apres_au_garde_un_vrai_gout(assistant):
+    resultat = assistant.repondre("une glace au durian")  # sans Ollama : repli « au durian »
+    assert resultat["compris"]["aromes"] == ["durian"]
