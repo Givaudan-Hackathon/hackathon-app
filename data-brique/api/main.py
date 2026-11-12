@@ -176,12 +176,21 @@ class Reference(BaseModel):
     labels: list[str]
 
 
+class ReferenceSansLabel(BaseModel):
+    arome: str = Field(examples=["chocolat"])
+    code: str = Field(description="Référence qui existe, mais sans le label demandé.",
+                      examples=["DEMO-020"])
+    label_manquant: str = Field(examples=["bio"])
+
+
 class Compris(BaseModel):
     division: Literal["flavors", "fragrance"] | None
     type_produit: str | None = Field(examples=["boisson pétillante"])
     arome: str | None = Field(description="Arôme principal.", examples=["citron vert"])
     aromes: list[str] = Field(description="Arômes cités par le client, le principal en premier.")
     contraintes: list[str] = Field(examples=[["peu sucré", "bio"]])
+    profil: list[str] = Field(default=[], description="Ajout V2.2.2 : profil recherché.",
+                              examples=[["frais", "exotique", "acidulé"]])
 
 
 class Piste(BaseModel):
@@ -195,6 +204,8 @@ class Piste(BaseModel):
     nb_produits_marche: int = Field(description="Produits du marché étudié qui justifient la piste.")
     references: list[Reference]
     sans_reference: list[str] = Field(description="Arômes sans référence : création sur mesure.")
+    references_sans_label: list[ReferenceSansLabel] = Field(
+        default=[], description="Ajout V2.2.2 : arômes dont la référence n'a pas le label demandé.")
     image: None = Field(default=None, description="Toujours null en V2 : visuel par défaut côté front.")
 
 
@@ -206,6 +217,11 @@ class Brief(BaseModel):
     codes_references: list[str]
     codes_solutions: list[str]
     creation_sur_mesure: list[str]
+    references_sans_label: list[ReferenceSansLabel] = Field(
+        default=[], description="Ajout V2.2.2 : arômes dont la référence n'a pas le label demandé.")
+    profil: list[str] = Field(default=[], description="Ajout V2.2.2 : profil recherché.")
+    volume: str | None = Field(default=None, description="Ajout V2.2.2 : volume cité par le client, "
+                                                         "tel quel (ex. « 5 000 bouteilles »).")
 
 
 class Echantillons(Brief):
@@ -264,7 +280,8 @@ def vers_contrat(session_id: str, r: dict) -> ReponseConversation:
     pistes = [Piste(id=p["id"], rang=p["numero"], nom=p["aromes"][0].upper() + p["aromes"][1:],
                     description=DESCRIPTIONS_PISTE[p["type"]], explication=p["explication"],
                     aromes=p["liste_aromes"], nb_produits_marche=p["nb_produits"],
-                    references=p["references"], sans_reference=p["sans_reference"])
+                    references=p["references"], sans_reference=p["sans_reference"],
+                    references_sans_label=p["references_sans_label"])
               for p in r["pistes"]]
     brief = None
     if r["brief_final"]:
@@ -272,9 +289,11 @@ def vers_contrat(session_id: str, r: dict) -> ReponseConversation:
         brief = {"type_produit": b["type_de_produit"], "piste_id": pistes[b["piste"] - 1].id,
                  "aromes": b["aromes"], "contraintes": b["contraintes"],
                  "codes_references": b["codes_references"], "codes_solutions": b["codes_solutions"],
-                 "creation_sur_mesure": b["creation_sur_mesure"]}
+                 "creation_sur_mesure": b["creation_sur_mesure"],
+                 "references_sans_label": b["references_sans_label"], "profil": b["profil"],
+                 "volume": b["volume"]}
     echantillons = None
-    if r["demande_echantillons"] and brief:
+    if r["demande_echantillons"] and brief:  # brouillon renvoye tant qu'il est valide
         echantillons = {**brief, "statut": "brouillon_non_envoye",
                         "date": r["demande_echantillons"]["date"],
                         "brief_client": r["demande_echantillons"]["brief_du_client"]}

@@ -36,10 +36,12 @@ def test_recommander(client, brief, division):
 CLES_REPONSE = {"session_id", "etape", "intention", "reponse", "compris", "pistes", "solutions",
                 "brief", "echantillons", "version_modele", "attribution"}
 CLES_PISTE = {"id", "rang", "nom", "description", "explication", "aromes", "nb_produits_marche",
-              "references", "sans_reference", "image"}
+              "references", "sans_reference", "image",
+              "references_sans_label"}  # ajout V2.2.2
 CLES_REFERENCE = {"code", "nom", "profil_sensoriel", "forme", "labels"}
 CLES_BRIEF = {"type_produit", "piste_id", "aromes", "contraintes", "codes_references",
-              "codes_solutions", "creation_sur_mesure"}
+              "codes_solutions", "creation_sur_mesure",
+              "references_sans_label", "profil", "volume"}  # ajouts V2.2.2
 
 
 def _envoyer(client, session_id, message="", **champs):
@@ -68,7 +70,7 @@ def test_conversation_parcours_citron_vert(client):
     assert (corps["etape"], corps["intention"]) == ("pistes", "precision")
     assert corps["compris"] == {"division": "flavors", "type_produit": "boisson pétillante",
                                 "arome": "citron vert", "aromes": ["citron vert"],
-                                "contraintes": ["peu sucré"]}
+                                "contraintes": ["peu sucré"], "profil": []}
     assert corps["pistes"][0]["id"] == "citron-vert" and corps["pistes"][0]["rang"] == 1
     assert [s["code"] for s in corps["solutions"]] == ["DEMO-028"]
 

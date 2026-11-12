@@ -350,3 +350,32 @@ Réponses dans `benchmark/sorties/parcours_v22.json` (mode reformulé :
   (« arôme citron »). Elle est réelle dans les données, mais peu originale.
 - **Arômes hors liste de référence** (durian) : seul le modèle les extrait ; sans Ollama, un
   repli prend le mot qui suit « arôme / goût / saveur ».
+
+## V2.2.2 — corrections de la revue Codex (PR #18) et cas kombucha
+
+Version : `v2.2.2-references`. Contrat V2 : uniquement des ajouts de champs (voir
+`docs/contrat_api.md`). Tests : `tests/test_revue_codex.py` (15 tests).
+
+| #   | Anomalie                                                                                 | Correction                                                                                                                                    |
+| --- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | « riche en protéines » changeait un yaourt en boisson protéinée                          | Un type n'est jamais tiré d'un mot qui sert de contrainte ; « boisson protéinée » exige le nom du produit (« boisson protéinée », « shake »). |
+| 2   | Après « merci », `etape` = `echantillons` mais `echantillons` = `null`                   | Le brouillon reste renvoyé tant qu'il est valide (invalidé seulement si l'étude est relancée).                                                |
+| 3   | Une référence sans le label demandé (chocolat sans bio) n'apparaissait que dans le texte | Nouveau champ `references_sans_label: [{arome, code, label_manquant}]` dans la piste, le brief et les échantillons.                           |
+| 4   | Impossible de retirer une contrainte                                                     | « finalement pas bio », « sans le bio », « pas besoin de bio »… retirent la contrainte ; étude et références recalculées.                     |
+| 5   | « une autre boisson » complétait le projet en cours                                      | Changement explicite de projet → `nouvelle_demande`, projet vide (« une autre piste » reste une question).                                    |
+| 6   | « piste 9 » → erreur 500                                                                 | Réponse polie « Je n'ai que N pistes : 1. … », rien n'est choisi, `etape` reste `pistes`.                                                     |
+| 7   | Indexation : `benchmark/cache` absent sur un clone neuf                                  | Le script crée le dossier avant la boucle (fonction `indexer()`, testée avec un faux moteur).                                                 |
+
+Scénario Product « kombucha d'été », avant / après :
+
+- **Type et division :** avant, « frais », « bord de l'eau » envoyaient la demande en fragrance,
+  sans type. Maintenant : kombucha, division flavors, avec une étude sur les 50 kombuchas les plus
+  proches (57 au catalogue).
+- **Arôme :** « fruit de la passion » est reconnu (avant : « passion », cherché dans la liste
+  parfum). 8 des 50 kombuchas étudiés l'utilisent, dont 7 avec du thé.
+- **Profil et contrainte :** profil « frais, exotique, acidulé » (champ `compris.profil`) ;
+  « naturel » est une contrainte qui filtre le label naturel des références.
+- **Volume :** « 5 000 bouteilles » est noté dans `brief.volume`, sans commentaire dans la
+  réponse. Un volume seul ne relance ni l'étude ni le choix.
+- **Limite :** la banque de démo n'a pas de référence fruit de la passion, d'où une création
+  sur mesure.

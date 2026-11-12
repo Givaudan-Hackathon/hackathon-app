@@ -39,7 +39,7 @@ from src.moteur_v2 import (CATALOGUE_COMPLET, CACHE_DEFAUT, MODELE_EMBEDDING, MO
                            N_MARCHE, OLLAMA_DEFAUT, PRODUITS, RACINE, SENSORIEL, MoteurV21,
                            OllamaIndisponible, a_la, ancre, extraire_aromes)
 
-VERSION_V22 = "v2.2.1-references"
+VERSION_V22 = "v2.2.2-references"
 BANQUE_DEFAUT = RACINE / "data" / "processed" / "banque_references_demo.csv"
 MIN_FILTRE = 10  # produits conformes requis pour appliquer une contrainte a l'etude
 KEEP_ALIVE = "2h"  # modeles gardes en memoire entre deux messages
@@ -52,6 +52,9 @@ ATTRIBUTION = "Étude de marché réalisée sur des données d'Open Food Facts (
 # catalogue, application de la banque, type generique parent). Ordre : du plus precis au plus
 # general (« the glace » avant « glace », « creme dessert » avant « dessert »).
 TYPES = {
+    "kombucha": (r"\bkombuchas?\b|kefirs? de fruits?|boissons? fermentees?",
+                 r"kombucha|fermented-tea|fermented-drink|kefir|fermentee", {"boissons_aromatisees"},
+                 "boissons", "boisson"),
     "boisson pétillante": (r"petillant|gazeu|\bsodas?\b|limonade|\btonic|\bbulles?\b",
                            r"carbonated|sodas|lemonade|sparkling|colas|tonic|petillant|gazeu|limonade",
                            {"boissons_aromatisees"}, "boissons", "boisson"),
@@ -62,8 +65,10 @@ TYPES = {
     "yaourt à boire": (r"yaourts? a boire|yogourts? a boire|kefir|lait fermente",
                        r"yogurt-drink|drinkable-yog|a boire|fermented-milk-drink|kefir",
                        {"boissons_lactees", "boissons_proteinees"}, "laitier", "boisson"),
-    "boisson protéinée": (r"protein|proteine|\bshakes?\b", None, {"boissons_proteinees"},
-                          "boissons", "boisson"),
+    # le nom du produit est exige : « riche en proteines » seul est une contrainte, pas un type
+    "boisson protéinée": (r"boissons? (?:hyper)?proteine\w*|boissons? (?:riches?|enrichies?) en proteines"
+                          r"|\bshakes?\b|proteines? en poudre|\bwhey\b", None,
+                          {"boissons_proteinees"}, "boissons", "boisson"),
     "boisson lactée": (r"boissons? lactees?|laits? aromatises?|milk ?shake|boissons? au lait"
                        r"|lait (?:au|a la) ", None, {"boissons_lactees"}, "laitier", "boisson"),
     "boisson végétale": (r"boissons? vegetales?|laits? vegeta|lait d (?:amande|avoine|riz)"
@@ -89,9 +94,17 @@ _TYPES = {nom: (re.compile(client), re.compile(produit) if produit else None, ca
 
 
 def type_cite(texte: str) -> str | None:
-    """Type de produit le plus precis cite dans un message ("petillante" -> boisson petillante)."""
+    """Type de produit le plus precis cite dans un message ("petillante" -> boisson petillante).
+
+    Un mot qui sert de contrainte ne donne jamais un type : dans « un yaourt riche en
+    proteines », « proteines » est la contrainte « proteine », le type reste « yaourt »."""
     texte = " ".join(re.findall(r"[a-z]+", normaliser(texte)))
-    return next((nom for nom, (motif, *_) in _TYPES.items() if motif.search(texte)), None)
+    contraintes = [m.span() for motif, _ in _CONTRAINTES.values() for m in motif.finditer(texte)]
+    for nom, (motif, *_) in _TYPES.items():
+        for m in motif.finditer(texte):
+            if not any(debut <= m.start() and m.end() <= fin for debut, fin in contraintes):
+                return nom
+    return None
 
 
 def generique(type_produit: str | None) -> str | None:
@@ -133,7 +146,7 @@ PROFILS = {
     "gourmand": r"gourmand", "fruité": r"fruit[ei]", "frais": r"\bfrais\b|fraich",
     "intense": r"intense|puissant|\bfort\b", "doux": r"\bdou(?:x|ce)\b|douceur|delicat",
     "acidulé": r"acidul", "léger": r"\bleger|legere\b", "original": r"original|surprenant|audacieux",
-    "classique": r"classique|traditionnel|intemporel",
+    "classique": r"classique|traditionnel|intemporel", "exotique": r"exoti",
 }
 # contrainte appliquee a l'etude -> adjectif qui decrit les produits etudies
 ADJECTIFS = {"peu sucré": "peu sucrés", "sans sucre": "sans sucre", "végétal": "végétaux",
@@ -144,7 +157,8 @@ PLURIELS = {"boisson pétillante": "boissons pétillantes", "thé glacé": "thé
             "sirop": "sirops", "yaourt à boire": "yaourts à boire",
             "boisson protéinée": "boissons protéinées", "boisson lactée": "boissons lactées",
             "boisson végétale": "boissons végétales", "crème dessert": "crèmes dessert",
-            "glace": "glaces", "yaourt": "yaourts", "dessert": "desserts", "boisson": "boissons"}
+            "glace": "glaces", "yaourt": "yaourts", "dessert": "desserts", "boisson": "boissons",
+            "kombucha": "kombuchas"}
 ADJECTIFS_FEMININS = {"peu sucré": "peu sucrées", "végétal": "végétales", "naturel": "sans additifs "
                       "artificiels", "protéiné": "protéinées", "moins gras": "allégées en gras",
                       "moins salé": "moins salées"}
@@ -153,7 +167,7 @@ TYPES_FEMININS = {"boisson pétillante", "boisson protéinée", "boisson lactée
 FEMININ_SINGULIER = {"peu sucré": "peu sucrée", "végétal": "végétale", "protéiné": "protéinée",
                      "moins salé": "moins salée", "gourmand": "gourmande", "fruité": "fruitée",
                      "frais": "fraîche", "doux": "douce", "acidulé": "acidulée", "léger": "légère",
-                     "original": "originale"}
+                     "original": "originale", "exotique": "exotique"}
 _CONTRAINTES = {nom: (re.compile(client), re.compile(produit) if produit else None)
                 for nom, (client, produit, _) in CONTRAINTES.items()}
 _PROFILS = {nom: re.compile(motif) for nom, motif in PROFILS.items()}
@@ -166,6 +180,54 @@ def extraire_contraintes(texte: str) -> list[str]:
     if "sans sucre" in trouvees and "peu sucré" in trouvees:
         trouvees.remove("peu sucré")
     return trouvees
+
+
+# contraintes qu'un client peut retirer (« finalement pas bio ») : nom -> mot dans le message
+RETIRABLES = {"bio": r"bio(?:logique)?", "végétal": r"vegan|vegetal\w*|vegetaux", "naturel": r"naturel\w*",
+              "halal": r"halal", "casher": r"casher|kasher|kosher", "protéiné": r"proteine\w*",
+              "pour enfants": r"(?:pour )?(?:les )?enfants?", "sans gluten": r"(?:sans )?gluten",
+              "sans lactose": r"(?:sans )?lactose",
+              "peu sucré": r"peu sucr\w*|reduire le sucre|moins de sucre"}
+_RETRAITS = {nom: re.compile(
+    rf"\b(?:(?:finalement|en fait|au final) )?(?:pas|plus) (?:besoin (?:de |d |du )|forcement "
+    rf"|obligatoirement |necessairement )?(?:de |du |le |la |l |en )?(?:{mot})\b"
+    rf"|\bsans (?:le |la |les |l )(?:{mot})\b"
+    rf"|\b(?:oublie[rz]?|retire[rz]?|enleve[rz]?|supprime[rz]?) (?:le |la |les |l )?(?:{mot})\b")
+    for nom, mot in RETIRABLES.items()}
+
+
+def extraire_retraits(texte: str) -> tuple[list[str], str]:
+    """(contraintes retirees, texte sans les passages de retrait) : « finalement pas bio »."""
+    texte = " ".join(re.findall(r"[a-z]+", normaliser(texte)))
+    retirees = []
+    for nom, motif in _RETRAITS.items():
+        if motif.search(texte):
+            retirees.append(nom)
+            texte = motif.sub(" ", texte)
+    return retirees, texte
+
+
+VOLUME = re.compile(r"(\d{1,3}(?:[ .\u202f\u00a0]\d{3})+|\d+(?:[.,]\d+)?)\s*(?:k\s*)?"
+                    r"(bouteilles?|canettes?|litres?|hl|kg|tonnes?|unites?|pots?|flacons?|cl|ml"
+                    r"|exemplaires?|pieces?|briques?|cartons?|palettes?)\b")
+
+
+def extraire_volume(texte: str) -> str | None:
+    """Volume cite par le client (« 5 000 bouteilles »), tel qu'il l'a ecrit ; aucun calcul."""
+    normalise = normaliser(texte)
+    m = VOLUME.search(normalise)
+    if not m:
+        return None
+    source = texte if len(texte) == len(normalise) else normalise
+    return " ".join(source[m.start():m.end()].split())
+
+
+# changement explicite de projet : on repart d'un projet vide
+NOUVEAU_PROJET = re.compile(
+    r"\b(?:une? autres? (?!pistes?|associations?|idees?|questions?|references?|choix|aromes?|gouts?"
+    r"|contraintes?|versions?|fois|chose)\w+|nouveau projet|nouvelle demande|autre projet"
+    r"|nouveau produit|nouvelle boisson|nouveau dessert|maintenant je (?:voudrais|veux|souhaite"
+    r"|cherche|voudrai|aimerais)|on (?:change|passe) (?:de projet|a autre chose)|je change de projet)\b")
 
 
 def extraire_profil(texte: str) -> list[str]:
@@ -460,7 +522,9 @@ class BanqueReferences:
                 continue
             j = meilleure(scores, sans_labels, {arome}) if labels else None
             if j is not None:  # existe, mais sans le label demande
-                resultat["sans_label"].append({"arome": arome, **self.fiche(self.df.iloc[j], scores[j])})
+                fiche = self.fiche(self.df.iloc[j], scores[j])
+                resultat["sans_label"].append({"arome": arome, **fiche, "labels_manquants": [
+                    label for label in labels if label not in fiche["labels"]]})
             else:
                 resultat["manquants"].append(arome)
         return resultat
@@ -601,11 +665,12 @@ class AssistantV22:
 
     def reinitialiser(self) -> None:
         self.projet = {"division": None, "type": None, "produit": None, "arome": None, "profil": [],
-                       "contraintes": [], "aromes_cites": [], "messages": []}
+                       "contraintes": [], "aromes_cites": [], "volume": None, "messages": []}
         self.etude: dict | None = None  # derniere sortie de MoteurV22.etude (ou relance)
         self.etudes_precedentes: list[tuple[str, dict]] = []  # (resume, frequence des aromes)
         self.piste_choisie: dict | None = None
         self.demande_echantillons: dict | None = None
+        self.hors_bornes: int | None = None  # numero de piste demande mais inexistant
 
     def _chat(self, messages: list[dict], format_json: dict | None = None,
               num_predict: int = 300) -> str:
@@ -673,33 +738,42 @@ class AssistantV22:
                     or ASSOCIATION.search(normaliser(message)))
 
     def analyser(self, message: str) -> dict:
-        """{intention, numero, division, type, arome, application, contraintes, profil, trace}."""
+        """{intention, numero, division, type, arome, application, contraintes, retraits, profil,
+        volume, trace}."""
         texte = _mots_normalises(message)
         projet_en_cours = bool(self.projet["messages"])
+        nouveau_projet = projet_en_cours and bool(NOUVEAU_PROJET.search(texte))
+        retraits, sans_retraits = extraire_retraits(message) if projet_en_cours else ([], message)
+        retraits = [r for r in retraits if r in self.projet["contraintes"]]
         cite = numero_cite(message)
         a = {"intention": None, "numero": None, "division": None, "type": type_cite(message),
-             "arome": None, "application": None, "contraintes": extraire_contraintes(message),
-             "profil": extraire_profil(message), "trace": {"modele_appele": False}}
-        cites = extraire_aromes(message, self.projet["division"] or "flavors")
+             "arome": None, "application": None, "contraintes": extraire_contraintes(sans_retraits),
+             "retraits": retraits, "profil": extraire_profil(message),
+             "volume": extraire_volume(message), "trace": {"modele_appele": False}}
+        cites = extraire_aromes(message, "flavors" if a["type"] else self.projet["division"] or "flavors")
         a["arome"] = cites[0] if cites else None
         if a["type"]:
             a["division"] = "flavors"
+        changement = a["type"] or a["arome"] or a["contraintes"] or a["retraits"] or a["profil"] \
+            or a["volume"]
 
         # regles qui suffisent
-        if ECHANTILLON.search(texte):
+        if ECHANTILLON.search(texte) and not nouveau_projet:
             a["intention"] = "demande_echantillons"
         elif self.pistes and cite and (CHOIX.search(texte) or len(texte.split()) <= 4):
-            a["intention"], a["numero"] = "choix_piste", cite
+            a["intention"], a["numero"] = "choix_piste", cite  # numero hors bornes : voir repondre
+        elif nouveau_projet and not changement:
+            a["intention"] = "nouvelle_demande"  # « nouveau projet » seul : projet vide, relance
         elif POLITESSE.search(texte.replace(" ?", "")):
             a["intention"] = "hors_sujet"
-        elif QUESTION.search(texte) and not (a["type"] or a["contraintes"]) and (
+        elif QUESTION.search(texte) and not (a["type"] or a["contraintes"] or a["retraits"]
+                                             or a["volume"]) and (
                 self.pistes or not (a["arome"] or a["profil"])):
             a["intention"] = ("question_piste" if self.pistes and self._sur_les_pistes(message)
                               else "question")
-        elif (a["type"] or a["arome"] or a["contraintes"] or a["profil"]) and not (
-                not a["arome"] and SENSORIEL.search(self._sans_reconnus(texte))):
+        elif changement and not (not a["arome"] and SENSORIEL.search(self._sans_reconnus(texte))):
             # tout est reconnu par les listes de reference : pas besoin du modele
-            nouveau = not projet_en_cours or (
+            nouveau = not projet_en_cours or nouveau_projet or (
                 a["type"] and generique(a["type"]) != generique(self.projet["type"])
                 and self.projet["type"] is not None and a["arome"] is not None)
             a["intention"] = "nouvelle_demande" if nouveau else "precision"
@@ -738,6 +812,8 @@ class AssistantV22:
                           "question") if QUESTION.search(texte) else "hors_sujet")
         if intention == "nouvelle_demande" and projet_en_cours and not (a["type"] or a["application"]):
             intention = "precision"  # pas de nouveau produit : complete le projet
+        if nouveau_projet and intention in ("precision", "question", "question_piste", "hors_sujet"):
+            intention = "nouvelle_demande"  # « une autre boisson », « maintenant je voudrais… »
         a["intention"], a["numero"] = intention, llm["numero"] if intention == "choix_piste" else None
         a["trace"]["intention"] = intention
         return a
@@ -757,6 +833,9 @@ class AssistantV22:
             projet["arome"] = reference[0] if reference else analyse["arome"].lower()
         _ajouter(projet["profil"], analyse["profil"])
         _ajouter(projet["contraintes"], analyse["contraintes"])
+        projet["contraintes"][:] = [c for c in projet["contraintes"] if c not in analyse.get("retraits", [])]
+        if analyse.get("volume"):
+            projet["volume"] = analyse["volume"]
         _ajouter(projet["aromes_cites"], ([projet["arome"]] if analyse["arome"] else [])
                  + extraire_aromes(message, projet["division"] or "flavors"))
         if "sans sucre" in projet["contraintes"] and "peu sucré" in projet["contraintes"]:
@@ -867,8 +946,15 @@ class AssistantV22:
                  "aromes": libelle_piste(p), "liste_aromes": list(p["aromes"]),
                  "nb_produits": int(p.get("nb_produits") or 0), "explication": p["explication"],
                  "origine": self.origine(p), "references": p.get("references", []),
-                 "sans_reference": p.get("sans_reference", [])}
+                 "sans_reference": p.get("sans_reference", []),
+                 "references_sans_label": self._sans_label(p)}
                 for i, p in enumerate(self.pistes, 1)]
+
+    @staticmethod
+    def _sans_label(piste: dict) -> list[dict]:
+        """Arômes dont la référence n'a pas le label demandé : {arome, code, label_manquant}."""
+        return [{"arome": s["arome"], "code": s["code"], "label_manquant": ", ".join(s["labels_manquants"])}
+                for s in piste.get("sans_label", [])]
 
     def numero_de_piste(self, piste_id: str) -> int | None:
         """Numero (1 a 3) de la piste d'identifiant piste_id parmi les pistes actuelles."""
@@ -961,6 +1047,8 @@ class AssistantV22:
         if numero and 1 <= numero <= len(self.pistes):
             q = affichees[numero - 1]
             phrases.append(f"La piste {numero}, {q['aromes']} : {q['origine']}.")
+        elif numero and self.pistes:
+            phrases.append(f"Je n'ai que {len(self.pistes)} piste{'s' if len(self.pistes) > 1 else ''}.")
         for arome in cites:
             numeros = [i for i, q in enumerate(self.pistes, 1) if arome in q["aromes"]]
             if numeros:
@@ -1025,6 +1113,9 @@ class AssistantV22:
             phrases.append(f"Références retenues : {_et(codes)}.")
         if piste.get("sans_reference"):
             phrases.append(f"Pour l'arôme {_et(piste['sans_reference'])}, il faudra une création sur mesure.")
+        for s in self._sans_label(piste):
+            phrases.append(f"{s['code']} ({s['arome']}) n'existe pas en version {s['label_manquant']} "
+                           "dans la banque.")
         phrases.append("Je peux préparer une demande d'échantillons de ces références, pour que vous "
                        "les testiez dans votre recette. Le souhaitez-vous ?")
         return " ".join(phrases)
@@ -1054,8 +1145,18 @@ class AssistantV22:
             return self._brouillon_pistes() if self.pistes else self._brouillon_relance()
         if intention == "question_piste":
             return self._brouillon_question(message)
+        if intention == "choix_piste" and self.hors_bornes:
+            return (f"Je n'ai que {len(self.pistes)} piste{'s' if len(self.pistes) > 1 else ''} : "
+                    f"{self._rappel_pistes()}. Laquelle choisissez-vous ?")
         if intention == "choix_piste":
             return self._brouillon_choix()
+        if intention == "volume":
+            suite = ("Souhaitez-vous une demande d'échantillons pour la piste choisie ?"
+                     if self.piste_choisie and not self.demande_echantillons else
+                     "Le récapitulatif ci-dessous est à jour." if self.demande_echantillons else
+                     f"Laquelle de mes pistes vous tente : {self._rappel_pistes()} ?" if self.pistes
+                     else " ".join(self._questions()))
+            return f"C'est noté dans votre brief. {suite}"
         if self.demande_echantillons:
             codes = self.demande_echantillons["codes_references"] + self.demande_echantillons["codes_solutions"]
             return (f"Voici le récapitulatif de votre demande d'échantillons"
@@ -1076,7 +1177,7 @@ class AssistantV22:
             return sorted({a for q in self.pistes for a in q["aromes"]}) + codes
         if intention == "question_piste":
             return extraire_aromes(message, self.projet["division"] or "flavors") + codes
-        if intention == "choix_piste":
+        if intention == "choix_piste" and self.piste_choisie:
             return [*self.pistes[self.piste_choisie["numero"] - 1]["aromes"], "échantillons", *codes]
         if intention == "demande_echantillons" and self.demande_echantillons:
             return ["récapitulatif", "prototype", "conseiller", *codes]
@@ -1178,6 +1279,7 @@ class AssistantV22:
                 "profil": p["profil"], "contraintes": p["contraintes"],
                 "codes_references": references, "codes_solutions": solutions,
                 "creation_sur_mesure": piste.get("sans_reference", []),
+                "references_sans_label": self._sans_label(piste), "volume": p["volume"],
                 "brief_du_client": " / ".join(p["messages"])}
 
     def _preparer_echantillons(self) -> None:
@@ -1201,16 +1303,27 @@ class AssistantV22:
         else:
             analyse = self.analyser(message)
         intention = analyse["intention"]
+        self.hors_bornes = None
+        seulement_volume = intention == "precision" and analyse.get("volume") and not any(
+            analyse.get(cle) for cle in ("type", "arome", "application", "contraintes", "retraits",
+                                         "profil"))
         if intention == "nouvelle_demande":
             self.reinitialiser()
-        if intention in ("nouvelle_demande", "precision"):
+        if seulement_volume:  # le volume complete le brief sans relancer l'etude ni le choix
+            self.projet["volume"] = analyse["volume"]
+            self.projet["messages"].append(message)
+            if self.demande_echantillons:
+                self._preparer_echantillons()
+        elif intention in ("nouvelle_demande", "precision"):
             self._mettre_a_jour(message, analyse)
             self._lancer_etude()
+        elif intention == "choix_piste" and not 1 <= analyse["numero"] <= len(self.pistes):
+            self.hors_bornes = analyse["numero"]  # « piste 9 » : rien n'est choisi
         elif intention == "choix_piste":
             self._choisir(analyse["numero"])
         elif intention == "demande_echantillons" and self.piste_choisie:
             self._preparer_echantillons()
-        contexte = self.contexte(intention, message)
+        contexte = self.contexte("volume" if seulement_volume else intention, message)
         if reformuler:
             texte, verification = self.rediger(message, contexte["brouillon"],
                                                contexte.get("mots_obligatoires") or [])
@@ -1223,12 +1336,13 @@ class AssistantV22:
         compris = {"division": p["division"], "type_produit": p["produit"], "arome": p["arome"],
                    "aromes": ([p["arome"]] if p["arome"] else [])
                    + [a for a in p["aromes_cites"] if a != p["arome"]],
-                   "contraintes": list(p["contraintes"])}
+                   "contraintes": list(p["contraintes"]), "profil": list(p["profil"])}
         return {"intention": intention, "etape": self.etape, "compris": compris,
                 "texte": texte, "projet": self._projet_affiche(),
                 "pistes": self._pistes_affichees(), "solutions": (self.etude or {}).get("solutions", []),
                 "piste_choisie": self.piste_choisie, "brief_final": self.brief_final(),
-                "demande_echantillons": contexte.get("demande_echantillons"),
+                # le brouillon reste renvoye tant qu'il est valide (objet complet)
+                "demande_echantillons": self.demande_echantillons,
                 "contexte": contexte, "verification": verification,
                 "etapes": {**analyse["trace"], **((self.etude or {}).get("etapes") or {})},
                 "version_modele": VERSION_V22, "attribution": ATTRIBUTION}
