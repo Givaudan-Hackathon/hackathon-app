@@ -14,12 +14,22 @@ L'assistant :
 4. rédige le brief de la piste choisie ;
 5. prépare un brouillon de demande d'échantillons, jamais envoyé.
 
+**Vocabulaire.** Chaque terme a un seul sens dans ce document.
+
+| Terme                  | Sens                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Division               | Flavors (arômes) ou Fragrance (parfums).                                                                     |
+| Type de produit        | Le produit du client : boisson, yaourt, glace… (champ `compris.type_produit`).                               |
+| Famille                | Le groupe d'un produit du catalogue : boissons aromatisées, boissons protéinées… (colonne `query_category`). |
+| Arôme principal        | Le 1er goût compris (champ `compris.arome`).                                                                 |
+| Cas entièrement réussi | Un cas de validation qui remplit les 8 critères à la fois (section 4).                                       |
+
 **Équipe Data.**
 
-| Membre        | Travail visible dans l'historique Git                                                                                                                                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Meryem Lizoul | Tout le dossier [data-brique/](data-brique/) : données, pipeline, moteurs V1 → V2.3, benchmark, validation, API, applis Streamlit, docs.                                                                                                    |
-| Owen Lambert  | Compte Git `justeowen`. Service RAG du dossier [rag/](rag/), importé du fork `example-rag` (FastAPI + ChromaDB + Ollama), [PR #16](https://github.com/Givaudan-Hackathon/hackathon-app/pull/16). Ce service n'est pas appelé par le moteur. |
+| Membre        | Travail visible dans l'historique Git                                                                                                                                                                                                                                                                                      |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Meryem Lizoul | Tout le dossier [data-brique/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique) : données, pipeline, moteurs V1 → V2.3, benchmark, validation, API, applis Streamlit, docs.                                                                                                    |
+| Owen Lambert  | Compte Git `justeowen`. Service RAG du dossier [rag/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/rag), importé du fork `example-rag` (FastAPI + ChromaDB + Ollama), [PR #16](https://github.com/Givaudan-Hackathon/hackathon-app/pull/16). Ce service n'est pas appelé par le moteur. |
 
 **Date.** 12/11/2026.
 
@@ -114,15 +124,16 @@ ont été exécutées sur une copie neuve du dépôt (commit `569fc85`). Le guid
 5. **Affiner (V2.3) :** avant les pistes, 2 questions (goût, intensité). Les choix sont tirés des
    données, avec toujours « Je ne sais pas, proposez-moi ».
 
-**Benchmark des modèles.** [resultats.md](data-brique/benchmark/resultats.md), 15 briefs, run du
-10/11/2026.
+**Benchmark des modèles.** 15 briefs, run du 10/11/2026. Rapport :
+[Benchmark_llm.pdf](data-brique/benchmark/Benchmark_llm.pdf) ; mêmes résultats en Markdown, avec
+les mesures brutes : [resultats.md](data-brique/benchmark/resultats.md).
 
-| Recherche           | Catégorie dans le top 5 | Rang 1 | Précision top 5 | Temps / requête |
-| ------------------- | ----------------------- | ------ | --------------- | --------------- |
-| TF-IDF (baseline)   | 83 %                    | 67 %   | 57 %            | 2 ms            |
-| nomic-embed-text    | 100 %                   | 83 %   | 77 %            | 77 ms           |
-| **bge-m3 (retenu)** | 100 %                   | 100 %  | 87 %            | 79 ms           |
-| mxbai-embed-large   | 100 %                   | 75 %   | 63 %            | 94 ms           |
+| Recherche           | Famille attendue dans le top 5 | Famille attendue au rang 1 | Précision top 5 | Temps / requête |
+| ------------------- | ------------------------------ | -------------------------- | --------------- | --------------- |
+| TF-IDF (baseline)   | 83 %                           | 67 %                       | 57 %            | 2 ms            |
+| nomic-embed-text    | 100 %                          | 83 %                       | 77 %            | 77 ms           |
+| **bge-m3 (retenu)** | 100 %                          | 100 %                      | 87 %            | 79 ms           |
+| mxbai-embed-large   | 100 %                          | 75 %                       | 63 %            | 94 ms           |
 
 | Compréhension            | Division | Arôme principal | Temps / brief |
 | ------------------------ | -------- | --------------- | ------------- |
@@ -146,18 +157,27 @@ ont été exécutées sur une copie neuve du dépôt (commit `569fc85`). Le guid
 | V2.2.5  | Mots de lieu et de contexte (« au bord de l'eau »).                                         |
 | V2.3    | Étape Affiner, synonymes (limette = citron vert).                                           |
 
-## 4. Métriques sur 30 cas
+## 4. Métriques : 30 cas de référence et 10 cas jamais vus
 
 **Protocole.** [validation_30_cas.md](data-brique/docs/validation_30_cas.md)
 
-- 30 cas écrits avant la mesure, jamais modifiés ([cas_reference_30.csv](data-brique/benchmark/cas_reference_30.csv)).
-- Chaque cas est le 1er message d'une nouvelle session.
-- 8 critères stricts : type, arômes, arôme principal, contraintes, comportement, aucune marque,
-  aucun chiffre inventé, aucun prix.
-- Un cas réussi remplit les 8 critères.
-- Étape Affiner : la mesure répond « Je ne sais pas, proposez-moi », puis juge le comportement.
+- **Deux jeux, deux rôles.**
+  - **Les 30 cas de référence** ([cas_reference_30.csv](data-brique/benchmark/cas_reference_30.csv))
+    ont été écrits avant la 1re mesure et n'ont jamais été modifiés. Ils ont servi à diagnostiquer
+    les échecs, puis à corriger des **mécanismes** du moteur (vocabulaire, types, intentions,
+    marques), jamais un cas précis. Ils ont ensuite servi à mesurer. Ce jeu n'est donc pas
+    indépendant des corrections.
+  - **Les 10 cas jamais vus** ([cas_finaux_10.csv](data-brique/benchmark/cas_finaux_10.csv)) ont été
+    fournis après les corrections, puis mesurés sans rien modifier, ni avant ni après. C'est le
+    seul jeu indépendant.
+  - D'où l'écart : 26/30 sur le jeu qui a guidé les corrections, 6/10 sur le jeu indépendant.
+- **Mesure.** Chaque cas est le 1er message d'une nouvelle session.
+- **8 critères stricts :** type de produit, arômes, arôme principal, contraintes, comportement,
+  aucune marque, aucun chiffre inventé, aucun prix.
+- **Étape Affiner :** si le 1er message donne `etape = affiner`, la mesure répond « Je ne sais
+  pas, proposez-moi » et juge le comportement sur la 2e réponse.
 
-**Avant / après les corrections.**
+**30 cas de référence : avant / après les corrections.**
 
 | Critère                     | Avant (V2.2.2) | Après (v2.3.0-affiner) |
 | --------------------------- | -------------- | ---------------------- |
@@ -173,33 +193,55 @@ Cas perdus : aucun. Échecs restants : C05, C11, C21, C24. C11 et C21 sont discu
 utile, critère strict). Sorties : [validation_30_cas_avant.csv](data-brique/benchmark/sorties/validation_30_cas_avant.csv),
 [validation_30_cas.csv](data-brique/benchmark/sorties/validation_30_cas.csv).
 
-**10 cas jamais vus : 6/10.** Fournis après les corrections, mesurés sans rien modifier
-([cas_finaux_10.csv](data-brique/benchmark/cas_finaux_10.csv), [validation_cas_finaux.md](data-brique/benchmark/sorties/validation_cas_finaux.md)).
+Version « avant » : `v2.2.2-references`. Version « après » : `v2.3.0-affiner` (commit `569fc85`).
 
-| Cas | Message                                                            | Échec                                                  |
-| --- | ------------------------------------------------------------------ | ------------------------------------------------------ |
-| F01 | « on prépare un ice tea maison à la framboise, sans sucre ajouté » | « Ice Tea » est aussi une marque : le type est perdu.  |
-| F07 | « une sauce barbecue fumée »                                       | Le goût est absorbé par le nom du produit : relance.   |
-| F09 | « quels sont vos délais pour un échantillon ? »                    | Classée demande d'échantillons, pas question.          |
-| F10 | « je veux le goût du Nutella »                                     | Marque absente du catalogue : relance, pas hors sujet. |
+**10 cas jamais vus : 6/10 cas entièrement réussis**, mesurés sur `v2.2.3-mecanismes` (commit
+`75d259d`). Détail : [validation_cas_finaux.md](data-brique/benchmark/sorties/validation_cas_finaux.md).
+Les 4 échecs :
+
+| Cas | Message                                                            | Échec                                                            |
+| --- | ------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| F01 | « on prépare un ice tea maison à la framboise, sans sucre ajouté » | « Ice Tea » est aussi une marque : le type de produit est perdu. |
+| F07 | « une sauce barbecue fumée »                                       | Le goût est absorbé par le nom du produit : relance.             |
+| F09 | « quels sont vos délais pour un échantillon ? »                    | Classée demande d'échantillons, pas question.                    |
+| F10 | « je veux le goût du Nutella »                                     | Marque absente du catalogue : relance, pas hors sujet.           |
 
 Ces 4 cas ne sont pas corrigés : la décision revient au Product ([ticket #29](https://github.com/Givaudan-Hackathon/hackathon-app/issues/29)).
 
-**Comparaison V1 / V2.1 / V2.2.**
+**Comparaison des versions.** Chaque ligne mesure un seul critère. La division et l'arôme
+principal sont 2 des 8 critères : un cas peut les réussir et échouer sur un autre critère. Le
+« cas entièrement réussi » est donc toujours inférieur ou égal à eux : ce n'est pas une
+régression. V1 et V2.1 ne produisent pas tous les champs : leur « cas entièrement réussi » n'est
+pas mesurable (—).
 
-| Critère comparable           | V1      | V2.1   | V2.2   |
-| ---------------------------- | ------- | ------ | ------ |
-| Division, 30 cas             | 26/30   | 29/30  | 29/30  |
-| Arôme principal, 30 cas      | —       | 29/30  | 30/30  |
-| Pistes ou relance, 30 cas    | —       | 25/26  | 26/26  |
-| Division, 10 cas jamais vus  | 6/10    | 8/10   | 9/10   |
-| Arôme principal, 10 cas      | —       | 7/10   | 9/10   |
-| Temps moyen par cas (30 cas) | < 0,1 s | 4,95 s | 1,76 s |
+30 cas de référence (même run que `v2.3.0-affiner`, [validation_30_cas.csv](data-brique/benchmark/sorties/validation_30_cas.csv)) :
 
-**Temps (V2.3, 30 cas).** Moyenne 1,76 s, médiane 0,95 s. Le modèle est appelé pour 5 cas sur
-30 : 7,30 s en moyenne ces fois-là, 0,65 s sinon.
+| Critère mesuré                             | V1      | V2.1   | v2.3.0-affiner |
+| ------------------------------------------ | ------- | ------ | -------------- |
+| Division                                   | 26/30   | 29/30  | 29/30          |
+| Arôme principal                            | —       | 29/30  | 30/30          |
+| Pistes ou relance (26 cas qui l'attendent) | —       | 25/26  | 26/26          |
+| Cas entièrement réussi                     | —       | —      | 26/30          |
+| Temps moyen par cas                        | < 0,1 s | 4,95 s | 1,76 s         |
 
-**Tests.** 89 tests pytest ([tests/](data-brique/tests/)), dont les non-régressions des 3 revues
+10 cas jamais vus (run du commit `75d259d`, [validation_cas_finaux.csv](data-brique/benchmark/sorties/validation_cas_finaux.csv)) :
+
+| Critère mesuré                            | V1      | V2.1   | v2.2.3-mecanismes |
+| ----------------------------------------- | ------- | ------ | ----------------- |
+| Division                                  | 6/10    | 8/10   | 9/10              |
+| Arôme principal                           | —       | 7/10   | 9/10              |
+| Pistes ou relance (8 cas qui l'attendent) | —       | 7/8    | 7/8               |
+| Cas entièrement réussi                    | —       | —      | 6/10              |
+| Temps moyen par cas                       | < 0,1 s | 3,24 s | 2,15 s            |
+
+`v2.3.0-affiner` n'a pas été mesurée sur les 10 cas jamais vus.
+
+**Temps de `v2.3.0-affiner` (30 cas).** Moyenne 1,76 s, médiane 0,95 s, temps du 1er message de
+chaque cas. Le modèle est appelé pour 5 cas sur 30 : 7,30 s en moyenne ces fois-là, 0,65 s
+sinon. Pour comparaison, `v2.2.5-contexte` mesurait 1,06 s de moyenne et 0,50 s de médiane, sans
+l'étape Affiner (même fichier, commit `0db9b30`).
+
+**Tests.** 89 tests pytest ([tests/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/tests)), dont les non-régressions des 3 revues
 Codex ([test_revue_codex.py](data-brique/tests/test_revue_codex.py),
 [test_revue_codex_3.py](data-brique/tests/test_revue_codex_3.py)) et l'étape Affiner
 ([test_affiner.py](data-brique/tests/test_affiner.py)).
@@ -215,16 +257,17 @@ Codex ([test_revue_codex.py](data-brique/tests/test_revue_codex.py),
 FastAPI ([api/main.py](data-brique/api/main.py)), port 8000. Swagger automatique sur `/docs`.
 Contrat : [contrat_api.md](data-brique/docs/contrat_api.md).
 
-| Route                | Rôle                                                          |
-| -------------------- | ------------------------------------------------------------- |
-| `GET /sante`         | État de l'API. Renvoie `baseline-v1` (contrat V1 inchangé).   |
-| `POST /recommander`  | V1 : brief → division, application, 5 produits recommandés.   |
-| `POST /conversation` | V2 : un message par appel → objet complet de la conversation. |
+| Route                | Rôle                                                                |
+| -------------------- | ------------------------------------------------------------------- |
+| `GET /sante`         | État de l'API. Renvoie `baseline-v1` (contrat V1 inchangé).         |
+| `POST /recommander`  | V1 : brief → division, champ `application`, 5 produits recommandés. |
+| `POST /conversation` | V2 : un message par appel → objet complet de la conversation.       |
 
 **Contrat V2.** Entrée : `{session_id, message, piste_id}`. Chaque réponse contient l'objet
 complet : `session_id`, `etape`, `intention`, `reponse`, `compris`, `questions`, `pistes`,
-`solutions`, `brief`, `echantillons`, `version_modele`, `attribution`. Règle : ajouts seulement,
-aucun champ renommé ni supprimé (voir « Changements pour le front (V2.3) » dans le contrat).
+`solutions`, `brief`, `echantillons`, `version_modele`, `attribution`. Aucun champ renommé ni
+supprimé ; la nouvelle valeur `etape = affiner` doit être gérée par le front (voir « Changements
+pour le front (V2.3) » dans le contrat).
 
 **Exemple réel** (API locale, `v2.3.0-affiner`, 12/11/2026). 1er message « un yaourt à la fraise » :
 
@@ -278,9 +321,9 @@ Après « Je ne sais pas, proposez-moi », le choix de la piste `fraise`, puis �
 
 (extraits ; les autres champs sont toujours présents)
 
-**Accès.** Tunnel ngrok, URL au 12/11/2026 : https://aloof-glorify-epiphany.ngrok-free.dev
-(Swagger : https://aloof-glorify-epiphany.ngrok-free.dev/docs). L'URL change à chaque redémarrage
-du tunnel. En-tête à ajouter : `ngrok-skip-browser-warning: true`.
+**Accès.** Tunnel ngrok sur un domaine statique : https://aloof-glorify-epiphany.ngrok-free.dev
+(Swagger : https://aloof-glorify-epiphany.ngrok-free.dev/docs). L'URL reste la même tant que le
+tunnel est relancé avec ce domaine. En-tête à ajouter : `ngrok-skip-browser-warning: true`.
 
 **Temps de réponse.** 0,3 à 1,2 s via ngrok. Environ 5 s quand le message appelle le modèle
 (contrat, section « Obligations et limites (V2) »).
@@ -309,7 +352,10 @@ du tunnel. En-tête à ajouter : `ngrok-skip-browser-warning: true`.
 
 - **Références fictives :** les codes DEMO sont inventés. Aucune vraie référence Givaudan.
 - **Hébergement :** l'API tourne sur le PC de l'équipe (CPU), exposée par ngrok. Elle s'arrête
-  avec le PC ; l'URL change à chaque tunnel.
+  avec le PC.
+- **Pas d'authentification :** l'API de démo est un prototype. Toute personne qui a l'URL peut
+  l'appeler.
+- **Validation :** les 30 cas ont guidé les corrections ; seul le jeu de 10 cas est indépendant.
 - **Cas jamais vus : 6/10.** F01, F07, F09, F10 attendent la décision du Product (ticket #29).
 - **Couverture du catalogue :** boissons et desserts aromatisés. Glaces, yaourts aux fruits,
   biscuits, snacks salés et sauces sont hors catalogue : le marché étudié est alors limité, et la
@@ -321,13 +367,13 @@ du tunnel. En-tête à ajouter : `ngrok-skip-browser-warning: true`.
 
 ## 8. Tableau récapitulatif
 
-| Livrable     | Preuves dans le dépôt                                                                                                                                                                                                                              |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Données   | [inventaire_sources.md](data-brique/docs/inventaire_sources.md), [quality_report.md](data-brique/docs/quality_report.md), [comparaison_v0_v1.md](data-brique/docs/comparaison_v0_v1.md), [LICENSE_DONNEES.md](data-brique/data/LICENSE_DONNEES.md) |
-| 2. Pipeline  | [scripts/](data-brique/scripts/), [reproduire.md](data-brique/docs/reproduire.md)                                                                                                                                                                  |
-| 3. Modèle    | [resultats.md](data-brique/benchmark/resultats.md), [v2_notes.md](data-brique/docs/v2_notes.md), [src/](data-brique/src/), [baseline_v1.ipynb](data-brique/notebooks/baseline_v1.ipynb)                                                            |
-| 4. Métriques | [validation_30_cas.md](data-brique/docs/validation_30_cas.md), [benchmark/sorties/](data-brique/benchmark/sorties/), [tests/](data-brique/tests/)                                                                                                  |
-| 5. API       | [api/main.py](data-brique/api/main.py), [contrat_api.md](data-brique/docs/contrat_api.md), Swagger `/docs`                                                                                                                                         |
+| Livrable     | Preuves dans le dépôt                                                                                                                                                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1. Données   | [inventaire_sources.md](data-brique/docs/inventaire_sources.md), [quality_report.md](data-brique/docs/quality_report.md), [comparaison_v0_v1.md](data-brique/docs/comparaison_v0_v1.md), [LICENSE_DONNEES.md](data-brique/data/LICENSE_DONNEES.md)                                                                                   |
+| 2. Pipeline  | [scripts/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/scripts), [reproduire.md](data-brique/docs/reproduire.md)                                                                                                                                                                     |
+| 3. Modèle    | [Benchmark_llm.pdf](data-brique/benchmark/Benchmark_llm.pdf), [resultats.md](data-brique/benchmark/resultats.md), [v2_notes.md](data-brique/docs/v2_notes.md), [src/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/src), [baseline_v1.ipynb](data-brique/notebooks/baseline_v1.ipynb) |
+| 4. Métriques | [validation_30_cas.md](data-brique/docs/validation_30_cas.md), [benchmark/sorties/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/benchmark/sorties), [tests/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/tests)                      |
+| 5. API       | [api/main.py](data-brique/api/main.py), [contrat_api.md](data-brique/docs/contrat_api.md), Swagger `/docs`                                                                                                                                                                                                                           |
 
 | Suivi                           | Lien                                                                          |
 | ------------------------------- | ----------------------------------------------------------------------------- |
