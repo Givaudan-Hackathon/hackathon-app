@@ -6,6 +6,14 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 
+const BODY_PARSER_PATTERNS = [
+  /^Unexpected token/,
+  /^Unexpected end of JSON input/,
+  /^Expected property name or/,
+  /^Expected ',' or/,
+  /^Expected double-quoted property name/,
+];
+
 @Catch()
 export class ErrorFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
@@ -14,18 +22,16 @@ export class ErrorFilter implements ExceptionFilter {
     const msg = (exception as { message?: unknown })?.message;
     const cause = (exception as { cause?: unknown })?.cause;
 
-    const isJsonParseError =
+    const isBodyParseError =
       exception instanceof SyntaxError ||
       cause instanceof SyntaxError ||
       (typeof exception === 'object' &&
         exception !== null &&
         ((exception as { type?: unknown }).type === 'entity.parse.failed' ||
           (typeof msg === 'string' &&
-            (msg.includes('JSON') ||
-              msg.startsWith('Unexpected token') ||
-              msg.startsWith('Expected property')))));
+            BODY_PARSER_PATTERNS.some((re) => re.test(msg)))));
 
-    if (isJsonParseError) {
+    if (isBodyParseError) {
       return res.status(400).json({ error: 'Corps JSON invalide.' });
     }
 

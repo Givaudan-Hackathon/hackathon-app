@@ -87,7 +87,16 @@ export class QuestionsService {
     let data: { choices?: { message?: { content?: unknown } }[] };
     try {
       data = await response.json();
-    } catch {
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        (error.name === 'TimeoutError' || error.name === 'AbortError')
+      ) {
+        throw new HttpException(
+          "L'IA n'a pas répondu dans les 60 secondes. Réessayer.",
+          504,
+        );
+      }
       throw new HttpException("L'IA a renvoyé une réponse JSON invalide.", 502);
     }
 
