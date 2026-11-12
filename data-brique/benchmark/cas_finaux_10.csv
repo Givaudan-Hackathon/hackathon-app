@@ -1,0 +1,11 @@
+id,categorie,phrase_client,type_produit_attendu,arome_attendu,contraintes_attendues,comportement_attendu
+F01,boisson,"on prépare un ice tea maison à la framboise, sans sucre ajouté",thé glacé,framboise,peu sucré,pistes
+F02,boisson,"une boisson à base de lait d'amande parfum vanille",boisson végétale,vanille,,pistes
+F03,boisson,"je voudrais une limonade au concombre et à la menthe",boisson pétillante,concombre|menthe,,pistes
+F04,autre_produit,"un yaourt aux fruits rouges pour les enfants",yaourt,fruits rouges,pour enfants,pistes
+F05,autre_produit,"je fabrique des sorbets, je veux tester le litchi",glace,litchi,,pistes
+F06,autre_produit,"crème dessert caramel, bio et sans lactose",crème dessert,caramel,bio|sans lactose,pistes
+F07,autre_produit,"une sauce barbecue fumée",sauce,fumé,,pistes
+F08,flou_hors_sujet,"bonjour, vous pouvez m'aider ?",,,,relance
+F09,flou_hors_sujet,"quels sont vos délais pour un échantillon ?",,,,question
+F10,flou_hors_sujet,"je veux le goût du Nutella",,,,hors_sujet (aucune marque)

@@ -214,3 +214,94 @@ Remarques :
   est trouvé.
 - **Division :** 29/30. L'un des cas hors sujet reçoit la division `flavors` après l'appel au
   modèle, sans effet sur la réponse.
+
+## Test sur 10 cas jamais vus (mesure finale, 2026-11-12)
+
+Cas : `benchmark/cas_finaux_10.csv`, fournis après les corrections et enregistrés tels quels. Mesure faite **sans modifier le moteur ni les cas, ni avant ni après** (`v2.2.3-mecanismes`, mode rapide, catalogue complet). Commande : `python benchmark/valider_30_cas.py --cas benchmark/cas_finaux_10.csv --sortie benchmark/sorties/validation_cas_finaux.csv` ; résultats détaillés dans `benchmark/sorties/validation_cas_finaux.csv` et `.md`. Mêmes critères stricts que pour les 30 cas.
+
+**Résultat : 6/10 cas entièrement réussis.**
+
+| Critère                       | Global       | boisson    | autre_produit | flou_hors_sujet |
+| ----------------------------- | ------------ | ---------- | ------------- | --------------- |
+| Type de produit               | 8/10 (80%)   | 2/3 (67%)  | 3/4 (75%)     | 3/3 (100%)      |
+| Arôme(s), tous trouvés        | 9/10 (90%)   | 3/3 (100%) | 3/4 (75%)     | 3/3 (100%)      |
+| Arôme principal               | 9/10 (90%)   | 3/3 (100%) | 3/4 (75%)     | 3/3 (100%)      |
+| Contraintes (égalité stricte) | 10/10 (100%) | 3/3 (100%) | 4/4 (100%)    | 3/3 (100%)      |
+| Comportement                  | 7/10 (70%)   | 3/3 (100%) | 3/4 (75%)     | 1/3 (33%)       |
+| Aucune marque citée           | 10/10 (100%) | 3/3 (100%) | 4/4 (100%)    | 3/3 (100%)      |
+| Aucun chiffre inventé         | 10/10 (100%) | 3/3 (100%) | 4/4 (100%)    | 3/3 (100%)      |
+| Aucun prix inventé            | 10/10 (100%) | 3/3 (100%) | 4/4 (100%)    | 3/3 (100%)      |
+| **Cas entièrement réussi**    | 6/10 (60%)   | 2/3 (67%)  | 3/4 (75%)     | 1/3 (33%)       |
+
+Temps de réponse V2.2 : moyenne 2.15 s, médiane 0.89 s, max 6.49 s ; modèle appelé pour 3 cas sur 10 (moyenne 5.77 s ces fois-là, 0.60 s sinon).
+
+## Comparaison V1 / V2.1 / V2.2
+
+| Critère comparable                                     | V1                           | V2.1         | V2.2         |
+| ------------------------------------------------------ | ---------------------------- | ------------ | ------------ |
+| Division (flavors, ou aucune pour les cas flous)       | 6/10 (60%)                   | 8/10 (80%)   | 9/10 (90%)   |
+| Arôme principal                                        | —                            | 7/10 (70%)   | 9/10 (90%)   |
+| Arôme(s) attendus dans les 5 produits recommandés (V1) | 3/7 (43%)                    | —            | —            |
+| Pistes ou relance, cas qui l'attendent                 | —                            | 7/8 (88%)    | 7/8 (88%)    |
+| Aucune marque citée                                    | (produits du commerce : non) | 10/10 (100%) | 10/10 (100%) |
+| Temps moyen par cas                                    | < 0,1 s                      | 3.24 s       | 2.15 s       |
+
+### Échecs (réponse obtenue)
+
+#### F01 — « on prépare un ice tea maison à la framboise, sans sucre ajouté »
+
+- Attendu : type `thé glacé`, arômes `framboise`, contraintes `peu sucré`, comportement `pistes`
+- Obtenu : type `—`, arômes `framboise`, contraintes `peu sucré`, etape `pistes`, intention `nouvelle_demande`
+- Cause probable : « Ice Tea » est aussi une marque du catalogue (12 produits) : le détecteur de marques masque « ice tea », donc le type « thé glacé » est perdu. L'arôme et la contrainte sont justes.
+- Réponse :
+
+> Votre projet : à la framboise, peu sucré.
+> J'ai étudié les 50 produits du marché les plus proches de votre projet, tous peu sucrés.
+> Voici mes pistes :
+>
+> 1. Framboise seule : un goût franc, facile à reconnaître. 38 des 50 produits les plus proches de votre projet l'utilisent.
+>    Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+> 2. Framboise + fraise : l'association la plus fréquente sur le marché (11 produits sur 38 à la framboise). Un choix rassurant, que les consommateurs connaissent déjà.
+>    Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+> 3. Framboise + abricot : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+>    Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau). Aucune référence proche pour l'arôme abricot dans la banque : une création sur mesure est possible.
+>    Pour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).
+>    Laquelle vous tente ?
+
+#### F07 — « une sauce barbecue fumée »
+
+- Attendu : type `sauce`, arômes `fumé`, contraintes `—`, comportement `pistes`
+- Obtenu : type `sauce barbecue fumée`, arômes `—`, contraintes `—`, etape `relance`, intention `nouvelle_demande`
+- Cause probable : Sans « à la / au » entre le produit et le goût, le groupe nominal du produit absorbe le goût (« sauce barbecue fumée ») : pas d'arôme, donc relance. Le produit est hors catalogue (marché annoncé limité).
+- Réponse :
+
+> J'ai bien noté votre projet : sauce barbecue fumée. Parmi les 50 produits du marché les plus proches, les arômes les plus courants sont : framboise (12 produits), coco (9 produits) et vanille (7 produits). Quel goût recherchez-vous ?
+
+#### F09 — « quels sont vos délais pour un échantillon ? »
+
+- Attendu : type `—`, arômes `—`, contraintes `—`, comportement `question`
+- Obtenu : type `—`, arômes `—`, contraintes `—`, etape `relance`, intention `demande_echantillons`
+- Cause probable : La règle « échantillon + coût » ne couvre que le prix (« combien », « prix », « coût ») ; une question de délai sur un échantillon devient une demande d'échantillons au lieu d'une `question`.
+- Réponse :
+
+> Pour vous proposer des échantillons, décrivez-moi d'abord votre projet : quel produit, et quel goût ?
+
+#### F10 — « je veux le goût du Nutella »
+
+- Attendu : type `—`, arômes `—`, contraintes `—`, comportement `hors_sujet (aucune marque)`
+- Obtenu : type `—`, arômes `—`, contraintes `—`, etape `relance`, intention `nouvelle_demande`
+- Cause probable : « Nutella » n'apparaît dans aucun produit du catalogue Flavors : la marque n'est pas reconnue. Le bot relance sans citer la marque ni en tirer d'arôme, mais l'intention attendue était `hors_sujet`.
+- Réponse :
+
+> Quel type de produit voulez-vous créer ? Quel goût recherchez-vous ?
+
+### À retenir
+
+- **Généralisation :** 6/10 sur des cas jamais vus, contre 26/30 sur les 30 cas de référence.
+- **Fiabilité :** aucune marque citée, aucun chiffre ni prix inventé (10/10), contraintes 10/10, arôme principal 9/10.
+- **Trois mécanismes à revoir :**
+  - une marque peut masquer un nom de produit générique (« ice tea ») ;
+  - un goût sans préposition est absorbé par le nom du produit (« sauce barbecue fumée ») ;
+  - une question de service sur un échantillon n'est reconnue que si elle porte sur le prix.
+- **Limite de données :** une marque absente du catalogue (« Nutella ») n'est pas détectée.
+- **Moteur non modifié :** ces constats sont documentés, non corrigés ; corriger après avoir vu ces cas ferait de ce jeu un jeu d'entraînement.

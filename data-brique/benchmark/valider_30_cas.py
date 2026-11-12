@@ -3,6 +3,9 @@
 Usage (depuis data-brique/, Ollama lance, catalogue complet indexe) :
   .venv/Scripts/python benchmark/valider_30_cas.py
 Sorties : benchmark/sorties/validation_30_cas.csv (une ligne par cas) et docs/validation_30_cas.md.
+Autre jeu de cas (meme format), sans toucher au rapport des 30 cas :
+  .venv/Scripts/python benchmark/valider_30_cas.py --cas benchmark/cas_finaux_10.csv       --sortie benchmark/sorties/validation_cas_finaux.csv
+  (rapport ecrit a cote du CSV, meme nom en .md)
 
 Chaque cas est le 1er message d'une nouvelle session :
 - V2.2 : AssistantV22, mode rapide (defaut), catalogue complet ;
@@ -98,8 +101,8 @@ def comportement_v22(r: dict) -> set[str]:
     return {"relance"}
 
 
-def valider() -> pd.DataFrame:
-    cas = pd.read_csv(CAS, dtype=str)
+def valider(chemin: Path = CAS) -> pd.DataFrame:
+    cas = pd.read_csv(chemin, dtype=str)
     marques = Marques()
     moteur = MoteurV22(catalogue="complet")
     assistant = AssistantV22(moteur, prechauffer=True)
@@ -198,7 +201,7 @@ AVANT = RACINE / "benchmark" / "sorties" / "validation_30_cas_avant.csv"
 
 def avant_apres(df: pd.DataFrame) -> list[str]:
     """Tableau AVANT (V2.2.2, mesure du 2026-11-12 avant correction) / APRES (cette mesure)."""
-    if not AVANT.exists():
+    if not AVANT.exists() or set(df.id) != set(pd.read_csv(AVANT).id):
         return []
     avant = pd.read_csv(AVANT)
     lignes = ["", "## Avant / après les corrections par mécanismes", "",
@@ -220,13 +223,14 @@ def avant_apres(df: pd.DataFrame) -> list[str]:
     return lignes
 
 
-def rapport(df: pd.DataFrame, ignorees: list[str]) -> str:
+def rapport(df: pd.DataFrame, ignorees: list[str], titre: str = "les 30 cas de référence") -> str:
+    CATEGORIES = list(dict.fromkeys(df.categorie))  # noqa: N806 (categories du jeu de cas)
     criteres = [("type_ok", "Type de produit"), ("aromes_ok", "Arôme(s), tous trouvés"),
                 ("arome_principal_ok", "Arôme principal"), ("contraintes_ok", "Contraintes (égalité stricte)"),
                 ("comportement_ok", "Comportement"), ("sans_marque", "Aucune marque citée"),
                 ("sans_chiffre_invente", "Aucun chiffre inventé"), ("sans_prix", "Aucun prix inventé"),
                 ("cas_reussi", "**Cas entièrement réussi**")]
-    l = [f"# Validation sur les 30 cas de référence (V2.2, `{VERSION_V22}`)", "",
+    l = [f"# Validation sur {titre} (V2.2, `{VERSION_V22}`)", "",
          f"Mesure du {date.today().isoformat()}. Les cas (`benchmark/cas_reference_30.csv`) ont été "
          "écrits avant le test et n'ont pas été modifiés. Le résultat **avant correction** (V2.2.2, "
          "18/30) est conservé dans `benchmark/sorties/validation_30_cas_avant.csv`.",
@@ -265,7 +269,7 @@ def rapport(df: pd.DataFrame, ignorees: list[str]) -> str:
                  + " | ".join(taux(df[df.categorie == cat][cle]) for cat in CATEGORIES) + " |")
     t = df["secondes"]
     l += ["", f"Temps de réponse V2.2 : moyenne {t.mean():.2f} s, médiane {t.median():.2f} s, "
-          f"max {t.max():.2f} s ; modèle appelé pour {int(df.modele_appele.sum())} cas sur 30 "
+          f"max {t.max():.2f} s ; modèle appelé pour {int(df.modele_appele.sum())} cas sur {len(df)} "
           f"(moyenne {df[df.modele_appele].secondes.mean():.2f} s ces fois-là, "
           f"{df[~df.modele_appele].secondes.mean():.2f} s sinon).", "",
           "## Comparaison V1 / V2.1 / V2.2", "",
@@ -311,6 +315,20 @@ if __name__ == "__main__":
     for flux in (sys.stdout,):
         if hasattr(flux, "reconfigure"):
             flux.reconfigure(encoding="utf-8")
+    import argparse
+    options = argparse.ArgumentParser()
+    options.add_argument("--cas", type=Path, help="autre fichier de cas (meme format)")
+    options.add_argument("--sortie", type=Path, help="CSV de sortie pour --cas")
+    arguments = options.parse_args()
+    if arguments.cas:
+        resultats = valider(arguments.cas)
+        sortie = arguments.sortie or SORTIE_CSV.with_name(f"validation_{arguments.cas.stem}.csv")
+        resultats.to_csv(sortie, index=False)
+        sortie.with_suffix(".md").write_text(
+            rapport(resultats, Marques().ignorees, f"{len(resultats)} cas jamais vus ({arguments.cas.name})"),
+            encoding="utf-8")
+        print(f"\nCas réussis : {resultats.cas_reussi.sum()}/{len(resultats)} -> {sortie.name}")
+        sys.exit(0)
     resultats = valider()
     SORTIE_CSV.parent.mkdir(parents=True, exist_ok=True)
     resultats.to_csv(SORTIE_CSV, index=False)
