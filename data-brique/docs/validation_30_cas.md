@@ -54,16 +54,16 @@ Cas gagnés : C10, C14, C22, C26, C27, C28, C29, C30. Cas perdus : aucun.
 
 Temps de réponse V2.2 : moyenne 1.76 s, médiane 0.95 s, max 16.07 s ; modèle appelé pour 5 cas sur 30 (moyenne 7.30 s ces fois-là, 0.65 s sinon).
 
-## Comparaison V1 / V2.1 / V2.2
+## Comparaison V1 / V2.1 / v2.3.0-affiner
 
-| Critère comparable                                     | V1                           | V2.1         | V2.2         |
-| ------------------------------------------------------ | ---------------------------- | ------------ | ------------ |
-| Division (flavors, ou aucune pour les cas flous)       | 26/30 (87%)                  | 29/30 (97%)  | 29/30 (97%)  |
-| Arôme principal                                        | —                            | 29/30 (97%)  | 30/30 (100%) |
-| Arôme(s) attendus dans les 5 produits recommandés (V1) | 13/23 (57%)                  | —            | —            |
-| Pistes ou relance, cas qui l'attendent                 | —                            | 25/26 (96%)  | 26/26 (100%) |
-| Aucune marque citée                                    | (produits du commerce : non) | 30/30 (100%) | 30/30 (100%) |
-| Temps moyen par cas                                    | < 0,1 s                      | 4.95 s       | 1.76 s       |
+| Critère comparable                                     | V1                           | V2.1         | v2.3.0-affiner |
+| ------------------------------------------------------ | ---------------------------- | ------------ | -------------- |
+| Division (flavors, ou aucune pour les cas flous)       | 26/30 (87%)                  | 29/30 (97%)  | 29/30 (97%)    |
+| Arôme principal                                        | —                            | 29/30 (97%)  | 30/30 (100%)   |
+| Arôme(s) attendus dans les 5 produits recommandés (V1) | 13/23 (57%)                  | —            | —              |
+| Pistes ou relance, cas qui l'attendent                 | —                            | 25/26 (96%)  | 26/26 (100%)   |
+| Aucune marque citée                                    | (produits du commerce : non) | 30/30 (100%) | 30/30 (100%)   |
+| Temps moyen par cas                                    | < 0,1 s                      | 4.95 s       | 1.76 s         |
 
 ## Échecs (réponse obtenue)
 
