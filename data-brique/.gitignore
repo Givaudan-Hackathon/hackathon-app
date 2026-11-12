@@ -21,6 +21,8 @@ data/processed/*
 !data/processed/.gitkeep
 !data/processed/sample_v1.csv
 !data/processed/sample_v1.meta.json
+!data/processed/banque_references_demo.csv
+!data/processed/banque_references_demo.meta.json
 !data/processed/catalogue_complet/
 data/processed/catalogue_complet/*
 !data/processed/catalogue_complet/flavors_catalogue_complet.csv

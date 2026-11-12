@@ -225,5 +225,128 @@ rapide, corrections. Un test vérifie aussi les vraies réponses du modèle enre
   Les teneurs en sucre (nutriments) ne sont pas dans le catalogue.
 - **Pistache :** aucune crème dessert végétale et peu sucrée de l'échantillon n'utilise la
   pistache ; les pistes 2 et 3 sont donc « à valider en dégustation ». Indexer le catalogue
-  complet reste à faire.
+  complet reste à faire (fait en V2.2.1, voir ci-dessous).
 - **API :** pas encore branchée sur la V2.2.
+
+## V2.2.1 — types de produit, références DEMO, mode rapide, catalogue complet
+
+Version : `v2.2.1-references`. Même code (`src/moteur_v22.py`, `demo_bot_v22.py`). Nouveau cas
+de démo : boisson + agrumes (la pistache est abandonnée).
+
+### Corrections du parcours
+
+- **Type de produit.** 12 types reconnus dans le message : boisson pétillante (soda, limonade,
+  « pétillante »), thé glacé, sirop, yaourt à boire, boisson protéinée, boisson lactée, boisson
+  végétale, crème dessert, glace, yaourt, et les génériques « dessert » et « boisson ». Le type
+  restreint l'étude aux catégories et aux mots-clés Open Food Facts correspondants. « Une
+  boisson » cite maintenant orange, cola et citron (boissons aromatisées), et non plus les laits
+  végétaux.
+- **Filtres.** L'étude garde d'abord tous les produits du type, puis ceux qui respectent les
+  contraintes, puis les 50 plus proches (bge-m3). Les contraintes ne changent jamais le type. Si
+  une contrainte laisse moins de 10 produits, elle n'est pas appliquée et le bot le dit (« je
+  reste sur les boissons pétillantes »). Exemple : seules 6 boissons pétillantes peu sucrées sont
+  bio dans le catalogue ; le bio reste dans le brief et filtre les références.
+- **Invention.** Toute réponse reformulée est rejetée si elle cite un arôme, un code DEMO ou un
+  type de produit absent du brouillon, ou si une référence passe sous la mauvaise piste. Le
+  brouillon dit d'où vient chaque piste (`origine`) : « association observée : 22 des 36 produits
+  au citron vert étudiés y ajoutent l'arôme citron », ou « pas encore observée : à valider en
+  dégustation ».
+- **Questions.** Au plus 2 questions simples par message (type précis, goût, contrainte).
+- **Accord.** « boisson pétillante au citron vert, peu sucrée » ; « yaourt à la fraise, peu sucré ».
+
+### Banque de références de démo
+
+- `data/processed/banque_references_demo.csv` (script `scripts/creer_banque_references.py`) :
+  30 références **fictives** `DEMO-001` à `DEMO-030`, 13 agrumes (dont 4 bio), vanille, café,
+  thé, laitier, chocolat, menthe, fruits rouges, mangue, coco, gingembre, et 3 TasteSolutions
+  (Sweetness, Mouthfeel, Saltiness).
+- `banque_references_demo.meta.json` : exemple fictif inspiré de sources publiques, pas de vraies
+  références Givaudan. La répartition TasteEssentials / TasteCollections est à valider : le
+  document de Product « Défi 02 » n'a pas été transmis.
+- **Liaison.** Pour chaque arôme d'une piste, bge-m3 classe les références filtrées par
+  application (boissons, sucré, laitier, salé) et par labels demandés (bio, vegan, naturel,
+  halal, casher). Une référence n'est retenue que si elle cite l'arôme ; un score bge-m3 ≥ 0,65
+  suffit sinon. Mesure : 0,58 à 0,72 quand la référence cite l'arôme, 0,55 au plus sinon
+  (durian : 0,50). Une référence qui couvre toute l'association (citron vert et menthe) est
+  préférée. Sans label demandé, la version standard passe avant la version bio.
+- « peu sucré » ou « sans sucre » ajoute Sweetness, « moins gras » Mouthfeel, « moins salé »
+  Saltiness. Sans référence proche, le bot propose une création sur mesure. Le récapitulatif
+  liste les codes DEMO choisis.
+
+### Vitesse
+
+- **Règles d'abord.** La plupart des messages sont analysés sans modèle (« bonjour », « piste 1 »,
+  « échantillons », types, arômes de la liste, contraintes, questions). Sinon, un seul appel à
+  llama3.2:3b donne l'intention et l'extraction. Sur le parcours citron vert, le modèle n'est
+  jamais appelé ; « un arôme durian pour une glace » l'appelle une fois (4 s).
+- **Démarrage.** `prechauffer=True` charge les deux modèles (keep_alive 2 h) et les vecteurs :
+  1 à 2 s au démarrage du bot.
+- **Mode rapide par défaut** : la réponse est le brouillon factuel.
+
+### Catalogue complet
+
+`scripts/indexer_catalogue_complet.py` a indexé les 8 943 produits Flavors avec bge-m3 (54 min
+sur le CPU de l'équipe, reprise possible). Le cache `benchmark/cache/bge-m3_complet.npz` n'est
+pas versionné. `MoteurV22(catalogue="auto")`, le défaut, l'utilise quand il existe ; sinon,
+l'échantillon `sample_v1`.
+
+### Temps par message — parcours boisson + citron vert (7 messages)
+
+Script : `benchmark/mesure_temps_v22.py` (détail dans `benchmark/sorties/temps_v22.csv`). « Avant » =
+V2.2 du commit `fea195c`. CPU de l'équipe, Ollama seul en cours.
+
+| Configuration                                 | Moyenne | Min    | Max    | Total   |
+| --------------------------------------------- | ------- | ------ | ------ | ------- |
+| Avant, reformulation (ancien défaut), sample  | 19,96 s | 3,39 s | 45,6 s | 139,7 s |
+| Avant, rapide, sample                         | 5,64 s  | 1,84 s | 14,8 s | 39,5 s  |
+| **Après, rapide (défaut), catalogue complet** | 0,29 s  | 0,00 s | 1,07 s | 2,0 s   |
+| Après, rapide, sample                         | 0,19 s  | 0,00 s | 0,81 s | 1,4 s   |
+| Après, reformulation (expérimental), complet  | 33,4 s  | 10,5 s | 87,1 s | 233,9 s |
+
+Objectif « moins de 3 s par message » atteint en mode rapide.
+
+### Mode reformulation : expérimental
+
+`AssistantV22(reformuler=True)`, ou `demo_bot_v22.py --reformuler`, est désactivé par défaut et
+n'est plus corrigé. La version officielle est le mode rapide.
+
+Défauts constatés sur le parcours de test :
+
+- **Lenteur :** 33 s par message en moyenne, jusqu'à 87 s avec deux tentatives.
+- **Types de produit inventés :** « 50 sirops » recopié de l'exemple guidé ; un avis ajouté
+  (« un peu prévisible »).
+- **Annonce d'envoi :** « je vais vous transmettre votre demande ».
+- **Références mal placées ou oubliées :** codes DEMO oubliés ou placés sous la mauvaise piste.
+
+Les garde-fous rejettent ces réponses et le bot affiche alors le brouillon ; 4 réponses sur 8 ont
+été rejetées.
+
+### Parcours de test (mode rapide, catalogue complet)
+
+Réponses dans `benchmark/sorties/parcours_v22.json` (mode reformulé :
+`parcours_v22_reformule.json`).
+
+- « je voudrais créer une boisson » : arômes courants orange (13), cola (11), citron (8), puis
+  2 questions (type précis, goût).
+- « pétillante, goût citron vert, pas trop sucrée » : 50 boissons pétillantes peu sucrées.
+  Pistes : citron vert seul (37 produits ; DEMO-003), citron vert + citron (23 sur 37 ;
+  DEMO-003 + DEMO-001), citron vert + fraise (1 produit ; DEMO-003 + DEMO-024). Solution :
+  DEMO-028 Sweetness.
+- « elle doit être bio » : filtre bio non appliqué à l'étude (6 produits), références bio
+  (DEMO-004 citron vert bio, DEMO-002 citron jaune bio) ; pas de pamplemousse bio dans la banque
+  (DEMO-008 sans le label).
+- « pourquoi vous proposez cette association ? » : origine chiffrée des pistes 2 et 3.
+- « je prends la piste 1 » → brief avec DEMO-004 et DEMO-028 ; « comment je reçois des
+  échantillons ? » → récapitulatif avec les codes, non envoyé.
+- « un arôme durian pour une glace » : 45 glaces au catalogue ; aucune référence durian →
+  création sur mesure ; pistes durian + coco (DEMO-026) et durian + cassis (DEMO-023).
+
+### Limites de la V2.2.1
+
+- **Banque fictive** de 30 références : ce ne sont pas de vrais codes Givaudan.
+- **Types et contraintes par mots-clés** et labels Open Food Facts : un produit mal catégorisé
+  n'est pas compté.
+- **Association « citron vert + citron » :** elle vient en partie des listes d'ingrédients
+  (« arôme citron »). Elle est réelle dans les données, mais peu originale.
+- **Arômes hors liste de référence** (durian) : seul le modèle les extrait ; sans Ollama, un
+  repli prend le mot qui suit « arôme / goût / saveur ».
