@@ -31,6 +31,24 @@ réponse. Ce test technique ne démontre pas encore le parcours de brief client.
 Ollama Windows avec `llama3.2:1b` est le choix d’atelier décrit dans l’ADR 0002 ;
 le fournisseur et le modèle du produit restent à évaluer avec la Data.
 
+## Prototype client : architecture puis réalisation
+
+Le parcours retenu accompagne uniquement le petit client dans son projet d’arômes
+alimentaires. La [référence d’architecture web](docs/ARCHITECTURE-WEB.md) décrit
+la cible React/TypeScript/Tailwind, le simulateur et la frontière avec le service
+Data. Elle ne change pas les dépendances actuellement installées.
+
+- [#19 — Architecture web](https://github.com/Givaudan-Hackathon/hackathon-app/issues/19) : découpage, état et contrat.
+- [#20 — Prototype client](https://github.com/Givaudan-Hackathon/hackathon-app/issues/20) : installation et parcours responsive illustré.
+- [#21 — Préparation m2](https://github.com/Givaudan-Hackathon/hackathon-app/issues/21) : démarrage complet, démo et tag du commit montré.
+
+Le contrat conversationnel V2 de la PR Data #18 a été consulté au commit
+`0cec17f` ; la PR reste à relire et à intégrer séparément. Les pistes possèdent
+un identifiant stable ; leurs images sont encore à `null`. Le premier lot web
+prévoit donc cinq visuels locaux de démonstration et une image de remplacement.
+La demande d’échantillons Data est un brouillon non envoyé, distinct d’un dépôt
+applicatif et d’une commande acceptée par un commercial.
+
 ## Organisation des composants
 
 ```text

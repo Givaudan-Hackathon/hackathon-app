@@ -1,0 +1,114 @@
+{
+  "session_id": "3f9c2a7b1d04",
+  "etape": "echantillons",
+  "intention": "demande_echantillons",
+  "reponse": "Voici le récapitulatif de votre demande d'échantillons (DEMO-004 et DEMO-028), juste en dessous. Dans ce prototype, la demande n'est pas envoyée : transmettez ce récapitulatif à un conseiller Givaudan. Je ne connais ni les délais, ni les quantités, ni le prix : le conseiller vous les donnera.",
+  "compris": {
+    "division": "flavors",
+    "type_produit": "boisson pétillante",
+    "arome": "citron vert",
+    "aromes": ["citron vert"],
+    "contraintes": ["peu sucré", "bio"]
+  },
+  "pistes": [
+    {
+      "id": "citron-vert",
+      "rang": 1,
+      "nom": "Citron vert",
+      "description": "L'arôme seul",
+      "explication": "Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.",
+      "aromes": ["citron vert"],
+      "nb_produits_marche": 36,
+      "references": [
+        {
+          "code": "DEMO-004",
+          "nom": "Citron vert bio",
+          "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+          "forme": "soluble eau",
+          "labels": ["naturel", "bio", "vegan"]
+        }
+      ],
+      "sans_reference": [],
+      "image": null
+    },
+    {
+      "id": "citron-vert+citron",
+      "rang": 2,
+      "nom": "Citron vert + citron",
+      "description": "L'association la plus courante",
+      "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+      "aromes": ["citron vert", "citron"],
+      "nb_produits_marche": 22,
+      "references": [
+        {
+          "code": "DEMO-004",
+          "nom": "Citron vert bio",
+          "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+          "forme": "soluble eau",
+          "labels": ["naturel", "bio", "vegan"]
+        },
+        {
+          "code": "DEMO-002",
+          "nom": "Citron jaune bio",
+          "profil_sensoriel": "citron jaune juteux, notes de zeste, acidulé",
+          "forme": "soluble eau",
+          "labels": ["naturel", "bio", "vegan"]
+        }
+      ],
+      "sans_reference": [],
+      "image": null
+    },
+    {
+      "id": "citron-vert+pamplemousse",
+      "rang": 3,
+      "nom": "Citron vert + pamplemousse",
+      "description": "L'association originale",
+      "explication": "Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+      "aromes": ["citron vert", "pamplemousse"],
+      "nb_produits_marche": 1,
+      "references": [
+        {
+          "code": "DEMO-004",
+          "nom": "Citron vert bio",
+          "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+          "forme": "soluble eau",
+          "labels": ["naturel", "bio", "vegan"]
+        }
+      ],
+      "sans_reference": [],
+      "image": null
+    }
+  ],
+  "solutions": [
+    {
+      "code": "DEMO-028",
+      "nom": "Sweetness",
+      "profil_sensoriel": "renforce la perception sucrée pour réduire le sucre ajouté",
+      "forme": "soluble eau",
+      "labels": ["naturel", "vegan", "halal", "casher"]
+    }
+  ],
+  "brief": {
+    "type_produit": "boisson pétillante",
+    "piste_id": "citron-vert",
+    "aromes": ["citron vert"],
+    "contraintes": ["peu sucré", "bio"],
+    "codes_references": ["DEMO-004"],
+    "codes_solutions": ["DEMO-028"],
+    "creation_sur_mesure": []
+  },
+  "echantillons": {
+    "type_produit": "boisson pétillante",
+    "piste_id": "citron-vert",
+    "aromes": ["citron vert"],
+    "contraintes": ["peu sucré", "bio"],
+    "codes_references": ["DEMO-004"],
+    "codes_solutions": ["DEMO-028"],
+    "creation_sur_mesure": [],
+    "statut": "brouillon_non_envoye",
+    "date": "2026-11-12",
+    "brief_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio"
+  },
+  "version_modele": "v2.2.1-references",
+  "attribution": "Étude de marché réalisée sur des données d'Open Food Facts (ODbL)"
+}
