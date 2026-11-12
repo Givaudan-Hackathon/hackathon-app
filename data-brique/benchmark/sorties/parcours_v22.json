@@ -1,0 +1,222 @@
+[
+  {
+    "message": "Bonjour",
+    "secondes": 12.9,
+    "intention": "hors_sujet",
+    "texte": "Bonjour ! Je suis là pour vous aider. Quel produit voulez-vous créer, et quel goût ou quelle odeur imaginez-vous ?",
+    "projet": {
+      "division": null,
+      "type_de_produit": null,
+      "arome_principal": null,
+      "profil_recherche": [],
+      "contraintes": []
+    },
+    "verification": {
+      "tentatives": 1,
+      "rejets": [],
+      "source": "llama3.2:3b"
+    },
+    "etapes": {
+      "intention_llm": "hors_sujet",
+      "intention": "hors_sujet"
+    },
+    "demande_echantillons": null,
+    "brouillon": "Bonjour ! Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût ou quelle odeur imaginez-vous ?"
+  },
+  {
+    "message": "je voudrais créer un dessert",
+    "secondes": 10.4,
+    "intention": "nouvelle_demande",
+    "texte": "Un dessert, super idée ! Parmi les 50 produits du marché les plus proches, les arômes les plus courants sont la vanille (22 produits), le chocolat (13 produits) et le caramel (6 produits). Quel goût aimeriez-vous pour votre dessert ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "dessert",
+      "arome_principal": null,
+      "profil_recherche": ["gourmand"],
+      "contraintes": ["peu sucré", "végétal"]
+    },
+    "verification": {
+      "tentatives": 1,
+      "rejets": [],
+      "source": "llama3.2:3b"
+    },
+    "etapes": {
+      "intention_llm": "nouvelle_demande",
+      "intention": "nouvelle_demande",
+      "comprehension": "llama3.2:3b",
+      "recherche": "bge-m3 (echantillon)",
+      "filtre_contraintes": []
+    },
+    "demande_echantillons": null,
+    "brouillon": "J'ai bien noté votre projet : dessert. Parmi les 50 produits du marché les plus proches, les arômes les plus courants sont : vanille (22 produits), chocolat (13 produits) et caramel (6 produits). Pour votre produit, quel goût recherchez-vous ?"
+  },
+  {
+    "message": "un goût pistache gourmand, pas trop sucré, pour des desserts végétaux",
+    "secondes": 28.3,
+    "intention": "precision",
+    "texte": "Super ! Votre projet : desserts végétaux à la pistache, gourmand, peu sucré et végétal. J'ai étudié les 26 produits du marché les plus proches de votre projet, tous peu sucrés et végétaux. \n\nVoici mes pistes : \n1. Pistache seule : un goût franc, facile à reconnaître. Aucun des 26 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.\n2. Pistache + amande : le goût amande est le plus présent dans les produits proches de votre projet (13 produits). L'association avec pistache n'y apparaît pas encore (aucun produit proche n'est à la pistache) : à valider en dégustation.\n3. Pistache + banane : un goût rare dans les produits proches (1 produit) et jamais associé à la pistache : une piste originale, à tester. \n\nLaquelle vous tente ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "desserts végétaux",
+      "arome_principal": "pistache",
+      "profil_recherche": ["gourmand"],
+      "contraintes": ["peu sucré", "végétal"]
+    },
+    "verification": {
+      "tentatives": 1,
+      "rejets": [],
+      "source": "llama3.2:3b"
+    },
+    "etapes": {
+      "intention_llm": "question_piste",
+      "intention": "precision",
+      "comprehension": "llama3.2:3b",
+      "recherche": "bge-m3 (echantillon)",
+      "filtre_contraintes": ["peu sucré", "végétal"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "Votre projet : desserts végétaux à la pistache, gourmand, peu sucré et végétal.\nJ'ai étudié les 26 produits du marché les plus proches de votre projet (desserts végétaux), tous peu sucrés et végétaux.\nVoici mes pistes :\n1. Pistache seule : un goût franc, facile à reconnaître. Aucun des 26 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.\n2. Pistache + amande : le goût amande est le plus présent dans les produits proches de votre projet (13 produits). L'association avec pistache n'y apparaît pas encore (aucun produit proche n'est à la pistache) : à valider en dégustation.\n3. Pistache + banane : un goût rare dans les produits proches (1 produit) et jamais associé à la pistache : une piste originale, à tester.\nLaquelle vous tente ? Vous pouvez aussi me poser une question sur une piste."
+  },
+  {
+    "message": "plutôt une crème dessert",
+    "secondes": 25.8,
+    "intention": "precision",
+    "texte": "Très bien ! Votre projet : crème dessert à la pistache, gourmand, peu sucré et végétal. J'ai étudié les 19 produits du marché les plus proches de votre projet, tous peu sucrés et végétaux. Voici mes pistes : \n\n1. Pistache seule : un goût franc, facile à reconnaître. Aucun des 19 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.\n2. Pistache + amande : le goût amande est le plus présent dans les produits proches de votre projet (13 produits). L'association avec pistache n'y apparaît pas encore (aucun produit proche n'est à la pistache) : à valider en dégustation.\n3. Pistache + café : un goût rare dans les produits proches (1 produit) et jamais associé à la pistache : une piste originale, à tester.\n\nLaquelle vous tente ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "crème dessert",
+      "arome_principal": "pistache",
+      "profil_recherche": ["gourmand"],
+      "contraintes": ["peu sucré", "végétal"]
+    },
+    "verification": {
+      "tentatives": 1,
+      "rejets": [],
+      "source": "llama3.2:3b"
+    },
+    "etapes": {
+      "intention_llm": "precision",
+      "intention": "precision",
+      "comprehension": "llama3.2:3b",
+      "recherche": "bge-m3 (echantillon)",
+      "filtre_contraintes": ["peu sucré", "végétal"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "Votre projet : crème dessert à la pistache, gourmand, peu sucré et végétal.\nJ'ai étudié les 19 produits du marché les plus proches de votre projet (crème dessert), tous peu sucrés et végétaux.\nVoici mes pistes :\n1. Pistache seule : un goût franc, facile à reconnaître. Aucun des 19 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.\n2. Pistache + amande : le goût amande est le plus présent dans les produits proches de votre projet (13 produits). L'association avec pistache n'y apparaît pas encore (aucun produit proche n'est à la pistache) : à valider en dégustation.\n3. Pistache + café : un goût rare dans les produits proches (1 produit) et jamais associé à la pistache : une piste originale, à tester.\nLaquelle vous tente ? Vous pouvez aussi me poser une question sur une piste."
+  },
+  {
+    "message": "pourquoi la vanille ?",
+    "secondes": 20.9,
+    "intention": "question_piste",
+    "texte": "Pas de vanille, je m'excuse ! L'arôme vanille n'est pas dans mes pistes. Dans mon étude actuelle (19 produits proches de « crème dessert », tous peu sucrés et végétaux), il n'apparaît que dans 2 produits, alors que l'arôme amande est dans 13 produits. Je l'avais cité plus tôt : c'était l'arôme le plus fréquent dans une étude précédente (50 produits proches de « dessert »), avec 22 produits. Laquelle de mes pistes vous tente : 1. pistache, 2. pistache + amande ou 3. pistache + café ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "crème dessert",
+      "arome_principal": "pistache",
+      "profil_recherche": ["gourmand"],
+      "contraintes": ["peu sucré", "végétal"]
+    },
+    "verification": {
+      "tentatives": 1,
+      "rejets": [],
+      "source": "llama3.2:3b"
+    },
+    "etapes": {
+      "intention_llm": "question_piste",
+      "intention": "question_piste",
+      "comprehension": "llama3.2:3b",
+      "recherche": "bge-m3 (echantillon)",
+      "filtre_contraintes": ["peu sucré", "végétal"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "L'arôme vanille ne fait pas partie de mes pistes. Dans mon étude actuelle (19 produits proches de « crème dessert », tous peu sucrés et végétaux), il n'apparaît que dans 2 produits, alors que l'arôme amande est dans 13 produits. Je l'avais cité plus tôt : c'était l'arôme le plus fréquent dans une étude précédente (50 produits proches de « dessert »), avec 22 produits. Laquelle de mes pistes vous tente : 1. pistache, 2. pistache + amande et 3. pistache + café ?"
+  },
+  {
+    "message": "je prends la piste 2",
+    "secondes": 17.3,
+    "intention": "choix_piste",
+    "texte": "Super ! La piste 2, pistache + amande, c'est un excellent choix ! Votre brief est clair : crème dessert, arômes pistache et amande, profil gourmand, et peu sucré, avec une touche végétale. Je peux préparer une demande d'échantillons de ces arômes, pour que vous les testiez dans votre recette. Le souhaitez-vous ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "crème dessert",
+      "arome_principal": "pistache",
+      "profil_recherche": ["gourmand"],
+      "contraintes": ["peu sucré", "végétal"]
+    },
+    "verification": {
+      "tentatives": 1,
+      "rejets": [],
+      "source": "llama3.2:3b"
+    },
+    "etapes": {
+      "intention_llm": "choix_piste",
+      "intention": "choix_piste",
+      "comprehension": "llama3.2:3b",
+      "recherche": "bge-m3 (echantillon)",
+      "filtre_contraintes": ["peu sucré", "végétal"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "Excellent choix : la piste 2, pistache + amande. Votre brief : crème dessert, arômes pistache et amande, profil gourmand, contraintes : peu sucré et végétal. Je peux préparer une demande d'échantillons de ces arômes, pour que vous les testiez dans votre recette. Le souhaitez-vous ?"
+  },
+  {
+    "message": "comment je reçois des échantillons ?",
+    "secondes": 29.4,
+    "intention": "demande_echantillons",
+    "texte": "Voici le récapitulatif de votre demande d'échantillons, juste en dessous. Dans ce prototype, la demande n'est pas envoyée : transmettez ce récapitulatif à un conseiller Givaudan. Je ne connais ni les délais, ni les quantités, ni le prix : le conseiller vous les donnera.",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "crème dessert",
+      "arome_principal": "pistache",
+      "profil_recherche": ["gourmand"],
+      "contraintes": ["peu sucré", "végétal"]
+    },
+    "verification": {
+      "tentatives": 2,
+      "rejets": [
+        {
+          "texte": "Pour obtenir des échantillons, je vais vous transmettre votre demande à un conseiller Givaudan. Voici le récapitulatif de votre demande d'échantillons, juste en dessous :\n\n* Demande d'échantillons pour votre sirop\n* Arôme : fraise\n* Délais et quantités non précisés\n* Prix non précisé\n* Le conseiller vous donnera plus d'informations\n\nJe vais vous transmettre votre demande, et le conseiller vous donnera plus de détails !",
+          "chiffres_inventes": [],
+          "couples_inventes": [],
+          "noms_du_commerce": [],
+          "chiffres_oublies": [],
+          "mots_oublies": ["prototype"],
+          "genre_suppose": [],
+          "envoi_annonce": [
+            "je vais vous transmettre",
+            "je vais vous transmettre"
+          ]
+        },
+        {
+          "texte": "Pour obtenir des échantillons, je vais vous transmettre votre demande à un conseiller Givaudan. Voici le récapitulatif de votre demande d'échantillons, juste en dessous : \n\n* Demande d'échantillons pour votre sirop \n* Arôme : fraise \n* Délais et quantités non précisés \n* Prix non précisé \n* Le conseiller vous donnera plus d'informations.",
+          "chiffres_inventes": [],
+          "couples_inventes": [],
+          "noms_du_commerce": [],
+          "chiffres_oublies": [],
+          "mots_oublies": ["prototype"],
+          "genre_suppose": [],
+          "envoi_annonce": ["je vais vous transmettre"]
+        }
+      ],
+      "source": "brouillon (vérification échouée)"
+    },
+    "etapes": {
+      "intention_llm": "demande_echantillons",
+      "intention": "demande_echantillons",
+      "comprehension": "llama3.2:3b",
+      "recherche": "bge-m3 (echantillon)",
+      "filtre_contraintes": ["peu sucré", "végétal"]
+    },
+    "demande_echantillons": {
+      "statut": "brouillon, non envoyé (prototype)",
+      "date": "2026-11-12",
+      "division": "arôme alimentaire",
+      "type_de_produit": "crème dessert",
+      "piste": 2,
+      "aromes": ["pistache", "amande"],
+      "profil": ["gourmand"],
+      "contraintes": ["peu sucré", "végétal"],
+      "brief_du_client": "je voudrais créer un dessert / un goût pistache gourmand, pas trop sucré, pour des desserts végétaux / plutôt une crème dessert"
+    },
+    "brouillon": "Voici le récapitulatif de votre demande d'échantillons, juste en dessous. Dans ce prototype, la demande n'est pas envoyée : transmettez ce récapitulatif à un conseiller Givaudan. Je ne connais ni les délais, ni les quantités, ni le prix : le conseiller vous les donnera."
+  }
+]
