@@ -122,16 +122,23 @@ const resultat = await reponse.json();
 
 ---
 
-# Contrat V2 (prévu) — assistant conversationnel V2.2
+# Contrat V2 — assistant conversationnel V2.2
 
-> **Statut : prévu, pas encore en ligne.** L'API du port 8000 sert toujours la V1 ci-dessus. Ce
-> contrat décrit ce que l'endpoint V2 renverra : il reprend la sortie de
-> `AssistantV22.repondre()` (`src/moteur_v22.py`). Les champs de la V1 restent inchangés.
+> **Statut : en ligne** sur la même API (port 8000, même URL ngrok), à côté de la V1. Il reprend
+> la sortie de `AssistantV22.repondre()` (`src/moteur_v22.py`). `/sante` et `/recommander`
+> ne changent pas : `/sante` renvoie toujours `baseline-v1`.
 
-## `POST /v2/conversation`
+## `POST /conversation`
 
 Un message du client par appel. Le serveur garde l'état de la conversation (projet, pistes,
-piste choisie) par `conversation_id`.
+piste choisie) par `conversation_id`, en mémoire.
+
+- Au plus 500 conversations ; chacune est oubliée après 2 h sans message.
+- Un redémarrage du serveur efface toutes les conversations.
+- Un `conversation_id` inconnu ou expiré ouvre une nouvelle conversation, sous cet identifiant.
+
+Temps de réponse (mode rapide, catalogue complet, via ngrok) : 0,3 à 1,2 s. Il faut environ 5 s
+quand le message demande le modèle (arôme hors liste, ex. « durian »).
 
 ### Requête
 

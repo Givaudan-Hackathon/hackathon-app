@@ -809,16 +809,19 @@ class AssistantV22:
                 "type_de_produit": p["produit"], "arome_principal": p["arome"],
                 "profil_recherche": p["profil"], "contraintes": p["contraintes"]}
 
+    def _etudies(self) -> str:
+        return "étudiées" if self.projet["type"] in TYPES_FEMININS else "étudiés"
+
     def origine(self, piste: dict) -> str:
         """D'ou vient la piste : nombre de produits, association observee ou non."""
         marche = self.etude["marche"]
         n, principal = marche["nb_produits_analyses"], piste["aromes"][0]
         n_principal = marche.get("nb_avec_arome_principal") or 0
         if piste["type"] == "principal":
-            return (f"l'arôme {principal} est utilisé par {n_principal} des {self._nom_produits(n)} étudiés"
-                    if n_principal else
-                    f"aucun des {self._nom_produits(n)} étudiés n'utilise l'arôme {principal} : "
-                    "une place libre sur ce marché")
+            etudies = f"{self._nom_produits(n)} {self._etudies()}"
+            aucun = "aucune" if self.projet["type"] in TYPES_FEMININS else "aucun"
+            return (f"l'arôme {principal} est utilisé par {n_principal} des {etudies}" if n_principal else
+                    f"{aucun} des {etudies} n'utilise l'arôme {principal} : une place libre sur ce marché")
         autre = piste["aromes"][1]
         if piste.get("observee"):
             return (f"association observée : {piste['nb_produits']} des {n_principal} produits "

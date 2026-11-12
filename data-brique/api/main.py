@@ -1,8 +1,15 @@
-"""API de la brique Data : brief client -> recommandation (baseline V1).
+"""API de la brique Data.
+
+- POST /recommander : brief client -> top k produits (baseline V1, inchange).
+- POST /conversation : assistant conversationnel V2.2 (pistes d'aromes, references DEMO,
+  demande d'echantillons), un message par appel, etat garde par conversation_id.
 
 Lancement (depuis data-brique/) : .venv/Scripts/uvicorn api.main:app --port 8000
 Swagger : http://127.0.0.1:8000/docs
 """
+import threading
+import time
+import uuid
 from contextlib import asynccontextmanager
 from typing import Literal
 
@@ -11,7 +18,10 @@ from fastapi import Body, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from src.moteur_v1 import VERSION_MODELE, MoteurV1
+from src.moteur_v1 import CATALOGUE_DEFAUT, VERSION_MODELE, MoteurV1
+from src.moteur_v2 import CATALOGUE_COMPLET
+from src.moteur_v22 import ATTRIBUTION as ATTRIBUTION_V22
+from src.moteur_v22 import VERSION_V22, AssistantV22, MoteurV22, NomsDuCommerce
 
 ATTRIBUTION = "Contient des données d'Open Food Facts / Open Beauty Facts, licence ODbL"
 
@@ -44,13 +54,26 @@ EXEMPLE_REPONSE = {
 }
 
 moteur: MoteurV1 | None = None
+moteur_v22: MoteurV22 | None = None
+noms_du_commerce: NomsDuCommerce | None = None
+
+# conversations en memoire (prototype) : au plus MAX_CONVERSATIONS, oubliees apres DUREE_CONVERSATION
+MAX_CONVERSATIONS = 500
+DUREE_CONVERSATION = 2 * 3600  # secondes d'inactivite
+conversations: dict[str, dict] = {}  # id -> {"assistant", "verrou", "vu"}
+verrou_conversations = threading.Lock()
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # index TF-IDF construit une fois au demarrage (~1 s)
-    global moteur
+    # index TF-IDF construit une fois au demarrage (~1 s) ; moteur V2.2 partage entre les
+    # conversations, modeles et vecteurs precharges (sans Ollama, l'assistant passe en repli)
+    global moteur, moteur_v22, noms_du_commerce
     moteur = MoteurV1()
+    moteur_v22 = MoteurV22()
+    chemins = [CATALOGUE_DEFAUT] + ([CATALOGUE_COMPLET] if moteur_v22.catalogue == "complet" else [])
+    noms_du_commerce = NomsDuCommerce(chemins)
+    AssistantV22(moteur_v22, noms_du_commerce).prechauffer()
     yield
 
 
@@ -122,6 +145,104 @@ EXEMPLES_DEMANDE = {
 }
 
 
+class MessageConversation(BaseModel):
+    conversation_id: str | None = Field(
+        default=None, max_length=64,
+        description="Absent ou inconnu : nouvelle conversation (l'identifiant est renvoyé).")
+    message: str = Field(min_length=1, max_length=500, description="Message du client, en français.")
+    reformuler: bool = Field(
+        default=False, description="Expérimental : réponse reformulée par llama3.2:3b (~33 s).")
+
+
+class Reference(BaseModel):
+    code: str = Field(description="Code fictif DEMO-001 à DEMO-030 (banque de démo).")
+    nom: str
+    profil_sensoriel: str
+    forme: Literal["soluble eau", "huile", "poudre"]
+    labels: list[str]
+
+
+class Piste(BaseModel):
+    numero: int
+    aromes: str = Field(examples=["citron vert + citron"])
+    explication: str
+    origine: str = Field(description="Nombre de produits, association observée ou à valider.")
+    references: list[Reference]
+    sans_reference: list[str] = Field(description="Arômes sans référence : création sur mesure.")
+
+
+class Projet(BaseModel):
+    division: str | None
+    type_de_produit: str | None
+    arome_principal: str | None
+    profil_recherche: list[str]
+    contraintes: list[str]
+
+
+class BriefFinal(BaseModel):
+    division: str | None
+    type_de_produit: str | None
+    piste: int
+    aromes: list[str]
+    profil: list[str]
+    contraintes: list[str]
+    codes_references: list[str]
+    codes_solutions: list[str]
+    creation_sur_mesure: list[str]
+    brief_du_client: str
+
+
+class DemandeEchantillons(BriefFinal):
+    statut: str = Field(examples=["brouillon, non envoyé (prototype)"])
+    date: str
+
+
+class PisteChoisie(BaseModel):
+    numero: int
+    aromes: str
+
+
+class ReponseConversation(BaseModel):
+    conversation_id: str
+    intention: Literal["nouvelle_demande", "precision", "question_piste", "choix_piste",
+                       "demande_echantillons", "hors_sujet"]
+    texte: str = Field(description="Réponse à afficher (paragraphes séparés par \n).")
+    projet: Projet
+    pistes: list[Piste]
+    solutions: list[Reference]
+    piste_choisie: PisteChoisie | None
+    brief_final: BriefFinal | None
+    demande_echantillons: DemandeEchantillons | None = Field(
+        description="Récapitulatif à afficher ; rien n'est envoyé.")
+    version_modele: str
+    attribution: str
+
+
+EXEMPLES_CONVERSATION = {
+    "debut": {"summary": "Nouvelle conversation",
+              "value": {"message": "je voudrais créer une boisson"}},
+    "suite": {"summary": "Suite d'une conversation",
+              "value": {"conversation_id": "remplacer-par-l-id-recu",
+                        "message": "pétillante, goût citron vert, pas trop sucrée"}},
+}
+
+
+def _conversation(conversation_id: str | None) -> tuple[str, dict]:
+    """Conversation existante, ou nouvelle si l'identifiant est absent, inconnu ou expire."""
+    maintenant = time.time()
+    with verrou_conversations:
+        for cle in [c for c, v in conversations.items() if maintenant - v["vu"] > DUREE_CONVERSATION]:
+            del conversations[cle]
+        if conversation_id not in conversations:
+            if len(conversations) >= MAX_CONVERSATIONS:
+                del conversations[min(conversations, key=lambda c: conversations[c]["vu"])]
+            conversation_id = conversation_id or uuid.uuid4().hex[:12]
+            conversations[conversation_id] = {"assistant": AssistantV22(moteur_v22, noms_du_commerce),
+                                              "verrou": threading.Lock()}
+        conversations[conversation_id]["vu"] = maintenant
+        return conversation_id, conversations[conversation_id]
+
+
 def _valeur(v):
     return None if pd.isna(v) else v
 
@@ -148,4 +269,20 @@ def recommander(demande: Demande = Body(openapi_examples=EXEMPLES_DEMANDE)) -> R
         brief=demande.brief, division=resultat["division"],
         scores_division=resultat["scores_division"], recommandations=recommandations,
         version_modele=VERSION_MODELE, attribution=ATTRIBUTION,
+    )
+
+
+@app.post("/conversation", response_model=ReponseConversation, tags=["conversation"],
+          summary="Assistant V2.2 : un message du client, la réponse et l'état du brief")
+def conversation(demande: MessageConversation = Body(openapi_examples=EXEMPLES_CONVERSATION)
+                 ) -> ReponseConversation:
+    conversation_id, session = _conversation(demande.conversation_id)
+    with session["verrou"]:  # messages d'une meme conversation traites dans l'ordre
+        r = session["assistant"].repondre(demande.message, reformuler=demande.reformuler)
+    return ReponseConversation(
+        conversation_id=conversation_id, intention=r["intention"], texte=r["texte"],
+        projet=r["projet"], pistes=r["pistes"], solutions=r["solutions"],
+        piste_choisie=r["piste_choisie"], brief_final=r["brief_final"],
+        demande_echantillons=r["demande_echantillons"], version_modele=VERSION_V22,
+        attribution=ATTRIBUTION_V22,
     )

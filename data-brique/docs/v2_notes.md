@@ -226,7 +226,7 @@ rapide, corrections. Un test vérifie aussi les vraies réponses du modèle enre
 - **Pistache :** aucune crème dessert végétale et peu sucrée de l'échantillon n'utilise la
   pistache ; les pistes 2 et 3 sont donc « à valider en dégustation ». Indexer le catalogue
   complet reste à faire (fait en V2.2.1, voir ci-dessous).
-- **API :** pas encore branchée sur la V2.2.
+- **API :** branchée sur la V2.2.1 par `POST /conversation` (voir `docs/contrat_api.md`).
 
 ## V2.2.1 — types de produit, références DEMO, mode rapide, catalogue complet
 
