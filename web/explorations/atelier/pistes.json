@@ -1,0 +1,99 @@
+{
+  "session_id": "session-demo-preparation-front",
+  "etape": "pistes",
+  "intention": "precision",
+  "reponse": "Votre projet : boisson pétillante au citron vert, peu sucrée.\nJ'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.\nVoici mes pistes :\n1. Citron vert seul : un goût franc, facile à reconnaître. 37 des 50 produits les plus proches de votre projet l'utilisent.\n   Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau).\n2. Citron vert + citron : l'association la plus fréquente sur le marché (23 produits sur 37 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.\n   Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau).\n3. Citron vert + concombre : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.\n   Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau). Aucune référence proche pour l'arôme concombre dans la banque : une création sur mesure est possible.\nPour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).\nLaquelle vous tente ?",
+  "compris": {
+    "division": "flavors",
+    "type_produit": "boisson pétillante",
+    "arome": "citron vert",
+    "aromes": ["citron vert"],
+    "contraintes": ["peu sucré"],
+    "profil": []
+  },
+  "pistes": [
+    {
+      "id": "citron-vert",
+      "rang": 1,
+      "nom": "Citron vert",
+      "description": "L'arôme seul",
+      "explication": "Citron vert seul : un goût franc, facile à reconnaître. 37 des 50 produits les plus proches de votre projet l'utilisent.",
+      "aromes": ["citron vert"],
+      "nb_produits_marche": 37,
+      "references": [
+        {
+          "code": "DEMO-003",
+          "nom": "Citron vert frais",
+          "profil_sensoriel": "citron vert vif, zeste, acidulé, notes vertes",
+          "forme": "soluble eau",
+          "labels": ["naturel", "vegan", "halal", "casher", "sans allergène"]
+        }
+      ],
+      "sans_reference": [],
+      "references_sans_label": [],
+      "image": null
+    },
+    {
+      "id": "citron-vert+citron",
+      "rang": 2,
+      "nom": "Citron vert + citron",
+      "description": "L'association la plus courante",
+      "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (23 produits sur 37 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+      "aromes": ["citron vert", "citron"],
+      "nb_produits_marche": 23,
+      "references": [
+        {
+          "code": "DEMO-003",
+          "nom": "Citron vert frais",
+          "profil_sensoriel": "citron vert vif, zeste, acidulé, notes vertes",
+          "forme": "soluble eau",
+          "labels": ["naturel", "vegan", "halal", "casher", "sans allergène"]
+        },
+        {
+          "code": "DEMO-001",
+          "nom": "Citron jaune zesté",
+          "profil_sensoriel": "citron frais, zeste, légèrement acidulé",
+          "forme": "soluble eau",
+          "labels": ["naturel", "vegan", "halal", "casher"]
+        }
+      ],
+      "sans_reference": [],
+      "references_sans_label": [],
+      "image": null
+    },
+    {
+      "id": "citron-vert+concombre",
+      "rang": 3,
+      "nom": "Citron vert + concombre",
+      "description": "L'association originale",
+      "explication": "Citron vert + concombre : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+      "aromes": ["citron vert", "concombre"],
+      "nb_produits_marche": 1,
+      "references": [
+        {
+          "code": "DEMO-003",
+          "nom": "Citron vert frais",
+          "profil_sensoriel": "citron vert vif, zeste, acidulé, notes vertes",
+          "forme": "soluble eau",
+          "labels": ["naturel", "vegan", "halal", "casher", "sans allergène"]
+        }
+      ],
+      "sans_reference": ["concombre"],
+      "references_sans_label": [],
+      "image": null
+    }
+  ],
+  "solutions": [
+    {
+      "code": "DEMO-028",
+      "nom": "Sweetness",
+      "profil_sensoriel": "renforce la perception sucrée pour réduire le sucre ajouté",
+      "forme": "soluble eau",
+      "labels": ["naturel", "vegan", "halal", "casher"]
+    }
+  ],
+  "brief": null,
+  "echantillons": null,
+  "version_modele": "v2.2.4-revue",
+  "attribution": "Étude de marché réalisée sur des données d'Open Food Facts (ODbL)"
+}

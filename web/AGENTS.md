@@ -16,3 +16,11 @@ décisions dans `../docs/adr/`. Ce fichier est maintenu par les Tech leads.
 - `src/main.ts` insère actuellement les réponses avec `textContent` ; conserver un affichage textuel des réponses reçues.
 - `../docs/adr/0008-interface-react.md` propose React avec Vite. Lors de sa migration validée, conserver les ports et le proxy, puis actualiser ce fichier et les commandes réellement ajoutées.
 - Pour le parcours produit, prévoir les états chargement, erreur et récapitulatif du brief dans les composants concernés ; leur présence doit être vérifiée dans le code et avec le Product.
+
+## Exploration du parcours — ticket #33
+
+Pour `explorations/atelier/`, appliquer [Interface Design](https://github.com/Dammyjay93/interface-design/blob/2f9be3206855bcb2d1d0af262c8bae25cba6658d/.claude/skills/interface-design/SKILL.md),
+en complément des skills frontend-design, vercel-react-best-practices et
+web-design-guidelines requis pour le front. Lire la source liée si le skill
+n’est pas installé. Les maquettes servent à choisir une direction ; elles ne
+remplacent pas le parcours React/Tailwind. Lire leur README avant modification.

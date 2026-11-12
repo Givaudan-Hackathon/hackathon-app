@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f8f5" />
+    <title>Choisir ses arômes — Étude du parcours Givaudan</title>
+    <link
+      rel="preload"
+      href="./assets/plex-sans-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="./atelier.css" />
+    <script type="module" src="./atelier.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">Aller aux propositions</a>
+    <aside class="review-tools" aria-label="Options de revue des maquettes">
+      <div class="review-title">
+        Étude du parcours <span>Écran Choisir</span>
+      </div>
+      <nav class="variant-links" aria-label="Variantes de présentation">
+        <a href="?vue=atelier" data-view="atelier">A · Atelier</a>
+        <a href="?vue=comparaison" data-view="comparaison">B · Comparaison</a>
+      </nav>
+      <label class="scenario-control" for="scenario"
+        >Données simulées
+        <select id="scenario" name="scenario">
+          <option value="trois">3 pistes</option>
+          <option value="deux">2 pistes</option>
+          <option value="une">1 piste</option>
+          <option value="reserve">Label à confirmer</option>
+          <option value="images">Sans images</option>
+          <option value="long">Textes longs</option>
+          <option value="vide">Aucune piste</option>
+          <option value="erreur">Erreur</option>
+        </select>
+      </label>
+    </aside>
+    <header class="brand-header">
+      <div
+        class="brand"
+        aria-label="Givaudan, Taste and Wellbeing"
+        translate="no"
+      >
+        <svg viewBox="0 0 28 40" width="28" height="40" aria-hidden="true">
+          <path
+            d="M14 36V18m0 12C3 30 3 18 3 18s11-1 11 12Zm0-8C25 22 25 8 25 8S14 7 14 22ZM8 37h13"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span
+          ><span class="wordmark">givaudan</span
+          ><span class="brand-caption">Taste &amp; Wellbeing</span></span
+        >
+      </div>
+      <span class="header-purpose">Votre projet d’arômes</span>
+      <button class="quiet-button" data-action="help" type="button">
+        Comment choisir ?
+      </button>
+    </header>
+    <div class="demo-note">
+      Maquette interactive · références fictives · aucun envoi
+    </div>
+    <nav class="journey" aria-label="Étapes du projet">
+      <ol>
+        <li>
+          <button type="button" data-action="edit">
+            <span class="step-number">✓</span><span>Votre idée</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" data-action="edit">
+            <span class="step-number">✓</span><span>Affiner</span>
+          </button>
+        </li>
+        <li aria-current="step">
+          <span class="current-step"
+            ><span class="step-number">3</span><span>Choisir</span></span
+          >
+        </li>
+        <li>
+          <span class="future-step"
+            ><span class="step-number">4</span><span>Paiement</span></span
+          >
+        </li>
+        <li>
+          <span class="future-step"
+            ><span class="step-number">5</span><span>Votre demande</span></span
+          >
+        </li>
+      </ol>
+    </nav>
+    <main id="contenu" tabindex="-1">
+      <div id="screen">
+        <p role="status" class="loading">Préparation des pistes…</p>
+      </div>
+    </main>
+    <p
+      id="feedback"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></p>
+    <footer class="page-footer">
+      <p>
+        Les références et chiffres présentés sont fictifs. Aucun échantillon ni
+        commande n’est envoyé.
+      </p>
+      <p id="attribution"></p>
+    </footer>
+    <dialog id="editor" aria-labelledby="editor-title">
+      <form id="brief-form">
+        <div class="dialog-heading">
+          <h2 id="editor-title">Votre projet</h2>
+          <button
+            type="button"
+            class="close-button"
+            data-close="editor"
+            aria-label="Fermer le projet"
+          >
+            ×
+          </button>
+        </div>
+        <p>Précisez votre brief avant de choisir une piste.</p>
+        <label for="application">Quel produit préparez-vous ?</label>
+        <input
+          id="application"
+          name="application"
+          maxlength="100"
+          required
+          autocomplete="off"
+        />
+        <label for="volume"
+          >Volume envisagé <span class="optional">facultatif</span></label
+        >
+        <input
+          id="volume"
+          name="volume"
+          maxlength="140"
+          autocomplete="off"
+          placeholder="Par exemple, 5 000 bouteilles de 33 cl…"
+        />
+        <label for="constraints"
+          >Contraintes de recette
+          <span class="optional">facultatif</span></label
+        >
+        <textarea
+          id="constraints"
+          name="constraints"
+          maxlength="240"
+          rows="3"
+          autocomplete="off"
+        ></textarea>
+        <p class="local-note">
+          Dans cette maquette, les modifications restent locales et les pistes
+          ne sont pas recalculées. Modifier le brief annule votre sélection.
+        </p>
+        <div class="dialog-actions">
+          <button type="button" class="quiet-button" data-close="editor">
+            Annuler</button
+          ><button type="submit" class="primary-button">
+            Enregistrer le brief
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="review" aria-labelledby="review-title">
+      <div class="dialog-heading">
+        <h2 id="review-title">Vérifier votre brief</h2>
+        <button
+          type="button"
+          class="close-button"
+          data-close="review"
+          aria-label="Fermer la relecture"
+        >
+          ×
+        </button>
+      </div>
+      <div id="review-content"></div>
+      <div class="next-step-note">
+        <strong>Ensuite : un engagement de 10 € fictifs</strong>
+        <p>
+          Le paiement de démonstration précède la demande. Un commercial
+          vérifiera le projet avant toute commande.
+        </p>
+      </div>
+      <p class="local-note">
+        Cette maquette s’arrête à la relecture. Aucun paiement ni envoi n’est
+        effectué.
+      </p>
+      <div class="dialog-actions">
+        <button class="primary-button" type="button" data-close="review">
+          Revenir aux propositions
+        </button>
+      </div>
+    </dialog>
+    <dialog id="help" aria-labelledby="help-title">
+      <div class="dialog-heading">
+        <h2 id="help-title">Choisir une direction de goût</h2>
+        <button
+          type="button"
+          class="close-button"
+          data-close="help"
+          aria-label="Fermer l’aide"
+        >
+          ×
+        </button>
+      </div>
+      <p>
+        Comparez le profil sensoriel et l’explication de chaque proposition avec
+        votre idée de départ.
+      </p>
+      <ul class="help-list">
+        <li>Une piste peut associer plusieurs arômes.</li>
+        <li>
+          Une référence absente ou un label manquant demande une vérification
+          avec un expert.
+        </li>
+        <li>Votre choix prépare un brief. Il ne lance pas de commande.</li>
+      </ul>
+      <p>
+        Vous pourrez contacter un expert gratuitement dans le parcours complet.
+      </p>
+      <div class="dialog-actions">
+        <button type="button" class="primary-button" data-close="help">
+          Compris
+        </button>
+      </div>
+    </dialog>
+  </body>
+</html>
