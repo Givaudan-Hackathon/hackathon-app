@@ -17,7 +17,7 @@ les tâches et les vérifications. Ces trois outils sont complémentaires.
 Propositions à relire pour le produit et m1 :
 
 - [0007 — Organisation du dépôt](0007-organisation-du-depot.md) : proposée.
-- [0008 — Interface React avec Vite](0008-interface-react.md) : proposée, migration à réaliser.
+- [0008 — Interface React avec Vite](0008-interface-react.md) : choix React/Tailwind confirmé pour le prototype ; réalisation dans le ticket #20, encore à relire.
 - [0009 — API applicative NestJS](0009-api-nestjs.md) : proposée, migration à réaliser.
 - [0010 — Contrat OpenAPI versionné](0010-contrat-openapi.md) : proposée ; référence `openapi.yaml`.
 

@@ -15,15 +15,14 @@ se trouvent dans le [journal des ADR](docs/adr/README.md).
 
 | Partie           | Code actuellement présent                                  | Proposition pour le produit                                 |
 | ---------------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
-| Interface `web/` | Vite et TypeScript, formulaire de test                     | React avec Vite et TypeScript, ADR 0008                     |
+| Interface `web/` | React/TypeScript/Tailwind, parcours simulé                 | Branchement à l’API applicative, ADR 0008                   |
 | API `api/`       | Express/TypeScript, PostgreSQL et appel IA                 | NestJS/TypeScript, ADR 0009                                 |
 | Data             | Python/FastAPI, moteur et tests dans `feature/data-brique` | Service Python conservé ; intégration à relire avec la Data |
 | Organisation     | Workspaces npm `api/` et `web/`, base dans `db/`           | Dépôt commun par composant, ADR 0007                        |
 
-Les deux Tech leads maîtrisent React et NestJS. Les ADR 0007 à 0010 restent au
-statut **Proposée**. Cette branche prépare la documentation et le contrat de m1 ;
-les migrations React/NestJS et l’intégration de la branche Data ne sont pas
-réalisées par la présence de ces documents.
+Les deux Tech leads maîtrisent React et NestJS. Le choix React/Tailwind est
+confirmé par Christopher pour le prototype et réalisé dans le ticket #20. Les ADR 0007, 0009 et 0010 restent proposés. NestJS et
+l’intégration Data ne sont pas réalisés par la présence de ces documents.
 
 Le socle de test actuel affiche l’état de PostgreSQL et les échanges enregistrés.
 Son formulaire appelle `POST /api/questions`, interroge Ollama puis conserve la
@@ -31,10 +30,52 @@ réponse. Ce test technique ne démontre pas encore le parcours de brief client.
 Ollama Windows avec `llama3.2:1b` est le choix d’atelier décrit dans l’ADR 0002 ;
 le fournisseur et le modèle du produit restent à évaluer avec la Data.
 
+## Prototype client React
+
+Le [ticket #20](https://github.com/Givaudan-Hackathon/hackathon-app/issues/20)
+réalise le parcours invité : décrire un projet, préciser son besoin, comparer
+jusqu’à trois pistes illustrées, relire et simuler une demande. Cinq ingrédients
+sont couverts : citron vert, citron jaune, pamplemousse, vanille et fraise.
+
+```bash
+npm ci
+npm run dev -w web
+```
+
+Ouvrir http://localhost:5173. Le prototype fonctionne sans backend : réponses,
+références et dépôts sont simulés en mémoire. Recharger la page réinitialise
+le projet. Les coordonnées ne sont ni transmises ni stockées ; aucun e-mail,
+échantillon ou commande n’est envoyé. Les photos et les fontes sont locales ;
+les [prompts des visuels](web/src/assets/README.md) sont conservés.
+
+Le contrat V2 de la [PR Data #18](https://github.com/Givaudan-Hackathon/hackathon-app/pull/18)
+est consulté au commit `09d22f3`, sans intégration ni approbation de cette PR.
+Les composants dépendent d’un service avec adaptateur simulé, remplaçable par
+HTTP lors du branchement à Nest. Ce dernier reste un chantier distinct.
+
+Le test technique historique est accessible à http://localhost:5173/diagnostic.html
+et requiert l’API Express/PostgreSQL démarrée. Le build produit les deux pages.
+La préparation Compose et le tag `m2` sont suivis dans le
+[ticket #21](https://github.com/Givaudan-Hackathon/hackathon-app/issues/21) : ce
+front simulé ne vaut pas intégration de la tranche jusqu’aux données.
+
+```bash
+npm run lint
+npm run format:check
+npm run typecheck
+npm test
+npm run build
+```
+
+Pour les vérifications navigateur, installer le Chromium Playwright et ses
+bibliothèques système dans l’environnement de test, puis lancer `npm run test:e2e`.
+Les tests couvrent les formats 1440 et 360 px. Les captures et traces restent
+sous `.scratch/qa/`. Les validations Product et la revue restent humaines.
+
 ## Organisation des composants
 
 ```text
-web/                     Interface et dépendances npm du front
+web/                     Prototype React/Tailwind et dépendances npm du front
 api/                     API applicative et dépendances npm du back
   src/index.ts           Routes du socle Express actuel
 data-brique/             Source Data dans feature/data-brique, à intégrer
@@ -97,7 +138,7 @@ Node 24, npm 11 et le client PostgreSQL 17.
    npm run dev
    ```
 
-Ouvrir [le front Vite](http://localhost:5173). Il doit afficher l’état de l’API,
+Ouvrir [le diagnostic API](http://localhost:5173/diagnostic.html). Il doit afficher l’état de l’API,
 la version PostgreSQL et les derniers échanges. Les ports 3000 et 5173 sont
 transférés par VS Code ; vérifier l’onglet **Ports** si nécessaire. Ctrl+C arrête
 les serveurs. `npm run dev -w api` et `npm run dev -w web` les lancent séparément.

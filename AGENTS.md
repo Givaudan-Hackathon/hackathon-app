@@ -15,7 +15,7 @@ et déposent un brief. Lire `README.md` pour l’état du socle et les choix pro
 
 - Avant de modifier `web/` ou `api/`, lire aussi leur `AGENTS.md` : la racine porte les règles communes et le fichier local précise son composant.
 - Les Data rédigent et maintiennent `data-brique/AGENTS.md` dans leur branche. Consulter ce fichier dès qu’il existe avant de modifier leur code ; son absence actuelle ne vaut pas validation des choix Data.
-- React et NestJS restent des propositions documentées dans `docs/adr/`, pas des dépendances déjà installées.
+- Le prototype web utilise React/TypeScript et Tailwind ; son mode conversationnel reste simulé. NestJS reste une proposition dans `docs/adr/`, distincte de l’API Express installée.
 - `db/` définit la base PostgreSQL commune à l’API applicative et au service Data. Les Data et les Tech leads coordonnent ses évolutions de schéma et ses données initiales ; la connexion Data reste à intégrer et à vérifier.
 - `db/init/` n’est joué qu’à l’initialisation de PostgreSQL ; modifier ses scripts ne met pas à jour une base existante. Toute évolution doit préciser comment mettre à jour une base déjà initialisée.
 - Le fournisseur IA du socle est appelé par `ask()` dans `api/src/index.ts` ; ses valeurs viennent de `api/.env`.
@@ -26,7 +26,7 @@ et déposent un brief. Lire `README.md` pour l’état du socle et les choix pro
 ## Décisions
 
 - Lire `docs/adr/README.md` et les ADR concernés avant de changer un composant ou ses dépendances.
-- Respecter les ADR acceptés ; les propositions 0007 à 0010 demandent encore une validation. Un changement d’ADR accepté passe par une nouvelle décision explicite.
+- Respecter les ADR acceptés ; React/Tailwind est le choix demandé pour le prototype (ADR 0008). Les propositions 0007, 0009 et 0010 restent à valider. Un changement d’ADR accepté passe par une nouvelle décision explicite.
 - Une modification des routes doit mettre à jour `openapi.yaml` et les consommateurs concernés dans la même PR.
 
 ## À ne pas faire

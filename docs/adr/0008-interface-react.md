@@ -1,7 +1,7 @@
 # ADR 0008 — Construire l’interface produit avec React et Vite
 
 - Date : 10 novembre 2026
-- Statut : Proposée ; migration non réalisée dans cette PR
+- Statut : Choix React/Tailwind confirmé par Christopher le 12 novembre ; implémentation proposée à la revue dans le ticket #20
 - Décideurs : les deux Tech leads, avec le Product pour le parcours
 
 ## Contexte
@@ -27,7 +27,8 @@ au 10 novembre à 18 h ; il exige des livrables cohérents avec le code au tag.
 Adopter React pour le front produit dans `web/`, en conservant Vite, TypeScript,
 le port 5173 et le proxy `/api`. La migration fera l’objet d’un changement de code
 revu et testé. Jusqu’à cette migration, le README et AGENTS.md décrivent le front
-Vite/TypeScript réellement présent.
+Vite/TypeScript réellement présent. La réalisation du ticket #20 installe ensuite
+React, Tailwind et un contrôle TypeScript dédié ; Nest et Data restent séparés.
 
 Ce choix répond au parcours interactif du prototype. Aucun besoin de rendu côté
 serveur n’a été validé ; ajouter un autre framework de rendu n’est pas proposé ici.
@@ -42,3 +43,18 @@ serveur n’a été validé ; ajouter un autre framework de rendu n’est pas pr
   si des exigences de rendu côté serveur apparaissent.
 
 Source : [React avec un outil de build, dont Vite](https://react.dev/learn/build-a-react-app-from-scratch).
+
+## Précision pour le prototype du 12 novembre
+
+Christopher confirme le passage à la réalisation après le cadrage #19/PR #22.
+React/TypeScript et Tailwind sont installés dans le workspace web ; l’API Express
+et ses routes sont conservées. Le parcours client consomme un service simulé au
+contrat V2 de la PR Data #18, via une interface indépendante des composants.
+Les vérifications de réalisation et les limites restent dans le ticket #20.
+
+Pour les styles, CSS par composant et Tailwind ont été examinés dans le cadrage.
+Tailwind est retenu selon la demande de Christopher pour les tokens, utilitaires
+et composants partagés. Le coût est une dépendance et une convention de classes
+à maintenir. Les effets du MVP utilisent CSS ; aucune dépendance de moteur 3D,
+de routage ou de store global n’est ajoutée. Zod valide les objets reçus à
+l’exécution et les coordonnées, TypeScript vérifiant leurs usages dans le code.
