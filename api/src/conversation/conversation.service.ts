@@ -5,12 +5,16 @@ import { ConversationRequestDto } from './dto/conversation-request.dto.js';
 export class ConversationService {
   private readonly logger = new Logger(ConversationService.name);
 
-  async relayToPython(payload: ConversationRequestDto): Promise<any> {
-    // Lecture à l'intérieur de la méthode pour être sûr d'avoir la valeur à jour
+  async relayToPython(
+    payload: ConversationRequestDto,
+  ): Promise<Record<string, unknown>> {
     const baseUrl = process.env.DATA_API_BASE_URL;
 
     if (!baseUrl) {
-      throw new HttpException("Configuration DATA_API_BASE_URL manquante.", 500);
+      throw new HttpException(
+        'Configuration DATA_API_BASE_URL manquante.',
+        500,
+      );
     }
 
     const message = payload.message?.trim() || '';
@@ -19,13 +23,13 @@ export class ConversationService {
     // Règle métier : le message ne peut pas être vide si pas de piste_id
     if (!message && !pisteId) {
       throw new HttpException(
-        { error: 'Le message est requis si aucune piste_id n\'est fournie.' },
+        { error: "Le message est requis si aucune piste_id n'est fournie." },
         400,
       );
     }
 
     const url = `${baseUrl.replace(/\/+$/, '')}/conversation`;
-    
+
     let response: Response;
     try {
       response = await fetch(url, {
@@ -41,31 +45,53 @@ export class ConversationService {
         }),
         signal: AbortSignal.timeout(30_000),
       });
-    } catch (error: any) {
-      if (error.name === 'TimeoutError' || error.name === 'AbortError') {
-        throw new HttpException({ error: "Le service Data n'a pas répondu dans les 30 secondes." }, 504);
+    } catch (error: unknown) {
+      if (
+        error instanceof Error &&
+        (error.name === 'TimeoutError' || error.name === 'AbortError')
+      ) {
+        throw new HttpException(
+          { error: "Le service Data n'a pas répondu dans les 30 secondes." },
+          504,
+        );
       }
       this.logger.error('Erreur réseau Data:', error);
-      throw new HttpException({ error: 'Le service Data est injoignable.' }, 503);
+      throw new HttpException(
+        { error: 'Le service Data est injoignable.' },
+        503,
+      );
     }
 
     if (!response.ok) {
       this.logger.warn(`Erreur Data HTTP ${response.status}`);
-      let errorBody;
+      let errorBody: Record<string, unknown>;
       try {
-        errorBody = await response.json();
+        errorBody = (await response.json()) as Record<string, unknown>;
       } catch {
-        throw new HttpException({ error: "Le service Data a renvoyé une erreur illisible." }, 502);
+        throw new HttpException(
+          { error: 'Le service Data a renvoyé une erreur illisible.' },
+          502,
+        );
       }
-      
-      throw new HttpException({ error: errorBody.detail || errorBody.error || 'Erreur Data inconnue.' }, 422);
+
+      const errorMessage =
+        typeof errorBody?.detail === 'string'
+          ? errorBody.detail
+          : typeof errorBody?.error === 'string'
+            ? errorBody.error
+            : 'Erreur Data inconnue.';
+
+      throw new HttpException({ error: errorMessage }, 422);
     }
 
     try {
-      const data = await response.json();
+      const data = (await response.json()) as Record<string, unknown>;
       return data; // On retourne tout l'objet (brief, echantillons, etc.)
     } catch {
-      throw new HttpException({ error: "Le service Data a renvoyé un JSON invalide." }, 502);
+      throw new HttpException(
+        { error: 'Le service Data a renvoyé un JSON invalide.' },
+        502,
+      );
     }
   }
 }
