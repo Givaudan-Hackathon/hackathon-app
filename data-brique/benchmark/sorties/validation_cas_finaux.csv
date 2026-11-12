@@ -1,0 +1,68 @@
+id,categorie,phrase_client,type_attendu,type_obtenu,aromes_attendus,aromes_obtenus,contraintes_attendues,contraintes_obtenues,comportement_attendu,comportement_obtenu,etape,intention,type_ok,arome_principal_ok,aromes_ok,contraintes_ok,comportement_ok,division_ok,sans_marque,marques_citees,sans_chiffre_invente,chiffres_inventes,sans_prix,modele_appele,secondes,reponse,cas_reussi,v1_division,v1_division_ok,v1_arome_top5_ok,v21_secondes,v21_division_ok,v21_arome,v21_arome_principal_ok,v21_comportement,v21_comportement_ok,v22_comparable_ok,v21_sans_marque
+F01,boisson,"on prépare un ice tea maison à la framboise, sans sucre ajouté",thé glacé,,framboise,framboise,peu sucré,peu sucré,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,,True,,True,True,6.488,"Votre projet : à la framboise, peu sucré.
+J'ai étudié les 50 produits du marché les plus proches de votre projet, tous peu sucrés.
+Voici mes pistes :
+1. Framboise seule : un goût franc, facile à reconnaître. 38 des 50 produits les plus proches de votre projet l'utilisent.
+   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+2. Framboise + fraise : l'association la plus fréquente sur le marché (11 produits sur 38 à la framboise). Un choix rassurant, que les consommateurs connaissent déjà.
+   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+3. Framboise + abricot : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau). Aucune référence proche pour l'arôme abricot dans la banque : une création sur mesure est possible.
+Pour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).
+Laquelle vous tente ?",False,indeterminee,False,False,3.714,True,framboise,True,pistes,True,True,True
+F02,boisson,une boisson à base de lait d'amande parfum vanille,boisson végétale,boisson végétale,vanille,vanille,,,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.662,"Votre projet : boisson végétale à la vanille.
+J'ai étudié les 50 boissons végétales du marché les plus proches de votre projet.
+Voici mes pistes :
+1. Vanille seule : un goût franc, facile à reconnaître. 45 des 50 produits les plus proches de votre projet l'utilisent.
+   Référence : DEMO-014 Vanille bourbon (vanille ronde, crémeuse, notes boisées ; soluble eau).
+2. Vanille + amande : l'association la plus fréquente sur le marché (8 produits sur 45 à la vanille). Un choix rassurant, que les consommateurs connaissent déjà.
+   Référence : DEMO-014 Vanille bourbon (vanille ronde, crémeuse, notes boisées ; soluble eau). Aucune référence proche pour l'arôme amande dans la banque : une création sur mesure est possible.
+3. Vanille + pomme : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+   Référence : DEMO-014 Vanille bourbon (vanille ronde, crémeuse, notes boisées ; soluble eau). Aucune référence proche pour l'arôme pomme dans la banque : une création sur mesure est possible.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,2.765,False,vanille,True,pistes,True,True,True
+F03,boisson,je voudrais une limonade au concombre et à la menthe,boisson pétillante,boisson pétillante,concombre|menthe,menthe|concombre,,,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.727,"Votre projet : boisson pétillante à la menthe.
+J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet.
+Voici mes pistes :
+1. Menthe seule : un goût franc, facile à reconnaître. 28 des 50 produits les plus proches de votre projet l'utilisent.
+   Référence : DEMO-021 Menthe poivrée (menthe poivrée, fraîche, puissante ; huile).
+2. Menthe + citron : l'association la plus fréquente sur le marché (8 produits sur 28 à la menthe). Un choix rassurant, que les consommateurs connaissent déjà.
+   Références : DEMO-021 Menthe poivrée (menthe poivrée, fraîche, puissante ; huile) + DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau).
+3. Menthe + concombre : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+   Référence : DEMO-021 Menthe poivrée (menthe poivrée, fraîche, puissante ; huile). Aucune référence proche pour l'arôme concombre dans la banque : une création sur mesure est possible.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,3.805,True,,False,relance,False,True,True
+F04,autre_produit,un yaourt aux fruits rouges pour les enfants,yaourt,yaourt,fruits rouges,fruits rouges,pour enfants,pour enfants,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.77,"Votre projet : yaourt aux fruits rouges, pour enfants.
+J'ai étudié les 50 yaourts du marché les plus proches de votre projet.
+Je n'ai pas pu filtrer l'étude sur « pour enfants » : les données du marché ne le précisent pas. Je reste sur les yaourts et je garde cette contrainte dans votre brief.
+Voici mes pistes :
+1. Fruits rouges seuls : un goût franc, facile à reconnaître. 8 des 50 produits les plus proches de votre projet l'utilisent.
+   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+2. Fruits rouges + fraise : l'association la plus fréquente sur le marché (6 produits sur 8 aux fruits rouges). Un choix rassurant, que les consommateurs connaissent déjà.
+   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+3. Fruits rouges + cassis : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+Laquelle vous tente ?",True,flavors,True,True,3.62,True,fruits rouges,True,pistes,True,True,True
+F05,autre_produit,"je fabrique des sorbets, je veux tester le litchi",glace,glace,litchi,litchi,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,1.002,"Votre projet : glace au litchi.
+J'ai étudié les 45 glaces du marché les plus proches de votre projet.
+Le catalogue ne compte que 45 glaces : l'étude est donc limitée.
+Voici mes pistes :
+1. Litchi seul : un goût franc, facile à reconnaître. Aucun des 45 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.
+   Aucune référence proche pour l'arôme litchi dans la banque : une création sur mesure est possible.
+2. Litchi + coco : le goût coco est le plus présent dans les produits proches de votre projet (39 produits). L'association avec litchi n'y apparaît pas encore (aucun produit proche n'est au litchi) : à valider en dégustation.
+   Référence : DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau). Aucune référence proche pour l'arôme litchi dans la banque : une création sur mesure est possible.
+3. Litchi + agrumes : un goût rare dans les produits proches (1 produit) et jamais associé au litchi : une piste originale, à tester.
+   Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau). Aucune référence proche pour l'arôme litchi dans la banque : une création sur mesure est possible.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,indeterminee,False,True,3.14,True,litchi,True,pistes,True,True,True
+F06,autre_produit,"crème dessert caramel, bio et sans lactose",crème dessert,crème dessert,caramel,caramel,bio|sans lactose,bio|sans lactose,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,1.052,"Votre projet : crème dessert au caramel, bio et sans lactose.
+J'ai étudié les 45 crèmes dessert du marché les plus proches de votre projet, toutes bio et sans lactose.
+Voici mes pistes :
+1. Caramel seul : un goût franc, facile à reconnaître. 7 des 45 produits les plus proches de votre projet l'utilisent.
+   Aucune référence proche pour l'arôme caramel dans la banque : une création sur mesure est possible.
+2. Caramel + vanille : l'association la plus fréquente sur le marché (1 produit sur 7 au caramel). Un choix rassurant, que les consommateurs connaissent déjà.
+   Référence : DEMO-015 Vanille bio (vanille douce, gourmande ; poudre). Aucune référence proche pour l'arôme caramel dans la banque : une création sur mesure est possible.
+3. Caramel + amande : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+   Aucune référence proche pour les arômes caramel et amande dans la banque : une création sur mesure est possible.
+Laquelle vous tente ?",True,flavors,True,True,4.045,True,caramel,True,pistes,True,True,True
+F07,autre_produit,une sauce barbecue fumée,sauce,sauce barbecue fumée,fumé,,,,pistes,relance,relance,nouvelle_demande,False,False,False,True,False,True,True,,True,,True,True,5.332,"J'ai bien noté votre projet : sauce barbecue fumée. Parmi les 50 produits du marché les plus proches, les arômes les plus courants sont : framboise (12 produits), coco (9 produits) et vanille (7 produits). Quel goût recherchez-vous ?",False,indeterminee,False,False,2.978,True,barbecue,False,pistes,True,False,True
+F08,flou_hors_sujet,"bonjour, vous pouvez m'aider ?",,,,,,,relance,relance,relance,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.001,Quel type de produit voulez-vous créer ? Quel goût recherchez-vous ?,True,indeterminee,True,,2.215,True,,True,relance,True,True,True
+F09,flou_hors_sujet,quels sont vos délais pour un échantillon ?,,,,,,,question,relance,relance,demande_echantillons,True,True,True,True,False,True,True,,True,,True,False,0.002,"Pour vous proposer des échantillons, décrivez-moi d'abord votre projet : quel produit, et quel goût ?",False,indeterminee,True,,2.472,True,,True,relance,,,True
+F10,flou_hors_sujet,je veux le goût du Nutella,,,,,,,hors_sujet (aucune marque),relance,relance,nouvelle_demande,True,True,True,True,False,False,True,,True,,True,True,5.503,Quel type de produit voulez-vous créer ? Quel goût recherchez-vous ?,False,flavors,False,,3.653,False,chocolat,False,pistes,,,True

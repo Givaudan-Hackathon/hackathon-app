@@ -47,7 +47,8 @@ export const flavors = [
     key: 'lime',
     id: 'citron-vert',
     label: 'citron vert',
-    match: /citron vert|citron-vert|lime/,
+    // L’alias « lime » ne doit pas être reconnu dans « alimentaire ».
+    match: /citron vert|citron-vert|\blimes?\b/,
   },
   {
     key: 'grapefruit',

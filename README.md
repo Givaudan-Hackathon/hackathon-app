@@ -13,18 +13,20 @@ se trouvent dans le [journal des ADR](docs/adr/README.md).
 
 ## État du code et choix proposés
 
-| Partie           | Code actuellement présent                                  | Proposition pour le produit                                 |
-| ---------------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
-| Interface `web/` | React/TypeScript/Tailwind, parcours simulé                 | Branchement à l’API applicative, ADR 0008                   |
-| API `api/`       | Express/TypeScript, PostgreSQL et appel IA                 | NestJS/TypeScript, ADR 0009                                 |
-| Data             | Python/FastAPI, moteur et tests dans `feature/data-brique` | Service Python conservé ; intégration à relire avec la Data |
-| Organisation     | Workspaces npm `api/` et `web/`, base dans `db/`           | Dépôt commun par composant, ADR 0007                        |
+| Partie           | Code actuellement présent                        | Proposition pour le produit                      |
+| ---------------- | ------------------------------------------------ | ------------------------------------------------ |
+| Interface `web/` | React/TypeScript/Tailwind, parcours simulé       | Branchement à l’API applicative, ADR 0008        |
+| API `api/`       | NestJS 12, PostgreSQL et appel IA                | Migration du socle réalisée, ADR 0009 acceptée   |
+| Data             | Python/FastAPI dans `data-brique/`               | Relais Nest–Python à réaliser dans le ticket #31 |
+| Organisation     | Workspaces npm `api/` et `web/`, base dans `db/` | Dépôt commun par composant, ADR 0007             |
 
 Les deux Tech leads maîtrisent React et NestJS. Le choix React/Tailwind est
-confirmé par Christopher pour le prototype et réalisé dans le ticket #20. Les ADR 0007, 0009 et 0010 restent proposés. NestJS et
-l’intégration Data ne sont pas réalisés par la présence de ces documents.
+confirmé par Christopher pour le prototype et réalisé dans le ticket #20.
+L’ADR 0009 est acceptée et la migration du socle API vers NestJS est fusionnée
+(PR #27). Les ADR 0007 et 0010 restent proposés. La présence des sources Python
+ne constitue pas encore un branchement du parcours React à leur conversation.
 
-Le socle de test actuel affiche l’état de PostgreSQL et les échanges enregistrés.
+Le diagnostic API affiche l’état de PostgreSQL et les échanges enregistrés.
 Son formulaire appelle `POST /api/questions`, interroge Ollama puis conserve la
 réponse. Ce test technique ne démontre pas encore le parcours de brief client.
 Ollama Windows avec `llama3.2:1b` est le choix d’atelier décrit dans l’ADR 0002 ;
@@ -32,7 +34,9 @@ le fournisseur et le modèle du produit restent à évaluer avec la Data.
 
 ## Prototype client React
 
-Le [ticket #20](https://github.com/Givaudan-Hackathon/hackathon-app/issues/20)
+Le [cadrage web](docs/ARCHITECTURE-WEB.md), livré dans le ticket #19 / PR #22,
+fixe les fonctionnalités, l’état du parcours et les adaptateurs. Le
+[ticket #20](https://github.com/Givaudan-Hackathon/hackathon-app/issues/20)
 réalise le parcours invité : décrire un projet, préciser son besoin, comparer
 jusqu’à trois pistes illustrées, relire et simuler une demande. Cinq ingrédients
 sont couverts : citron vert, citron jaune, pamplemousse, vanille et fraise.
@@ -62,12 +66,15 @@ le projet. Les coordonnées ne sont ni transmises ni stockées ; aucun e-mail,
 les [prompts des visuels](web/src/assets/README.md) sont conservés.
 
 Le contrat V2 de la [PR Data #18](https://github.com/Givaudan-Hackathon/hackathon-app/pull/18)
-est consulté au commit `09d22f3`, sans intégration ni approbation de cette PR.
-Les composants dépendent d’un service avec adaptateur simulé, remplaçable par
-HTTP lors du branchement à Nest. Ce dernier reste un chantier distinct.
+a servi à construire le simulateur (source `09d22f3`). La brique Python est
+maintenant présente dans le dépôt, mais le parcours reste simulé : le relais
+Nest–Python est suivi dans #31 et le raccordement HTTP du front dans #32.
+Les composants dépendent d’une interface de service indépendante des fixtures.
+Le brouillon Data reste distinct du dépôt applicatif et de l’acceptation
+commerciale d’une commande.
 
 Le test technique historique est accessible à http://localhost:5173/diagnostic.html
-et requiert l’API Express/PostgreSQL démarrée. Le build produit les deux pages.
+et requiert l’API NestJS/PostgreSQL démarrée. Le build produit les deux pages.
 La préparation Compose et le tag `m2` sont suivis dans le
 [ticket #21](https://github.com/Givaudan-Hackathon/hackathon-app/issues/21) : ce
 front simulé ne vaut pas intégration de la tranche jusqu’aux données.
@@ -80,18 +87,27 @@ npm test
 npm run build
 ```
 
+`npm test` exécute les tests unitaires NestJS et les tests métier du front.
+
 Pour les vérifications navigateur, installer le Chromium Playwright et ses
 bibliothèques système dans l’environnement de test, puis lancer `npm run test:e2e`.
 Les tests couvrent les formats 1440 et 360 px. Les captures et traces restent
 sous `.scratch/qa/`. Les validations Product et la revue restent humaines.
+Si le prototype est déjà ouvert sur 5173, utiliser
+`GIVAUDAN_TEST_PORT=5184 npm run test:e2e` pour tester cette copie séparément.
 
 ## Organisation des composants
 
 ```text
 web/                     Prototype React/Tailwind et dépendances npm du front
-api/                     API applicative et dépendances npm du back
-  src/index.ts           Routes du socle Express actuel
-data-brique/             Source Data dans feature/data-brique, à intégrer
+api/                     API NestJS et dépendances npm du back
+  src/main.ts            Bootstrap NestJS et préfixe /api
+  src/app.module.ts      Modules Database, Health et Questions
+  src/database/          Pool PostgreSQL partagé
+  src/health/            GET /api/health
+  src/questions/         GET|POST /api/questions et fournisseur IA
+  src/shared/            Filtre d’erreurs { error }
+data-brique/             Service Python/FastAPI, relais Nest à réaliser
   api/                   API FastAPI
   src/                   Moteur Python
   notebooks/             Expérimentations
@@ -183,8 +199,10 @@ pour la tranche verticale m2.
 
 ## Travail avec la Data
 
-La source Data examinée est `feature/data-brique` au commit `148f6e4`. Elle
-expose `/sante` et `/recommander`, avec son propre contrat et ses dépendances.
+Les sources Data sont fusionnées dans `data-brique/`. Le service expose
+`/sante`, `/recommander` et `/conversation`, avec son propre environnement
+Python. Son [contrat conversationnel](data-brique/docs/contrat_api.md) décrit
+les snapshots, les étapes et les brouillons renvoyés au front.
 Le script suivant vérifie un service Data déjà lancé :
 
 ```bash
@@ -192,10 +210,11 @@ node scripts/verifier-api-data.mjs http://127.0.0.1:8000
 ```
 
 Les résultats de l’essai et la procédure de reproduction sont dans le ticket #13.
-L’intégration de l’API applicative vers Data relève du
-[Spike #12](https://github.com/Givaudan-Hackathon/hackathon-app/issues/12).
-Les contrôles Python et le démarrage commun seront ajoutés avec l’intégration
-Data ; la CI actuelle vérifie les workspaces TypeScript.
+Le [ticket #31](https://github.com/Givaudan-Hackathon/hackathon-app/issues/31)
+porte le relais Nest vers Python ; #32 porte son consommateur React. Le
+[Spike #12](https://github.com/Givaudan-Hackathon/hackathon-app/issues/12)
+conserve l’étude initiale. Les dépendances et tests Python restent séparés
+des workspaces npm. Le démarrage commun relève de #21.
 
 ## Collaboration et jalon m1
 

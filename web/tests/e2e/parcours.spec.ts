@@ -35,6 +35,43 @@ async function fillContact(page: Page) {
   await page.getByLabel('E-mail professionnel').fill('camille@example.com');
 }
 
+test('sans piste, les questions affinent le besoin avant de proposer des arômes', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page
+    .getByRole('textbox', { name: 'Qu’avez-vous envie de créer ?' })
+    .fill('Je veux créer un produit alimentaire.');
+  await page
+    .getByRole('button', { name: 'Explorer les arômes de mon projet' })
+    .click();
+  const nav = page.getByRole('navigation', { name: 'Étapes de votre projet' });
+  await expect(nav.getByRole('button', { name: '2. Affiner' })).toHaveAttribute(
+    'aria-current',
+    'step',
+  );
+  await expect(nav.getByRole('button', { name: '3. Choisir' })).toBeDisabled();
+  await expect(page.locator('.chat-assistant')).toContainText(
+    'Dans quel produit souhaitez-vous retrouver ce goût',
+  );
+  await expect(page.locator('.options-section')).toHaveCount(0);
+  const answer = page.getByRole('textbox', { name: 'Précisons votre idée' });
+  await answer.fill('Une boisson pétillante');
+  await page.getByRole('button', { name: 'Envoyer ma précision' }).click();
+  await expect(page.locator('.chat-assistant')).toContainText(
+    'Quel goût imaginez-vous ?',
+  );
+  await expect(nav.getByRole('button', { name: '3. Choisir' })).toBeDisabled();
+  await answer.fill('Citron vert');
+  await page.getByRole('button', { name: 'Envoyer ma précision' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Trois pistes, à vous d’explorer.' }),
+  ).toBeVisible();
+  await expect(page.locator('.option-card')).toHaveCount(3);
+  await expect(nav.getByRole('button', { name: '4. Paiement' })).toBeDisabled();
+  await noOverflow(page);
+});
+
 test('accueil et dialogues centrés, accessibles et utilisables en petit écran', async ({
   page,
 }, testInfo) => {

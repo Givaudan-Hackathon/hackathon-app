@@ -14,7 +14,7 @@
     "format:check": "prettier --check . '!db/data'",
     "prepare": "husky",
     "typecheck": "npm run typecheck -w web",
-    "test": "npm run test -w web",
+    "test": "npm run test --workspaces",
     "test:e2e": "npm run test:e2e -w web"
   },
   "lint-staged": {

@@ -14,11 +14,11 @@ les tâches et les vérifications. Ces trois outils sont complémentaires.
 | [0005](0005-collaboration-et-depot-public.md) | Collaboration, qualité et dépôt public             | Accepté ; visibilité autorisée par Christopher       |
 | [0006](0006-integration-sequentielle.md)      | Intégration séquentielle des ateliers dans develop | Accepté ; remplace l’ordre de revue de l’ADR 0005    |
 
-Propositions à relire pour le produit et m1 :
+Décisions et propositions du produit :
 
 - [0007 — Organisation du dépôt](0007-organisation-du-depot.md) : proposée.
-- [0008 — Interface React avec Vite](0008-interface-react.md) : choix React/Tailwind confirmé pour le prototype ; réalisation dans le ticket #20, encore à relire.
-- [0009 — API applicative NestJS](0009-api-nestjs.md) : proposée, migration à réaliser.
+- [0008 — Interface React avec Vite](0008-interface-react.md) : choix React/Tailwind confirmé ; [cadrage](../ARCHITECTURE-WEB.md) fusionné, réalisation du ticket #20 en revue.
+- [0009 — API applicative NestJS](0009-api-nestjs.md) : acceptée ; migration du socle réalisée dans la PR #27.
 - [0010 — Contrat OpenAPI versionné](0010-contrat-openapi.md) : proposée ; référence `openapi.yaml`.
 
 Les preuves et la procédure du choix de dépôt restent dans le

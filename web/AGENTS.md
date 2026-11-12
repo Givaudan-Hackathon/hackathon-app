@@ -19,7 +19,7 @@ le dépôt d’une demande reste distinct de son acceptation commerciale.
 
 ## Architecture du prototype
 
-Lire [le cadrage web](https://github.com/Givaudan-Hackathon/hackathon-app/blob/6403cb651fd3b03025145fbfd5547e7d2d175365/docs/ARCHITECTURE-WEB.md) avant le ticket #20 : état du
+Lire [le cadrage web](../docs/ARCHITECTURE-WEB.md) avant le ticket #20 : état du
 parcours, adaptateurs, contrat Data et images de démonstration. Le ticket #19
 porte le cadrage ; le ticket #20 installe React/Tailwind et le parcours simulé.
 Le périmètre vise le petit client ; brouillon Data,
@@ -30,6 +30,7 @@ dépôt applicatif et acceptation commerciale restent des états distincts.
 - Depuis la racine : `npm run dev -w web` pour Vite sur 5173, puis `npm run build -w web` pour le bundle.
 - La CI reste définie dans `../.github/workflows/ci.yml` ; lancer aussi les contrôles racine avant la PR.
 - `npm run typecheck -w web` vérifie TypeScript ; le build Vite reste distinct. `npm test -w web` lance les tests métier avec Node 24 ; `npm run test:e2e -w web` vérifie le parcours avec Playwright, après installation de Chromium.
+- `GIVAUDAN_TEST_PORT=5184 npm run test:e2e` utilise un serveur de test distinct, sans réutiliser le prototype déjà ouvert sur 5173.
 
 ## Code actuel et évolution
 

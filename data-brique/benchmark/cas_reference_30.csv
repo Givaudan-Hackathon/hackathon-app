@@ -1,0 +1,31 @@
+id,categorie,phrase_client,type_produit_attendu,arome_attendu,contraintes_attendues,comportement_attendu
+C01,boisson_agrumes,"je voudrais créer une boisson pétillante au citron vert pas trop sucrée",boisson pétillante,citron vert,peu sucré,pistes
+C02,boisson_agrumes,"une limonade bio au citron jaune",boisson pétillante,citron,bio,pistes
+C03,boisson_agrumes,"thé glacé saveur pêche et citron",thé glacé,pêche|citron,,pistes
+C04,boisson_agrumes,"un sirop au pamplemousse rose",sirop,pamplemousse,,pistes
+C05,boisson_agrumes,"une eau aromatisée à l'orange sans sucre ajouté",boisson,orange,peu sucré,pistes
+C06,boisson_agrumes,"je cherche un goût yuzu pour une boisson gazeuse",boisson pétillante,yuzu,,pistes
+C07,boisson_agrumes,"boisson végétale vegan goût orange",boisson végétale,orange,vegan,pistes
+C08,boisson_agrumes,"un thé glacé bio peu sucré au citron",thé glacé,citron,bio|peu sucré,pistes
+C09,boisson_agrumes,"soda au citron et au gingembre",boisson pétillante,citron|gingembre,,pistes
+C10,boisson_agrumes,"sirop de mandarine pour cocktails sans alcool",sirop,mandarine,,pistes
+C11,boisson_agrumes,"une boisson aux agrumes pour enfants, pas trop acide",boisson,agrumes,,pistes
+C12,boisson_agrumes,"je veux une boisson",boisson,,,relance
+C13,boisson_agrumes,"boisson pétillante citron vert et menthe façon mojito",boisson pétillante,citron vert|menthe,,pistes
+C14,boisson_agrumes,"une boisson à la bergamote halal",boisson,bergamote,halal,pistes
+C15,boisson_agrumes,"jus pétillant orange sanguine bio et vegan",boisson pétillante,orange,bio|vegan,pistes
+C16,autre_produit,"une crème dessert végétale à la vanille",crème dessert,vanille,vegan,pistes
+C17,autre_produit,"glace au caramel beurre salé",glace,caramel,,pistes
+C18,autre_produit,"yaourt à boire fraise banane",yaourt à boire,fraise|banane,,pistes
+C19,autre_produit,"un yaourt bio à la framboise",yaourt,framboise,bio,pistes
+C20,autre_produit,"boisson lactée au chocolat peu sucrée",boisson lactée,chocolat,peu sucré,pistes
+C21,autre_produit,"chips goût barbecue",snack salé,barbecue,,pistes
+C22,autre_produit,"une glace au durian",glace,durian,,creation_sur_mesure
+C23,autre_produit,"dessert à la noix de coco et mangue vegan",dessert,coco|mangue,vegan,pistes
+C24,autre_produit,"je fais des biscuits, je veux un goût noisette",biscuit,noisette,,pistes
+C25,autre_produit,"un dessert",dessert,,,relance
+C26,flou_hors_sujet,"je veux un truc bon",,,,relance
+C27,flou_hors_sujet,"quelle heure est-il ?",,,,hors_sujet
+C28,flou_hors_sujet,"c'est combien un échantillon ?",,,,question (ne pas inventer de prix)
+C29,flou_hors_sujet,"donne-moi la recette de Coca-Cola",,,,hors_sujet (aucune marque)
+C30,flou_hors_sujet,"quel est le meilleur arôme ?",,,,relance

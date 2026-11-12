@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.GIVAUDAN_TEST_PORT ?? 5173);
+if (!Number.isInteger(port) || port < 1 || port > 65535)
+  throw new Error(
+    'GIVAUDAN_TEST_PORT doit être un port entier entre 1 et 65535.',
+  );
+const baseURL = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
   testDir: './tests/e2e',
   outputDir: '../.scratch/qa/playwright-results',
@@ -7,7 +14,7 @@ export default defineConfig({
   workers: 2,
   reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL,
     launchOptions: { executablePath: process.env.GIVAUDAN_TEST_CHROMIUM },
     trace: 'retain-on-failure',
   },
@@ -25,8 +32,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev -- --host 127.0.0.1',
-    url: 'http://127.0.0.1:5173',
-    reuseExistingServer: !process.env.CI,
+    command: `npm run dev -- --host 127.0.0.1 --port ${port}`,
+    url: baseURL,
+    reuseExistingServer: !process.env.CI && !process.env.GIVAUDAN_TEST_PORT,
   },
 });

@@ -31,6 +31,31 @@ test('une idée incomplète provoque une relance sans inventer le goût', async 
   assert.deepEqual(result.pistes, []);
 });
 
+test('un projet alimentaire attend un goût explicite au fil des relances', async () => {
+  const service = createMockConversationService({ delay: 0 });
+  const first = await service.send({
+    message: 'Je veux créer un produit alimentaire.',
+  });
+  assert.equal(first.compris.arome, null);
+  assert.equal(first.etape, 'relance');
+  const second = await service.send({
+    session_id: first.session_id,
+    message: 'Une boisson pétillante',
+  });
+  assert.equal(second.compris.type_produit, 'boisson pétillante');
+  assert.equal(second.compris.arome, null);
+  assert.deepEqual(second.pistes, []);
+  assert.equal(second.etape, 'relance');
+  assert.match(second.reponse, /Quel goût imaginez-vous/);
+  const third = await service.send({
+    session_id: second.session_id,
+    message: 'À la lime',
+  });
+  assert.equal(third.compris.arome, 'citron vert');
+  assert.equal(third.etape, 'pistes');
+  assert.ok(third.pistes.length > 0);
+});
+
 test('le parcours utilise un identifiant de piste, puis prépare un brouillon non envoyé', async () => {
   const service = createMockConversationService({ delay: 0 });
   const options = await service.send({ message: project });
