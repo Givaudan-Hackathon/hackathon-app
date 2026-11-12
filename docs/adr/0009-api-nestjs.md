@@ -32,14 +32,13 @@ la base PostgreSQL commune aux Data et aux Tech leads et l’interface HTTP de l
 brique Data Python/FastAPI. La connexion Data à PostgreSQL reste à intégrer et
 à vérifier dans sa branche.
 
-La migration a été engagée : NestJS 12 (ESM, Vitest) fournit le nouveau socle
-de `api/`, l’ancien `src/index.ts` Express est supprimé. Le préfixe global
-`/api` est défini dans `main.ts` afin de préserver le contrat `openapi.yaml`.
-Les routes `GET /api/health` et `GET|POST /api/questions` restent à porter dans
-des contrôleurs Nest ; tant qu’elles manquent, `openapi.yaml` décrit des routes
-non encore implémentées et l’ADR 0010 reste en suspens sur ces points.
-`pg` est conservé comme dépendance d’exécution ; `@types/pg` comme dépendance
-de développement.
+La migration est réalisée : NestJS 12 (ESM, Vitest) fournit le socle de `api/`,
+l’ancien `src/index.ts` Express est supprimé. Le préfixe global `/api` est défini
+dans `main.ts` afin de préserver le contrat `openapi.yaml`. Les routes
+`GET /api/health` et `GET|POST /api/questions` sont portées dans
+`HealthController` et `QuestionsController`, avec un filtre d’exception global
+qui préserve le format `{ error }`. `pg` est conservé comme dépendance
+d’exécution ; `@types/pg` comme dépendance de développement.
 
 La migration doit préserver le contrat de test `openapi.yaml` ou en documenter
 explicitement les changements. Elle vérifie les routes, codes d’erreur,
@@ -50,7 +49,7 @@ d’atelier.
 
 - Conventions communes pour séparer traitement HTTP, logique et accès aux services.
 - Coût engagé : scaffold NestJS, migration du point d’entrée, suppression du socle
-  Express. Les routes métier (`health`, `questions`) restent à porter.
+  Express, portage des routes `health` et `questions`, tests unitaires et e2e.
 - Une interface et deux services restent possibles dans un dépôt commun ; NestJS
   n’impose ni microservices supplémentaires, ni nouvel ORM, ni seconde base.
 - À revoir si le coût de migration menace la tranche verticale ou si les besoins
