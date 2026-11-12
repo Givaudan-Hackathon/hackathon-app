@@ -97,13 +97,13 @@ paths:
               descriptionInitiale:
                 value:
                   session_id: null
-                  message: "Je souhaite créer une boisson."
+                  message: 'Je souhaite créer une boisson.'
                   piste_id: null
               choixPiste:
                 value:
-                  session_id: "session-1234"
-                  message: ""
-                  piste_id: "piste-abc-987"
+                  session_id: 'session-1234'
+                  message: ''
+                  piste_id: 'piste-abc-987'
       responses:
         '200':
           description: État de la conversation mis à jour avec succès.
@@ -193,7 +193,17 @@ components:
 
     ConversationResponse:
       type: object
-      required: [session_id, etape, reponse, compris, pistes, solutions, brief, echantillons]
+      required:
+        [
+          session_id,
+          etape,
+          reponse,
+          compris,
+          pistes,
+          solutions,
+          brief,
+          echantillons,
+        ]
       properties:
         session_id:
           type: string
