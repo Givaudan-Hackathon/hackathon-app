@@ -1,0 +1,273 @@
+modele,id,brief,sortie,json_valide,division_ok,arome_attendu,arome_ok,secondes
+qwen2.5:1.5b,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré","{
+  ""division"": ""flavors"",
+  ""application"": ""dessert"",
+  ""aromes"": [""pistache"", ""gourmand""],
+  ""contraintes"": [""vegétal"", ""non sucré""]
+}",True,True,pistache,True,2.24
+qwen2.5:1.5b,2,"boisson protéinée vanille pour sportifs, base pois","{
+  ""division"": ""flavors"",
+  ""application"": ""soupe"",
+  ""aromes"": [""vanille""],
+  ""contraintes"": [""sucre"", ""origine française"", ""sportif""]
+}",True,True,vanille,True,2.07
+qwen2.5:1.5b,3,arôme fraise pour yaourt à boire,"{
+  ""division"": ""flavors"",
+  ""application"": ""yaourt"",
+  ""aromes"": [""fruits"", ""sour"", ""creme""],
+  ""contraintes"": []
+}",True,True,fraise,False,1.86
+qwen2.5:1.5b,4,sirop goût menthe pour cafés,"{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""menthe""],
+  ""contraintes"": []
+}",True,True,menthe,True,1.48
+qwen2.5:1.5b,5,"un shake protéiné à prendre après la muscu, goût chocolat","{
+  ""division"": ""flavors"",
+  ""application"": ""shake"",
+  ""aromes"": [""chocolat""],
+  ""contraintes"": [""sucre"", ""origine française"", ""santé"", ""prix raisonnable""]
+}",True,True,chocolat,True,1.88
+qwen2.5:1.5b,6,"une boisson sans lait pour le petit-déjeuner, goût noisette","{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""noisette""],
+  ""contraintes"": []
+}",True,True,noisette,True,1.33
+qwen2.5:1.5b,7,"une petite crème qui a le goût d'enfance, comme chez mamie","{
+  ""division"": ""flavors"",
+  ""application"": ""biscuit"",
+  ""aromes"": [""anis"", ""coco"", ""chocolat"", ""clou de girofle""],
+  ""contraintes"": []
+}",True,True,vanille|caramel,False,2.1
+qwen2.5:1.5b,8,une limonade pétillante au citron pour l'été,"{
+  ""division"": ""flavors"",
+  ""application"": ""limonade"",
+  ""aromes"": [""citron"", ""limon"", ""pétillant""],
+  ""contraintes"": [""sucre"", ""origine locale"", ""été"", ""low calorie""]
+}",True,True,citron,True,2.68
+qwen2.5:1.5b,9,un lait chocolaté pour le goûter des enfants,"{
+  ""division"": ""flavors"",
+  ""application"": ""lait"",
+  ""aromes"": [""chocolat"", ""léger""],
+  ""contraintes"": [""sourcé en France"", ""sans sucre"", ""pour enfants""]
+}",True,True,chocolat,True,2.17
+qwen2.5:1.5b,10,une boisson au soja goût vanille pour une clientèle vegan,"{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""vanille""],
+  ""contraintes"": [""vegan""]
+}",True,True,vanille,True,1.4
+qwen2.5:1.5b,11,"une eau avec un petit goût de fruits rouges, sans sucre","{
+  ""division"": ""flavors"",
+  ""application"": ""eau"",
+  ""aromes"": [""fruit rouge""],
+  ""contraintes"": []
+}",True,True,fruits rouges,True,1.31
+qwen2.5:1.5b,12,un yaourt onctueux à la noix de coco,"{
+  ""division"": ""flavors"",
+  ""application"": ""yogurt"",
+  ""aromes"": [""coco"", ""savoureux""],
+  ""contraintes"": [""vegan"", ""low-fat"", ""natural""]
+}",True,True,coco,True,1.78
+qwen2.5:1.5b,13,une odeur de lavande pour mes savons faits main,"{
+  ""division"": ""flavors"",
+  ""application"": ""savon"",
+  ""aromes"": [""lavande""],
+  ""contraintes"": [""faits main""]
+}",True,False,lavande,True,1.47
+qwen2.5:1.5b,14,un gel douche qui sent bon les agrumes,"{
+  ""division"": ""fragrance"",
+  ""application"": ""shampoing"",
+  ""aromes"": [""citron"", ""orange"", ""pamplemousse""],
+  ""contraintes"": []
+}",True,True,agrume|citron|orange|bergamote|pamplemousse,True,1.58
+qwen2.5:1.5b,15,un parfum léger et fleuri pour femme,"{
+  ""division"": ""fragrance"",
+  ""application"": ""parfum"",
+  ""aromes"": [""fleuri"", ""léger""],
+  ""contraintes"": []
+}",True,True,fleur|floral|fleuri|rose|jasmin|muguet,True,1.46
+qwen2.5:3b,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré","{
+  ""division"": ""flavors"",
+  ""application"": ""biscuit"",
+  ""aromes"": [""pistache"", ""gourmand"", ""pas trop sucré""],
+  ""contraintes"": []
+}",True,True,pistache,True,3.26
+qwen2.5:3b,2,"boisson protéinée vanille pour sportifs, base pois","{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""vanille"", ""amande""],
+  ""contraintes"": []
+}",True,True,vanille,True,2.6
+qwen2.5:3b,3,arôme fraise pour yaourt à boire,"{
+  ""division"": ""flavors"",
+  ""application"": ""yaourt à boire"",
+  ""aromes"": [""fraise"", ""yaourt""],
+  ""contraintes"": []
+}",True,True,fraise,True,2.71
+qwen2.5:3b,4,sirop goût menthe pour cafés,"{
+  ""division"": ""flavors"",
+  ""application"": ""sirop"",
+  ""aromes"": [""menthe"", ""café""],
+  ""contraintes"": []
+}",True,True,menthe,True,2.53
+qwen2.5:3b,5,"un shake protéiné à prendre après la muscu, goût chocolat","{
+  ""division"": ""flavors"",
+  ""application"": ""shake"",
+  ""aromes"": [""chocolat"", ""protéiné""],
+  ""contraintes"": []
+}",True,True,chocolat,True,2.72
+qwen2.5:3b,6,"une boisson sans lait pour le petit-déjeuner, goût noisette","{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""noisette"", ""amande""],
+  ""contraintes"": []
+}",True,True,noisette,True,2.74
+qwen2.5:3b,7,"une petite crème qui a le goût d'enfance, comme chez mamie","{
+  ""division"": ""flavors"",
+  ""application"": ""crème"",
+  ""aromes"": [""vanille"", ""chocolat""],
+  ""contraintes"": []
+}",True,True,vanille|caramel,True,2.76
+qwen2.5:3b,8,une limonade pétillante au citron pour l'été,"{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""limon"", ""citron""],
+  ""contraintes"": []
+}",True,True,citron,False,3.04
+qwen2.5:3b,9,un lait chocolaté pour le goûter des enfants,"{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""chocolat"", ""vanille""],
+  ""contraintes"": []
+}",True,True,chocolat,True,2.94
+qwen2.5:3b,10,une boisson au soja goût vanille pour une clientèle vegan,"{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""vanille"", ""soja""],
+  ""contraintes"": []
+}",True,True,vanille,True,2.64
+qwen2.5:3b,11,"une eau avec un petit goût de fruits rouges, sans sucre","{
+  ""division"": ""flavors"",
+  ""application"": ""boisson"",
+  ""aromes"": [""fraise"", ""grenat""],
+  ""contraintes"": [
+    ""sans sucre""
+  ]
+}",True,True,fruits rouges,False,3.31
+qwen2.5:3b,12,un yaourt onctueux à la noix de coco,"{
+  ""division"": ""flavors"",
+  ""application"": ""yaourt"",
+  ""aromes"": [""noix de coco"", ""onctuosité""],
+  ""contraintes"": []
+}",True,True,coco,True,3.42
+qwen2.5:3b,13,une odeur de lavande pour mes savons faits main,"{
+  ""division"": ""fragrance"",
+  ""application"": ""savon"",
+  ""aromes"": [""lavande"", ""eucalyptus""],
+  ""contraintes"": []
+}",True,True,lavande,True,3.17
+qwen2.5:3b,14,un gel douche qui sent bon les agrumes,"{
+  ""division"": ""fragrance"",
+  ""application"": ""gel douche"",
+  ""aromes"": [""agrumes"", ""jus d'orange""],
+  ""contraintes"": []
+}",True,True,agrume|citron|orange|bergamote|pamplemousse,True,2.84
+qwen2.5:3b,15,un parfum léger et fleuri pour femme,"{
+  ""division"": ""fragrance"",
+  ""application"": ""parfum pour femme"",
+  ""aromes"": [""fleurie"", ""léger""],
+  ""contraintes"": []
+}",True,True,fleur|floral|fleuri|rose|jasmin|muguet,True,3.36
+llama3.2:3b,1,"Je lance une marque de desserts végétaux et je cherche un goût pistache gourmand, pas trop sucré","{
+  ""division"" : ""flavors"",
+  ""application"" : ""décoration de desserts végétaux"",
+  ""aromes"" : [""pistache"", ""gourmand"", ""froide""],
+  ""contraintes"" : [""pas trop sucré"", ""origine végétale""]
+}",True,True,pistache,True,5.79
+llama3.2:3b,2,"boisson protéinée vanille pour sportifs, base pois","{
+  ""division"" : ""flavors"",
+  ""application"" : ""boisson"",
+  ""aromes"" : [""vanille"", ""protéine"", ""fruits rouges""],
+  ""contraintes"" : [""sucre réduit"", ""origine naturelle"", ""gluten libre"", ""cible sportif""]
+}",True,True,vanille,True,5.6
+llama3.2:3b,3,arôme fraise pour yaourt à boire,"{
+  ""division"" : ""flavors"",
+  ""application"" : ""yaourt"",
+  ""aromes"" : [""fraise"", ""citron""],
+  ""contraintes"" : []
+}",True,True,fraise,True,3.75
+llama3.2:3b,4,sirop goût menthe pour cafés,"{
+  ""division"" : ""flavors"",
+  ""application"" : ""sirop"",
+  ""aromes"" : [""menthe"", ""froide"", ""énergisant""],
+  ""contraintes"" : []
+}",True,True,menthe,True,4.41
+llama3.2:3b,5,"un shake protéiné à prendre après la muscu, goût chocolat","{
+  ""division"" : ""flavors"",
+  ""application"" : ""shake protéiné"",
+  ""aromes"" : [""chocolat"", ""vanille""],
+  ""contraintes"" : []
+}",True,True,chocolat,True,4.07
+llama3.2:3b,6,"une boisson sans lait pour le petit-déjeuner, goût noisette","{
+  ""division"" : ""flavors"",
+  ""application"" : ""boisson"",
+  ""aromes"" : [""noisette"", ""caramel"", ""vanille""],
+  ""contraintes"" : []
+}",True,True,noisette,True,4.16
+llama3.2:3b,7,"une petite crème qui a le goût d'enfance, comme chez mamie","{
+  ""division"" : ""flavors"",
+  ""application"" : ""crème"",
+  ""aromes"" : [""vanille"", ""caramel"", ""cannelle""],
+  ""contraintes"" : []
+}",True,True,vanille|caramel,True,3.68
+llama3.2:3b,8,une limonade pétillante au citron pour l'été,"{
+  ""division"" : ""flavors"",
+  ""application"" : ""limonade"",
+  ""aromes"" : [""citron"", ""froide"", ""été""],
+  ""contraintes"" : []
+}",True,True,citron,True,3.61
+llama3.2:3b,9,un lait chocolaté pour le goûter des enfants,"{
+  ""division"" : ""flavors"",
+  ""application"" : ""lait"",
+  ""aromes"" : [""chocolat"", ""caramel"", ""vanille""],
+  ""contraintes"" : []
+}",True,True,chocolat,True,3.53
+llama3.2:3b,10,une boisson au soja goût vanille pour une clientèle vegan,"{
+  ""division"" : ""flavors"",
+  ""application"" : ""boisson"",
+  ""aromes"" : [""vanille"", ""soja"", ""creme""],
+  ""contraintes"" : [""vegan"", ""sucre absent""]
+}",True,True,vanille,True,4.1
+llama3.2:3b,11,"une eau avec un petit goût de fruits rouges, sans sucre","{
+  ""division"" : ""flavors"",
+  ""application"" : ""eau"",
+  ""aromes"" : [""fruits rouges"", ""citron""],
+  ""contraintes"" : [""sans sucre""]
+}",True,True,fruits rouges,True,3.64
+llama3.2:3b,12,un yaourt onctueux à la noix de coco,"{
+  ""division"" : ""flavors"",
+  ""application"" : ""yaourt"",
+  ""aromes"" : [""noix de coco"", ""vanille"", ""caramel""],
+  ""contraintes"" : []
+}",True,True,coco,True,3.6
+llama3.2:3b,13,une odeur de lavande pour mes savons faits main,"{
+  ""division"" : ""fragrance"",
+  ""application"" : ""savon"",
+  ""aromes"" : [""lavande"", ""herbace""],
+  ""contraintes"" : []
+}",True,True,lavande,True,3.28
+llama3.2:3b,14,un gel douche qui sent bon les agrumes,"{
+  ""division"" : ""fragrance"",
+  ""application"" : ""gel douche"",
+  ""aromes"" : [""citron"", ""orange"", ""bergamote""],
+  ""contraintes"" : []
+}",True,True,agrume|citron|orange|bergamote|pamplemousse,True,3.41
+llama3.2:3b,15,un parfum léger et fleuri pour femme,"{
+  ""division"" : ""fragrance"",
+  ""application"" : ""parfum"",
+  ""aromes"" : [""fleur"", ""citron"", ""vanille""],
+  ""contraintes"" : []
+}",True,True,fleur|floral|fleuri|rose|jasmin|muguet,True,3.62

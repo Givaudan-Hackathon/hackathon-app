@@ -1,0 +1,44 @@
+{
+  "fichier": "off_obf_sample.csv",
+  "sources": {
+    "off": "Open Food Facts",
+    "obf": "Open Beauty Facts"
+  },
+  "licence": "ODbL 1.0 (base) / DbCL (contenu)",
+  "date_extraction": "2026-11-09T15:06:41+00:00",
+  "methode": "API v2 /search, tri unique_scans_n, User-Agent identifie, ~8 req/min",
+  "requetes": [
+    {
+      "source": "off",
+      "categorie": "beverages",
+      "pages": 2
+    },
+    {
+      "source": "off",
+      "categorie": "dairies",
+      "pages": 2
+    },
+    {
+      "source": "off",
+      "categorie": "snacks",
+      "pages": 2
+    },
+    {
+      "source": "obf",
+      "categorie": "soaps",
+      "pages": 2
+    },
+    {
+      "source": "obf",
+      "categorie": "shower-gels",
+      "pages": 2
+    },
+    {
+      "source": "obf",
+      "categorie": "shampoos",
+      "pages": 2
+    }
+  ],
+  "n_lignes": 1042,
+  "donnees_personnelles": "aucune (champs produit uniquement)"
+}

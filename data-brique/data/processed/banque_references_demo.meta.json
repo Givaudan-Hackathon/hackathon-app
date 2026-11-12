@@ -1,0 +1,35 @@
+{
+  "fichier": "banque_references_demo.csv",
+  "nature": "EXEMPLE FICTIF pour la démo : codes DEMO-xxx inventés, ce ne sont pas de vraies références Givaudan. Noms, profils, formes, labels et applications sont illustratifs.",
+  "inspiration": "Structure inspirée de sources publiques : présentations publiques des gammes Givaudan TasteEssentials®, TasteCollections et TasteSolutions®. Aucune donnée propriétaire.",
+  "a_valider": "La répartition des familles entre TasteEssentials et TasteCollections est une hypothèse : le document de Product « Défi 02 : les arômes du catalogue Givaudan » n'a pas été transmis avec la demande.",
+  "date_creation": "2026-11-12T09:21:25+00:00",
+  "script": "scripts/creer_banque_references.py",
+  "licence": "Données fictives créées par l'équipe G15, libres de réutilisation pour le hackathon.",
+  "n_references": 30,
+  "colonnes": {
+    "code": "identifiant fictif DEMO-001 à DEMO-030",
+    "gamme": "TasteEssentials, TasteCollections ou TasteSolutions",
+    "famille": "famille d'arôme ; « solution » pour les TasteSolutions",
+    "profil_sensoriel": "description courte du goût",
+    "forme": "soluble eau, huile ou poudre",
+    "labels": "séparés par | : naturel, vegan, bio, halal, casher, sans allergène",
+    "applications": "séparées par | : boissons, sucré, laitier, salé",
+    "inspire_de": "référence publique d'origine (gamme et famille)"
+  },
+  "familles": [
+    "agrumes",
+    "café",
+    "chocolat",
+    "coco",
+    "fruits rouges",
+    "gingembre",
+    "laitier",
+    "mangue",
+    "menthe",
+    "solution",
+    "thé",
+    "vanille"
+  ],
+  "n_agrumes": 13
+}

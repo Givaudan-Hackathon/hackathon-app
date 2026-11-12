@@ -1,0 +1,746 @@
+[
+  {
+    "parcours": "boisson_citron_vert",
+    "message": "Bonjour",
+    "secondes": 0.0,
+    "intention": "hors_sujet",
+    "texte": "Bonjour ! Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?",
+    "projet": {
+      "division": null,
+      "type_de_produit": null,
+      "arome_principal": null,
+      "profil_recherche": [],
+      "contraintes": []
+    },
+    "pistes": [],
+    "solutions": [],
+    "brief_final": null,
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": false,
+      "intention": "hors_sujet"
+    },
+    "demande_echantillons": null,
+    "brouillon": "Bonjour ! Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?"
+  },
+  {
+    "parcours": "boisson_citron_vert",
+    "message": "je voudrais créer une boisson",
+    "secondes": 0.16,
+    "intention": "nouvelle_demande",
+    "texte": "J'ai bien noté votre projet : boisson. Parmi les 50 boissons du marché les plus proches, les arômes les plus courants sont : orange (13 produits), cola (11 produits) et citron (8 produits). Quel type de boisson : plutôt pétillante, thé glacé, sirop, lactée ou végétale ? Quel goût recherchez-vous ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson",
+      "arome_principal": null,
+      "profil_recherche": [],
+      "contraintes": ["peu sucré", "bio"]
+    },
+    "pistes": [],
+    "solutions": [],
+    "brief_final": null,
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": false,
+      "intention": "nouvelle_demande",
+      "recherche": "bge-m3 (complet)",
+      "filtre_type": "boisson",
+      "filtre_contraintes": []
+    },
+    "demande_echantillons": null,
+    "brouillon": "J'ai bien noté votre projet : boisson. Parmi les 50 boissons du marché les plus proches, les arômes les plus courants sont : orange (13 produits), cola (11 produits) et citron (8 produits). Quel type de boisson : plutôt pétillante, thé glacé, sirop, lactée ou végétale ? Quel goût recherchez-vous ?"
+  },
+  {
+    "parcours": "boisson_citron_vert",
+    "message": "pétillante, goût citron vert, pas trop sucrée",
+    "secondes": 0.63,
+    "intention": "precision",
+    "texte": "Votre projet : boisson pétillante au citron vert, peu sucrée.\nJ'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.\nVoici mes pistes :\n1. Citron vert seul : un goût franc, facile à reconnaître. 37 des 50 produits les plus proches de votre projet l'utilisent.\n   Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau).\n2. Citron vert + citron : l'association la plus fréquente sur le marché (23 produits sur 37 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.\n   Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau).\n3. Citron vert + fraise : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.\n   Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-024 Fraise mûre (fraise mûre, sucrée, juteuse ; soluble eau).\nPour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).\nLaquelle vous tente ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "arome_principal": "citron vert",
+      "profil_recherche": [],
+      "contraintes": ["peu sucré", "bio"]
+    },
+    "pistes": [
+      {
+        "numero": 1,
+        "id": "citron-vert",
+        "type": "principal",
+        "aromes": "citron vert",
+        "liste_aromes": ["citron vert"],
+        "nb_produits": 37,
+        "explication": "Citron vert seul : un goût franc, facile à reconnaître. 37 des 50 produits les plus proches de votre projet l'utilisent.",
+        "origine": "l'arôme citron vert est utilisé par 37 des 50 boissons pétillantes étudiées",
+        "references": [
+          {
+            "code": "DEMO-003",
+            "nom": "Citron vert frais",
+            "profil_sensoriel": "citron vert vif, zeste, acidulé, notes vertes",
+            "forme": "soluble eau",
+            "labels": ["naturel", "vegan", "halal", "casher", "sans allergène"],
+            "score": 0.661
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 2,
+        "id": "citron-vert+citron",
+        "type": "association_frequente",
+        "aromes": "citron vert + citron",
+        "liste_aromes": ["citron vert", "citron"],
+        "nb_produits": 23,
+        "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (23 produits sur 37 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+        "origine": "association observée : 23 des 37 produits au citron vert étudiés y ajoutent l'arôme citron",
+        "references": [
+          {
+            "code": "DEMO-003",
+            "nom": "Citron vert frais",
+            "profil_sensoriel": "citron vert vif, zeste, acidulé, notes vertes",
+            "forme": "soluble eau",
+            "labels": ["naturel", "vegan", "halal", "casher", "sans allergène"],
+            "score": 0.661
+          },
+          {
+            "code": "DEMO-001",
+            "nom": "Citron jaune zesté",
+            "profil_sensoriel": "citron frais, zeste, légèrement acidulé",
+            "forme": "soluble eau",
+            "labels": ["naturel", "vegan", "halal", "casher"],
+            "score": 0.567
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 3,
+        "id": "citron-vert+fraise",
+        "type": "association_originale",
+        "aromes": "citron vert + fraise",
+        "liste_aromes": ["citron vert", "fraise"],
+        "nb_produits": 1,
+        "explication": "Citron vert + fraise : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+        "origine": "association observée : 1 des 37 produits au citron vert étudiés y ajoute l'arôme fraise",
+        "references": [
+          {
+            "code": "DEMO-003",
+            "nom": "Citron vert frais",
+            "profil_sensoriel": "citron vert vif, zeste, acidulé, notes vertes",
+            "forme": "soluble eau",
+            "labels": ["naturel", "vegan", "halal", "casher", "sans allergène"],
+            "score": 0.661
+          },
+          {
+            "code": "DEMO-024",
+            "nom": "Fraise mûre",
+            "profil_sensoriel": "fraise mûre, sucrée, juteuse",
+            "forme": "soluble eau",
+            "labels": ["naturel", "vegan", "sans allergène"],
+            "score": 0.591
+          }
+        ],
+        "sans_reference": []
+      }
+    ],
+    "solutions": [
+      {
+        "code": "DEMO-028",
+        "nom": "Sweetness",
+        "profil_sensoriel": "renforce la perception sucrée pour réduire le sucre ajouté",
+        "forme": "soluble eau",
+        "labels": ["naturel", "vegan", "halal", "casher"]
+      }
+    ],
+    "brief_final": null,
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": false,
+      "intention": "precision",
+      "recherche": "bge-m3 (complet)",
+      "filtre_type": "boisson pétillante",
+      "filtre_contraintes": ["peu sucré"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "Votre projet : boisson pétillante au citron vert, peu sucrée.\nJ'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.\nVoici mes pistes :\n1. Citron vert seul : un goût franc, facile à reconnaître. 37 des 50 produits les plus proches de votre projet l'utilisent.\n   Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau).\n2. Citron vert + citron : l'association la plus fréquente sur le marché (23 produits sur 37 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.\n   Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau).\n3. Citron vert + fraise : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.\n   Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-024 Fraise mûre (fraise mûre, sucrée, juteuse ; soluble eau).\nPour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).\nLaquelle vous tente ?"
+  },
+  {
+    "parcours": "boisson_citron_vert",
+    "message": "elle doit être bio",
+    "secondes": 0.71,
+    "intention": "precision",
+    "texte": "Votre projet : boisson pétillante au citron vert, peu sucrée et bio.\nJ'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.\nJe n'ai pas pu filtrer l'étude sur « bio » : seulement 6 produits du marché la respectent. Je reste sur les boissons pétillantes et je garde cette contrainte dans votre brief.\nVoici mes pistes :\n1. Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.\n   Référence : DEMO-004 Citron vert bio (citron vert juteux, frais, légèrement amer ; soluble eau).\n2. Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.\n   Références : DEMO-004 Citron vert bio (citron vert juteux, frais, légèrement amer ; soluble eau) + DEMO-002 Citron jaune bio (citron jaune juteux, notes de zeste, acidulé ; soluble eau).\n3. Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.\n   Référence : DEMO-004 Citron vert bio (citron vert juteux, frais, légèrement amer ; soluble eau). Pas de version bio de l'arôme pamplemousse dans la banque : DEMO-008 Pamplemousse existe sans ce label.\nPour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).\nLaquelle vous tente ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "arome_principal": "citron vert",
+      "profil_recherche": [],
+      "contraintes": ["peu sucré", "bio"]
+    },
+    "pistes": [
+      {
+        "numero": 1,
+        "id": "citron-vert",
+        "type": "principal",
+        "aromes": "citron vert",
+        "liste_aromes": ["citron vert"],
+        "nb_produits": 36,
+        "explication": "Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.",
+        "origine": "l'arôme citron vert est utilisé par 36 des 50 boissons pétillantes étudiées",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 2,
+        "id": "citron-vert+citron",
+        "type": "association_frequente",
+        "aromes": "citron vert + citron",
+        "liste_aromes": ["citron vert", "citron"],
+        "nb_produits": 22,
+        "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+        "origine": "association observée : 22 des 36 produits au citron vert étudiés y ajoutent l'arôme citron",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          },
+          {
+            "code": "DEMO-002",
+            "nom": "Citron jaune bio",
+            "profil_sensoriel": "citron jaune juteux, notes de zeste, acidulé",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.594
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 3,
+        "id": "citron-vert+pamplemousse",
+        "type": "association_originale",
+        "aromes": "citron vert + pamplemousse",
+        "liste_aromes": ["citron vert", "pamplemousse"],
+        "nb_produits": 1,
+        "explication": "Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+        "origine": "association observée : 1 des 36 produits au citron vert étudiés y ajoute l'arôme pamplemousse",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      }
+    ],
+    "solutions": [
+      {
+        "code": "DEMO-028",
+        "nom": "Sweetness",
+        "profil_sensoriel": "renforce la perception sucrée pour réduire le sucre ajouté",
+        "forme": "soluble eau",
+        "labels": ["naturel", "vegan", "halal", "casher"]
+      }
+    ],
+    "brief_final": null,
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": false,
+      "intention": "precision",
+      "recherche": "bge-m3 (complet)",
+      "filtre_type": "boisson pétillante",
+      "filtre_contraintes": ["peu sucré"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "Votre projet : boisson pétillante au citron vert, peu sucrée et bio.\nJ'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.\nJe n'ai pas pu filtrer l'étude sur « bio » : seulement 6 produits du marché la respectent. Je reste sur les boissons pétillantes et je garde cette contrainte dans votre brief.\nVoici mes pistes :\n1. Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.\n   Référence : DEMO-004 Citron vert bio (citron vert juteux, frais, légèrement amer ; soluble eau).\n2. Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.\n   Références : DEMO-004 Citron vert bio (citron vert juteux, frais, légèrement amer ; soluble eau) + DEMO-002 Citron jaune bio (citron jaune juteux, notes de zeste, acidulé ; soluble eau).\n3. Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.\n   Référence : DEMO-004 Citron vert bio (citron vert juteux, frais, légèrement amer ; soluble eau). Pas de version bio de l'arôme pamplemousse dans la banque : DEMO-008 Pamplemousse existe sans ce label.\nPour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).\nLaquelle vous tente ?"
+  },
+  {
+    "parcours": "boisson_citron_vert",
+    "message": "pourquoi vous proposez cette association ?",
+    "secondes": 0.0,
+    "intention": "question_piste",
+    "texte": "Piste 2 (citron vert + citron) : association observée : 22 des 36 produits au citron vert étudiés y ajoutent l'arôme citron. Piste 3 (citron vert + pamplemousse) : association observée : 1 des 36 produits au citron vert étudiés y ajoute l'arôme pamplemousse. Ces chiffres viennent des 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées. Laquelle de mes pistes vous tente : 1. citron vert, 2. citron vert + citron ou 3. citron vert + pamplemousse ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "arome_principal": "citron vert",
+      "profil_recherche": [],
+      "contraintes": ["peu sucré", "bio"]
+    },
+    "pistes": [
+      {
+        "numero": 1,
+        "id": "citron-vert",
+        "type": "principal",
+        "aromes": "citron vert",
+        "liste_aromes": ["citron vert"],
+        "nb_produits": 36,
+        "explication": "Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.",
+        "origine": "l'arôme citron vert est utilisé par 36 des 50 boissons pétillantes étudiées",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 2,
+        "id": "citron-vert+citron",
+        "type": "association_frequente",
+        "aromes": "citron vert + citron",
+        "liste_aromes": ["citron vert", "citron"],
+        "nb_produits": 22,
+        "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+        "origine": "association observée : 22 des 36 produits au citron vert étudiés y ajoutent l'arôme citron",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          },
+          {
+            "code": "DEMO-002",
+            "nom": "Citron jaune bio",
+            "profil_sensoriel": "citron jaune juteux, notes de zeste, acidulé",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.594
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 3,
+        "id": "citron-vert+pamplemousse",
+        "type": "association_originale",
+        "aromes": "citron vert + pamplemousse",
+        "liste_aromes": ["citron vert", "pamplemousse"],
+        "nb_produits": 1,
+        "explication": "Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+        "origine": "association observée : 1 des 36 produits au citron vert étudiés y ajoute l'arôme pamplemousse",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      }
+    ],
+    "solutions": [
+      {
+        "code": "DEMO-028",
+        "nom": "Sweetness",
+        "profil_sensoriel": "renforce la perception sucrée pour réduire le sucre ajouté",
+        "forme": "soluble eau",
+        "labels": ["naturel", "vegan", "halal", "casher"]
+      }
+    ],
+    "brief_final": null,
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": false,
+      "intention": "question_piste",
+      "recherche": "bge-m3 (complet)",
+      "filtre_type": "boisson pétillante",
+      "filtre_contraintes": ["peu sucré"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "Piste 2 (citron vert + citron) : association observée : 22 des 36 produits au citron vert étudiés y ajoutent l'arôme citron. Piste 3 (citron vert + pamplemousse) : association observée : 1 des 36 produits au citron vert étudiés y ajoute l'arôme pamplemousse. Ces chiffres viennent des 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées. Laquelle de mes pistes vous tente : 1. citron vert, 2. citron vert + citron ou 3. citron vert + pamplemousse ?"
+  },
+  {
+    "parcours": "boisson_citron_vert",
+    "message": "je prends la piste 1",
+    "secondes": 0.0,
+    "intention": "choix_piste",
+    "texte": "Excellent choix : la piste 1, citron vert. Votre brief : boisson pétillante, arôme citron vert, contraintes : peu sucré et bio. Références retenues : DEMO-004 et DEMO-028. Je peux préparer une demande d'échantillons de ces références, pour que vous les testiez dans votre recette. Le souhaitez-vous ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "arome_principal": "citron vert",
+      "profil_recherche": [],
+      "contraintes": ["peu sucré", "bio"]
+    },
+    "pistes": [
+      {
+        "numero": 1,
+        "id": "citron-vert",
+        "type": "principal",
+        "aromes": "citron vert",
+        "liste_aromes": ["citron vert"],
+        "nb_produits": 36,
+        "explication": "Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.",
+        "origine": "l'arôme citron vert est utilisé par 36 des 50 boissons pétillantes étudiées",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 2,
+        "id": "citron-vert+citron",
+        "type": "association_frequente",
+        "aromes": "citron vert + citron",
+        "liste_aromes": ["citron vert", "citron"],
+        "nb_produits": 22,
+        "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+        "origine": "association observée : 22 des 36 produits au citron vert étudiés y ajoutent l'arôme citron",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          },
+          {
+            "code": "DEMO-002",
+            "nom": "Citron jaune bio",
+            "profil_sensoriel": "citron jaune juteux, notes de zeste, acidulé",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.594
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 3,
+        "id": "citron-vert+pamplemousse",
+        "type": "association_originale",
+        "aromes": "citron vert + pamplemousse",
+        "liste_aromes": ["citron vert", "pamplemousse"],
+        "nb_produits": 1,
+        "explication": "Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+        "origine": "association observée : 1 des 36 produits au citron vert étudiés y ajoute l'arôme pamplemousse",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      }
+    ],
+    "solutions": [
+      {
+        "code": "DEMO-028",
+        "nom": "Sweetness",
+        "profil_sensoriel": "renforce la perception sucrée pour réduire le sucre ajouté",
+        "forme": "soluble eau",
+        "labels": ["naturel", "vegan", "halal", "casher"]
+      }
+    ],
+    "brief_final": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "piste": 1,
+      "aromes": ["citron vert"],
+      "profil": [],
+      "contraintes": ["peu sucré", "bio"],
+      "codes_references": ["DEMO-004"],
+      "codes_solutions": ["DEMO-028"],
+      "creation_sur_mesure": [],
+      "brief_du_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio"
+    },
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": false,
+      "intention": "choix_piste",
+      "recherche": "bge-m3 (complet)",
+      "filtre_type": "boisson pétillante",
+      "filtre_contraintes": ["peu sucré"]
+    },
+    "demande_echantillons": null,
+    "brouillon": "Excellent choix : la piste 1, citron vert. Votre brief : boisson pétillante, arôme citron vert, contraintes : peu sucré et bio. Références retenues : DEMO-004 et DEMO-028. Je peux préparer une demande d'échantillons de ces références, pour que vous les testiez dans votre recette. Le souhaitez-vous ?"
+  },
+  {
+    "parcours": "boisson_citron_vert",
+    "message": "comment je reçois des échantillons ?",
+    "secondes": 0.0,
+    "intention": "demande_echantillons",
+    "texte": "Voici le récapitulatif de votre demande d'échantillons (DEMO-004 et DEMO-028), juste en dessous. Dans ce prototype, la demande n'est pas envoyée : transmettez ce récapitulatif à un conseiller Givaudan. Je ne connais ni les délais, ni les quantités, ni le prix : le conseiller vous les donnera.",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "arome_principal": "citron vert",
+      "profil_recherche": [],
+      "contraintes": ["peu sucré", "bio"]
+    },
+    "pistes": [
+      {
+        "numero": 1,
+        "id": "citron-vert",
+        "type": "principal",
+        "aromes": "citron vert",
+        "liste_aromes": ["citron vert"],
+        "nb_produits": 36,
+        "explication": "Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.",
+        "origine": "l'arôme citron vert est utilisé par 36 des 50 boissons pétillantes étudiées",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 2,
+        "id": "citron-vert+citron",
+        "type": "association_frequente",
+        "aromes": "citron vert + citron",
+        "liste_aromes": ["citron vert", "citron"],
+        "nb_produits": 22,
+        "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+        "origine": "association observée : 22 des 36 produits au citron vert étudiés y ajoutent l'arôme citron",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          },
+          {
+            "code": "DEMO-002",
+            "nom": "Citron jaune bio",
+            "profil_sensoriel": "citron jaune juteux, notes de zeste, acidulé",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.594
+          }
+        ],
+        "sans_reference": []
+      },
+      {
+        "numero": 3,
+        "id": "citron-vert+pamplemousse",
+        "type": "association_originale",
+        "aromes": "citron vert + pamplemousse",
+        "liste_aromes": ["citron vert", "pamplemousse"],
+        "nb_produits": 1,
+        "explication": "Citron vert + pamplemousse : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.",
+        "origine": "association observée : 1 des 36 produits au citron vert étudiés y ajoute l'arôme pamplemousse",
+        "references": [
+          {
+            "code": "DEMO-004",
+            "nom": "Citron vert bio",
+            "profil_sensoriel": "citron vert juteux, frais, légèrement amer",
+            "forme": "soluble eau",
+            "labels": ["naturel", "bio", "vegan"],
+            "score": 0.715
+          }
+        ],
+        "sans_reference": []
+      }
+    ],
+    "solutions": [
+      {
+        "code": "DEMO-028",
+        "nom": "Sweetness",
+        "profil_sensoriel": "renforce la perception sucrée pour réduire le sucre ajouté",
+        "forme": "soluble eau",
+        "labels": ["naturel", "vegan", "halal", "casher"]
+      }
+    ],
+    "brief_final": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "piste": 1,
+      "aromes": ["citron vert"],
+      "profil": [],
+      "contraintes": ["peu sucré", "bio"],
+      "codes_references": ["DEMO-004"],
+      "codes_solutions": ["DEMO-028"],
+      "creation_sur_mesure": [],
+      "brief_du_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio"
+    },
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": false,
+      "intention": "demande_echantillons",
+      "recherche": "bge-m3 (complet)",
+      "filtre_type": "boisson pétillante",
+      "filtre_contraintes": ["peu sucré"]
+    },
+    "demande_echantillons": {
+      "statut": "brouillon, non envoyé (prototype)",
+      "date": "2026-11-12",
+      "division": "arôme alimentaire",
+      "type_de_produit": "boisson pétillante",
+      "piste": 1,
+      "aromes": ["citron vert"],
+      "profil": [],
+      "contraintes": ["peu sucré", "bio"],
+      "codes_references": ["DEMO-004"],
+      "codes_solutions": ["DEMO-028"],
+      "creation_sur_mesure": [],
+      "brief_du_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio"
+    },
+    "brouillon": "Voici le récapitulatif de votre demande d'échantillons (DEMO-004 et DEMO-028), juste en dessous. Dans ce prototype, la demande n'est pas envoyée : transmettez ce récapitulatif à un conseiller Givaudan. Je ne connais ni les délais, ni les quantités, ni le prix : le conseiller vous les donnera."
+  },
+  {
+    "parcours": "glace_durian",
+    "message": "un arôme durian pour une glace",
+    "secondes": 10.0,
+    "intention": "nouvelle_demande",
+    "texte": "Votre projet : glace au durian.\nJ'ai étudié les 45 glaces du marché les plus proches de votre projet.\nLe catalogue ne compte que 45 glaces : l'étude est donc limitée.\nVoici mes pistes :\n1. Durian seul : un goût franc, facile à reconnaître. Aucun des 45 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.\n   Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.\n2. Durian + coco : le goût coco est le plus présent dans les produits proches de votre projet (39 produits). L'association avec durian n'y apparaît pas encore (aucun produit proche n'est au durian) : à valider en dégustation.\n   Référence : DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau). Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.\n3. Durian + cassis : un goût rare dans les produits proches (1 produit) et jamais associé au durian : une piste originale, à tester.\n   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau). Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.\nLaquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",
+    "projet": {
+      "division": "arôme alimentaire",
+      "type_de_produit": "glace",
+      "arome_principal": "durian",
+      "profil_recherche": [],
+      "contraintes": []
+    },
+    "pistes": [
+      {
+        "numero": 1,
+        "id": "durian",
+        "type": "principal",
+        "aromes": "durian",
+        "liste_aromes": ["durian"],
+        "nb_produits": 0,
+        "explication": "Durian seul : un goût franc, facile à reconnaître. Aucun des 45 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.",
+        "origine": "aucune des 45 glaces étudiées n'utilise l'arôme durian : une place libre sur ce marché",
+        "references": [],
+        "sans_reference": ["durian"]
+      },
+      {
+        "numero": 2,
+        "id": "durian+coco",
+        "type": "association_frequente",
+        "aromes": "durian + coco",
+        "liste_aromes": ["durian", "coco"],
+        "nb_produits": 39,
+        "explication": "Durian + coco : le goût coco est le plus présent dans les produits proches de votre projet (39 produits). L'association avec durian n'y apparaît pas encore (aucun produit proche n'est au durian) : à valider en dégustation.",
+        "origine": "association pas encore observée sur ce marché (l'arôme coco est présent dans 39 produits étudiés) : à valider en dégustation",
+        "references": [
+          {
+            "code": "DEMO-026",
+            "nom": "Noix de coco",
+            "profil_sensoriel": "coco lactée, douce, exotique",
+            "forme": "soluble eau",
+            "labels": ["naturel", "vegan", "sans allergène"],
+            "score": 0.617
+          }
+        ],
+        "sans_reference": ["durian"]
+      },
+      {
+        "numero": 3,
+        "id": "durian+cassis",
+        "type": "association_originale",
+        "aromes": "durian + cassis",
+        "liste_aromes": ["durian", "cassis"],
+        "nb_produits": 1,
+        "explication": "Durian + cassis : un goût rare dans les produits proches (1 produit) et jamais associé au durian : une piste originale, à tester.",
+        "origine": "association pas encore observée sur ce marché (l'arôme cassis est présent dans 1 produit étudiés) : à valider en dégustation",
+        "references": [
+          {
+            "code": "DEMO-023",
+            "nom": "Fruits rouges",
+            "profil_sensoriel": "fraise, framboise et cassis, fruité, légèrement acidulé",
+            "forme": "soluble eau",
+            "labels": ["naturel", "vegan", "halal"],
+            "score": 0.604
+          }
+        ],
+        "sans_reference": ["durian"]
+      }
+    ],
+    "solutions": [],
+    "brief_final": null,
+    "verification": {
+      "tentatives": 0,
+      "rejets": [],
+      "source": "brouillon (mode rapide)"
+    },
+    "etapes": {
+      "modele_appele": true,
+      "intention_llm": "nouvelle_demande",
+      "intention": "nouvelle_demande",
+      "recherche": "bge-m3 (complet)",
+      "filtre_type": "glace",
+      "filtre_contraintes": []
+    },
+    "demande_echantillons": null,
+    "brouillon": "Votre projet : glace au durian.\nJ'ai étudié les 45 glaces du marché les plus proches de votre projet.\nLe catalogue ne compte que 45 glaces : l'étude est donc limitée.\nVoici mes pistes :\n1. Durian seul : un goût franc, facile à reconnaître. Aucun des 45 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.\n   Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.\n2. Durian + coco : le goût coco est le plus présent dans les produits proches de votre projet (39 produits). L'association avec durian n'y apparaît pas encore (aucun produit proche n'est au durian) : à valider en dégustation.\n   Référence : DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau). Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.\n3. Durian + cassis : un goût rare dans les produits proches (1 produit) et jamais associé au durian : une piste originale, à tester.\n   Référence : DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau). Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.\nLaquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?"
+  }
+]
