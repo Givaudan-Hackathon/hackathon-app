@@ -140,6 +140,8 @@ def test_parcours_citron_vert_hors_ligne_sans_derive(assistant_hors_ligne):
 
 def test_sans_reference_creation_sur_mesure(assistant_hors_ligne):
     resultat = assistant_hors_ligne.repondre("un arôme durian pour une glace")
+    assert resultat["etape"] == "affiner"
+    resultat = assistant_hors_ligne.repondre("Je ne sais pas, proposez-moi")
     assert resultat["projet"]["type_de_produit"] == "glace"
     assert resultat["projet"]["arome_principal"] == "durian"
     assert resultat["pistes"][0]["references"] == [] and resultat["pistes"][0]["sans_reference"] == ["durian"]

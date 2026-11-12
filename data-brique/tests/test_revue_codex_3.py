@@ -33,6 +33,7 @@ def assistant(noms):
 # 1. « maintenant je voudrais… » : nouveau projet seulement si un autre type ou produit est cite
 def test_maintenant_sans_autre_produit_est_une_precision(assistant):
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     assistant.repondre("elle doit être bio")
     resultat = assistant.repondre("maintenant je voudrais moins de sucre")
     assert resultat["intention"] == "precision" and resultat["etape"] == "pistes"
@@ -44,6 +45,7 @@ def test_maintenant_sans_autre_produit_est_une_precision(assistant):
 
 def test_maintenant_avec_autre_produit_est_un_nouveau_projet(assistant):
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     assistant.repondre("elle doit être bio")
     resultat = assistant.repondre("maintenant je voudrais un yaourt à la fraise")
     assert resultat["intention"] == "nouvelle_demande"
@@ -80,6 +82,7 @@ def test_acceptation_retire_la_contrainte(assistant, contrainte, phrase):
                                    "pas d'échantillon pour l'instant"])
 def test_refus_d_echantillons(assistant, refus):
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     brief = assistant.repondre("je prends la piste 1")["brief_final"]
     resultat = assistant.repondre(refus)
     assert resultat["etape"] == "recapitulatif" and resultat["demande_echantillons"] is None
@@ -89,6 +92,7 @@ def test_refus_d_echantillons(assistant, refus):
 
 def test_refus_annule_un_brouillon_existant(assistant):
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     assistant.repondre("je prends la piste 1")
     assert assistant.repondre("je veux des échantillons")["demande_echantillons"] is not None
     resultat = assistant.repondre("finalement pas d'échantillon pour l'instant")
@@ -97,6 +101,7 @@ def test_refus_annule_un_brouillon_existant(assistant):
 
 def test_demande_d_echantillons_toujours_reconnue(assistant):
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     assistant.repondre("je prends la piste 1")
     resultat = assistant.repondre("comment je reçois des échantillons ?")
     assert resultat["intention"] == "demande_echantillons" and resultat["etape"] == "echantillons"

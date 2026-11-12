@@ -132,6 +132,69 @@ Le client envoie un message par appel. Le serveur garde l'état de la session (c
 compris, pistes proposées, piste choisie) par `session_id`. Chaque réponse contient **l'objet
 complet**, jamais un delta : le front peut remplacer tout son état par la dernière réponse.
 
+## Changements pour le front (V2.3, `v2.3.0-affiner`)
+
+**Uniquement des ajouts : aucun champ renommé ni supprimé.**
+
+1. **Nouvelle valeur `etape = "affiner"`.**
+   - **Quand :** le type de produit et l'arôme sont connus, mais le client n'a donné aucun profil
+     ni aucune précision de goût. Exemple : « un yaourt à la fraise ».
+   - **Contenu de la réponse :** `pistes` est vide (les pistes ne sont pas encore proposées),
+     `brief` et `echantillons` valent `null`. `reponse` reprend les questions en texte.
+2. **Nouveau champ `questions`**, toujours présent :
+   `[{ "id": string, "question": string, "choix": string[] }]`. Liste vide sauf quand
+   `etape = "affiner"`.
+   - **Questions :** au plus 2 (`id` : `"gout"`, puis `"intensite"`).
+   - **Choix :** générés, pas écrits à la main : variantes de l'arôme tirées des noms de produits du
+     catalogue (« fraise des bois »), profils sensoriels de la banque DEMO (« fraise mûre »,
+     « juteuse »), complétés par fruité / gourmand / acidulé / frais. Intensité : « intensité
+     discrète / présente / marquée ».
+   - **Dernier choix :** toujours « Je ne sais pas, proposez-moi ».
+3. **Au clic :** envoyer le texte du choix **tel quel** comme `message` (même `session_id`).
+   - Le choix est ajouté à `compris.profil`, sauf « Je ne sais pas, proposez-moi ».
+   - La réponse passe à `etape = "pistes"` avec les 3 pistes.
+   - Si le client tape autre chose (« il doit être bio »), le message est traité normalement et les
+     pistes arrivent aussi : une seule série de questions par projet.
+4. **Pas d'Affiner** quand le goût est déjà précisé : variante citée (« fraise des bois »),
+   profil (« gourmand »), contrainte de goût (« pas trop sucré »), ou plusieurs arômes.
+5. **Pendant `affiner`,** un message qui cite une piste (« je prends la piste 1 ») vaut « Je ne
+   sais pas, proposez-moi » : les pistes s'affichent, mais aucune n'est choisie.
+6. **Synonymes :** une piste n'associe jamais un arôme à lui-même. « limette » est rattachée à
+   « citron vert », donc il n'y a plus de piste « citron vert + limette ».
+
+```json
+{
+  "etape": "affiner",
+  "intention": "nouvelle_demande",
+  "pistes": [],
+  "questions": [
+    {
+      "id": "gout",
+      "question": "Quel goût de fraise imaginez-vous ?",
+      "choix": [
+        "fraise des bois",
+        "fraise mûre",
+        "sucrée",
+        "juteuse",
+        "Je ne sais pas, proposez-moi"
+      ]
+    },
+    {
+      "id": "intensite",
+      "question": "Quelle intensité pour le goût fraise ?",
+      "choix": [
+        "intensité discrète",
+        "intensité présente",
+        "intensité marquée",
+        "Je ne sais pas, proposez-moi"
+      ]
+    }
+  ]
+}
+```
+
+(extrait de la réponse ; les autres champs sont toujours présents)
+
 > **V2.2.2 (revue de la PR #18) : uniquement des ajouts de champs**, aucun renommage ni aucune
 > suppression. Nouveaux champs : `compris.profil`, `pistes[].references_sans_label`, et
 > `references_sans_label`, `profil`, `volume` dans `brief` et `echantillons`. Comportements
@@ -151,19 +214,20 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 
 ## Réponse `200`
 
-| Champ            | Type                | Description                                                                                     |
-| ---------------- | ------------------- | ----------------------------------------------------------------------------------------------- |
-| `session_id`     | string              | Identifiant de la session, à renvoyer au message suivant                                        |
-| `etape`          | string              | État de la session **après** ce message (valeurs ci-dessous)                                    |
-| `intention`      | string              | Intention du **dernier** message du client (valeurs ci-dessous)                                 |
-| `reponse`        | string              | Texte à afficher au client ; paragraphes séparés par `\n`                                       |
-| `compris`        | objet               | Ce que l'assistant a compris du projet (voir ci-dessous)                                        |
-| `pistes`         | liste (0 à 3)       | Pistes d'arômes proposées, triées par `rang` ; vide tant qu'il en manque pour étudier le marché |
-| `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon          |
-| `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                       |
-| `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                  |
-| `version_modele` | string              | `v2.2.5-contexte`                                                                               |
-| `attribution`    | string              | Mention ODbL **à afficher**                                                                     |
+| Champ            | Type                | Description                                                                                       |
+| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------- |
+| `session_id`     | string              | Identifiant de la session, à renvoyer au message suivant                                          |
+| `etape`          | string              | État de la session **après** ce message (valeurs ci-dessous)                                      |
+| `intention`      | string              | Intention du **dernier** message du client (valeurs ci-dessous)                                   |
+| `reponse`        | string              | Texte à afficher au client ; paragraphes séparés par `\n`                                         |
+| `compris`        | objet               | Ce que l'assistant a compris du projet (voir ci-dessous)                                          |
+| `questions`      | liste (0 à 2)       | **Ajout V2.3.** Questions Affiner `[{id, question, choix}]` quand `etape = "affiner"`, vide sinon |
+| `pistes`         | liste (0 à 3)       | Pistes d'arômes proposées, triées par `rang` ; vide tant qu'il en manque pour étudier le marché   |
+| `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon            |
+| `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                         |
+| `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                    |
+| `version_modele` | string              | `v2.3.0-affiner`                                                                                  |
+| `attribution`    | string              | Mention ODbL **à afficher**                                                                       |
 
 ### `compris`
 
@@ -232,12 +296,13 @@ applicative (équipe Tech).
 
 ### Valeurs de `etape` (état après le message)
 
-| Valeur          | Signification                                                                          | `pistes` | `brief` | `echantillons` |
-| --------------- | -------------------------------------------------------------------------------------- | -------- | ------- | -------------- |
-| `relance`       | Il manque une information (type de produit, goût) ; `reponse` pose au plus 2 questions | vide     | null    | null           |
-| `pistes`        | Les pistes sont proposées ; le client peut préciser, poser une question ou choisir     | 1 à 3    | null    | null           |
-| `recapitulatif` | Une piste est choisie ; `reponse` récapitule le brief et propose des échantillons      | 1 à 3    | objet   | null           |
-| `echantillons`  | Le brouillon de demande d'échantillons est prêt (non envoyé)                           | 1 à 3    | objet   | objet          |
+| Valeur          | Signification                                                                                  | `pistes` | `brief` | `echantillons` |
+| --------------- | ---------------------------------------------------------------------------------------------- | -------- | ------- | -------------- |
+| `relance`       | Il manque une information (type de produit, goût) ; `reponse` pose au plus 2 questions         | vide     | null    | null           |
+| `affiner`       | **V2.3.** Type et arôme connus, goût pas encore précisé : `questions` à choix avant les pistes | vide     | null    | null           |
+| `pistes`        | Les pistes sont proposées ; le client peut préciser, poser une question ou choisir             | 1 à 3    | null    | null           |
+| `recapitulatif` | Une piste est choisie ; `reponse` récapitule le brief et propose des échantillons              | 1 à 3    | objet   | null           |
+| `echantillons`  | Le brouillon de demande d'échantillons est prêt (non envoyé)                                   | 1 à 3    | objet   | objet          |
 
 ### Règles de comportement
 
@@ -312,15 +377,16 @@ banque.
     "contraintes": ["peu sucré", "bio"],
     "profil": []
   },
+  "questions": [],
   "pistes": [
     {
       "id": "citron-vert",
       "rang": 1,
       "nom": "Citron vert",
       "description": "L'arôme seul",
-      "explication": "Citron vert seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.",
+      "explication": "Citron vert seul : un goût franc, facile à reconnaître. 37 des 50 produits les plus proches de votre projet l'utilisent.",
       "aromes": ["citron vert"],
-      "nb_produits_marche": 36,
+      "nb_produits_marche": 37,
       "references": [
         {
           "code": "DEMO-004",
@@ -339,9 +405,9 @@ banque.
       "rang": 2,
       "nom": "Citron vert + citron",
       "description": "L'association la plus courante",
-      "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 36 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
+      "explication": "Citron vert + citron : l'association la plus fréquente sur le marché (23 produits sur 37 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.",
       "aromes": ["citron vert", "citron"],
-      "nb_produits_marche": 22,
+      "nb_produits_marche": 23,
       "references": [
         {
           "code": "DEMO-004",
@@ -438,7 +504,7 @@ banque.
     "date": "2026-11-12",
     "brief_client": "je voudrais créer une boisson / pétillante, goût citron vert, pas trop sucrée / elle doit être bio / Peut-être 5 000 bouteilles pour tester"
   },
-  "version_modele": "v2.2.5-contexte",
+  "version_modele": "v2.3.0-affiner",
   "attribution": "Étude de marché réalisée sur des données d'Open Food Facts (ODbL)"
 }
 ```

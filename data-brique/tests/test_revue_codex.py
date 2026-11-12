@@ -76,6 +76,7 @@ def test_1_contrainte_ne_change_pas_le_type(assistant):
 # 2. le brouillon d'echantillons reste renvoye tant qu'il est valide
 def test_2_echantillons_conserves_apres_merci(client):
     sid = _envoyer(client, None, "une boisson pétillante goût citron vert")["session_id"]
+    _envoyer(client, sid, "Je ne sais pas, proposez-moi")  # etape Affiner
     _envoyer(client, sid, "je prends la piste 1")
     assert _envoyer(client, sid, "je veux des échantillons")["echantillons"] is not None
     corps = _envoyer(client, sid, "merci")
@@ -94,6 +95,7 @@ def test_3_references_sans_label(client):
     assert [(s["arome"], s["code"], s["labels_manquants"]) for s in trouve["sans_label"]] == [
         ("chocolat", "DEMO-020", ["bio"])]
     corps = _envoyer(client, None, "une crème dessert au chocolat bio")
+    corps = _envoyer(client, corps["session_id"], "Je ne sais pas, proposez-moi")  # etape Affiner
     piste = corps["pistes"][0]
     attendu = {"arome": "chocolat", "code": "DEMO-020", "label_manquant": "bio"}
     assert attendu in piste["references_sans_label"]
@@ -109,6 +111,7 @@ def test_4_retrait_de_contrainte(assistant, retrait):
     assert extraire_retraits(retrait)[0] == ["bio"]
     assert extraire_retraits("pas trop sucré")[0] == []  # « pas trop sucre » est une contrainte
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     bio = assistant.repondre("elle doit être bio")
     assert "bio" in bio["compris"]["contraintes"]
     assert "bio" in bio["pistes"][0]["references"][0]["labels"]
@@ -137,12 +140,14 @@ def test_5_changement_de_projet(assistant, message, type_produit):
 
 def test_5_une_autre_piste_n_est_pas_un_nouveau_projet(assistant):
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     assert assistant.repondre("tu as une autre piste ?")["intention"] != "nouvelle_demande"
 
 
 # 6. numero de piste hors bornes : pas d'erreur, reponse polie
 def test_6_piste_hors_bornes(client):
     sid = _envoyer(client, None, "une boisson pétillante goût citron vert")["session_id"]
+    _envoyer(client, sid, "Je ne sais pas, proposez-moi")  # etape Affiner
     corps = _envoyer(client, sid, "je prends la piste 9")
     assert corps["intention"] == "choix_piste" and corps["etape"] == "pistes"
     assert corps["reponse"].startswith(f"Je n'ai que {len(corps['pistes'])} pistes : 1. ")
@@ -189,6 +194,7 @@ def test_scenario_kombucha(assistant):
 
 def test_volume_seul_ne_relance_pas_le_choix(assistant):
     assistant.repondre("une boisson pétillante goût citron vert")
+    assistant.repondre("Je ne sais pas, proposez-moi")  # etape Affiner
     assistant.repondre("je prends la piste 1")
     resultat = assistant.repondre("environ 2000 litres")
     assert resultat["intention"] == "precision" and resultat["etape"] == "recapitulatif"

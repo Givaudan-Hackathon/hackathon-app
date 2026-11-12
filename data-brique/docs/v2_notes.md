@@ -466,3 +466,40 @@ l'eau » donnait l'arôme « bord ». Le repli « mot inconnu après au / à la 
 Ces mots ne comptent plus comme mots inconnus, et un arôme proposé par le modèle est refusé s'il
 en fait partie. Tests : `tests/test_revue_codex_3.py`, dont la phrase kombucha complète (aucun
 arôme, relance sur le goût). 77 tests au total. Validation : 26/30, aucun cas perdu.
+
+## V2.3 — étape Affiner avant les pistes, synonymes (branche `feature/data-affiner`)
+
+Version `v2.3.0-affiner`. Contrat : ajouts seulement (`etape = "affiner"`, champ `questions`),
+voir « Changements pour le front » dans `docs/contrat_api.md`. Tests : `tests/test_affiner.py`
+(11 tests) et `tests/test_api.py::test_affiner_contrat`. 89 tests au total. Validation 30 cas :
+26/30, aucun cas perdu ; 10 cas passent par Affiner (critère documenté dans
+`docs/validation_30_cas.md`).
+
+- **Quand :** type et arôme connus, aucun profil, aucune contrainte de goût (peu sucré, sans
+  sucre), un seul arôme cité. Le moteur pose alors 2 questions (goût, intensité) au lieu de
+  proposer les pistes. L'étude de marché est déjà calculée, mais les pistes ne sont renvoyées
+  qu'après la réponse.
+- **Choix générés, sans liste par arôme :**
+  - **Variantes de l'arôme :** tirées des noms de produits du catalogue (`variantes_arome` : mot ou
+    « de X » qui suit l'arôme dans au moins 3 noms). Sont exclus les mots de format ou d'emballage,
+    les autres arômes, les marques et le vocabulaire du moteur. Exemples : fraise des bois, chocolat
+    noir, vanille bourbon, pêche blanche, menthe verte.
+  - **Profils sensoriels :** ceux des références de la banque DEMO pour cet arôme (« fraise mûre »,
+    « juteuse »).
+  - **Compléments :** des choix génériques (fruité, gourmand, acidulé, frais) jusqu'à 4 choix ;
+    pour l'intensité, discrète / présente / marquée.
+  - **Toujours :** « Je ne sais pas, proposez-moi ».
+- **Réponse du client :**
+  - le choix cliqué est reconnu tel quel, ajouté au profil, et l'étude est relancée avec ce profil
+    (« fraise des bois » oriente les associations vers framboise et cerise) ;
+  - « Je ne sais pas » donne directement les pistes ;
+  - une seule série de questions par projet.
+- **Synonymes du vocabulaire :**
+  - **Règle de forme :** un terme tiré du catalogue est rattaché à un arôme de référence s'il
+    est formé d'un nom du motif de cet arôme plus une terminaison de pluriel ou de diminutif (lime
+    → limette = citron vert ; citronnelle, frais ne sont pas rattachés).
+  - **Pourquoi pas bge-m3 seul :** il ne relie pas ces mots (« limette » sort plus proche
+    d'« orange » que de « citron vert »).
+  - **Règle existante conservée :** bge-m3 + orthographe proche pour les fautes de frappe.
+  - **Effet :** une piste n'associe plus un arôme à lui-même (« citron vert + limette »).
+- **Non traité (en attente de Product, ticket #29) :** F01, F07, F09, F10 du test final.

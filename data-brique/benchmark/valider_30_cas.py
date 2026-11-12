@@ -123,15 +123,20 @@ def valider(chemin: Path = CAS) -> pd.DataFrame:
         r = assistant.repondre(c.phrase_client)
         secondes = time.perf_counter() - debut
         compris, texte = r["compris"], r["texte"]
-        obtenus = comportement_v22(r)
+        # etape Affiner (V2.3) : le front affiche une question ; la mesure clique « Je ne sais pas,
+        # proposez-moi » et juge le comportement sur la reponse suivante (pistes)
+        affiner = r["etape"] == "affiner"
+        r_comportement = assistant.repondre("Je ne sais pas, proposez-moi") if affiner else r
+        texte_suite = r_comportement["texte"] if affiner else ""
+        obtenus = comportement_v22(r_comportement)
         aromes_obt = compris["aromes"]
         # chiffres : chaque nombre de la reponse vient des donnees de l'etude de marche, des
         # numeros de piste ou du message du client
         marche = (assistant.etude or {}).get("marche") or {}
         source = (entiers(marche) | nombres(json.dumps(marche, ensure_ascii=False))
                   | {"1", "2", "3"} | nombres(c.phrase_client))
-        chiffres_inventes = sorted(nombres(texte) - source)
-        marques_citees = marques.trouvees(texte)
+        chiffres_inventes = sorted(nombres(f"{texte} {texte_suite}") - source)
+        marques_citees = marques.trouvees(f"{texte} {texte_suite}")
         ligne = {
             "id": c.id, "categorie": c.categorie, "phrase_client": c.phrase_client,
             "type_attendu": type_att if isinstance(type_att, str) else "",
@@ -141,7 +146,7 @@ def valider(chemin: Path = CAS) -> pd.DataFrame:
             "contraintes_obtenues": "|".join(sorted(compris["contraintes"])),
             "comportement_attendu": c.comportement_attendu,
             "comportement_obtenu": "|".join(sorted(obtenus)),
-            "etape": r["etape"], "intention": r["intention"],
+            "etape": r["etape"], "intention": r["intention"], "passe_par_affiner": affiner,
             "type_ok": (compris["type_produit"] or "") == (type_att if isinstance(type_att, str) else ""),
             "arome_principal_ok": (compris["arome"] in aromes_att) if aromes_att else compris["arome"] is None,
             "aromes_ok": set(aromes_att) <= set(aromes_obt) and (bool(aromes_att) or not aromes_obt),
@@ -151,9 +156,10 @@ def valider(chemin: Path = CAS) -> pd.DataFrame:
             "sans_marque": not marques_citees, "marques_citees": "|".join(marques_citees),
             "sans_chiffre_invente": not chiffres_inventes,
             "chiffres_inventes": "|".join(chiffres_inventes),
-            "sans_prix": not PRIX.search(texte),
+            "sans_prix": not PRIX.search(f"{texte} {texte_suite}"),
             "modele_appele": r["etapes"].get("modele_appele", False),
-            "secondes": round(secondes, 3), "reponse": texte,
+            "secondes": round(secondes, 3),
+            "reponse": texte + (f"\n[après « Je ne sais pas, proposez-moi »] {texte_suite}" if affiner else ""),
         }
         ligne["cas_reussi"] = all(ligne[k] for k in ("type_ok", "aromes_ok", "contraintes_ok",
                                                      "comportement_ok", "sans_marque",
@@ -256,6 +262,11 @@ def rapport(df: pd.DataFrame, ignorees: list[str], titre: str = "les 30 cas de r
          "marché (comptages), d'un numéro de piste ou du message du client. **Aucun prix** : ni "
          "« € », ni « euros », ni « prix de ».",
          "- **Cas réussi** : tous les critères ci-dessus à la fois.",
+         "- **Étape Affiner (V2.3)** : quand le 1er message donne `etape = affiner` (type et arôme "
+         "connus, aucun profil), la mesure répond « Je ne sais pas, proposez-moi », comme le bouton "
+         "du front. Le comportement est jugé sur cette 2e réponse. Type, arômes et contraintes "
+         "sont jugés sur la 1re. Marques, chiffres et prix sont contrôlés dans les deux textes. "
+         "Les cas n'ont pas été modifiés.",
          "- **V1** (`MoteurV1`) : division ; l'arôme est jugé sur les 5 produits recommandés (tous "
          "les arômes attendus présents dans leurs noms), car V1 n'extrait pas d'arôme.",
          "- **V2.1** (`MoteurV21.pistes`, catalogue complet) : division, arôme principal, pistes ou "

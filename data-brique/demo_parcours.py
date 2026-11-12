@@ -98,10 +98,14 @@ def decrire(message: str) -> None:
     etat = envoyer(message)
     if etat and etat["etape"] == "pistes":
         aller(2)
+    elif etat and etat["etape"] == "affiner":  # questions de l'API avant les pistes
+        aller(1)
 
 
 def affiner(mot: str) -> None:
-    envoyer(mot)
+    etat = envoyer(mot)
+    if etat and etat["etape"] == "pistes" and st.session_state.ecran == 1:
+        aller(2)  # reponse a une question Affiner : les pistes arrivent
 
 
 def choisir(piste: dict) -> None:
@@ -182,6 +186,16 @@ def ecran_affiner() -> None:
     st.header("Affinons votre projet")
     compris()
     etat = st.session_state.etat
+    if etat and etat["etape"] == "affiner" and etat.get("questions"):
+        # questions generees par l'API (variantes du catalogue, profils DEMO, intensite)
+        for question in etat["questions"]:
+            st.markdown(f"**{question['question']}**")
+            colonnes = st.columns(len(question["choix"]))
+            for colonne, choix in zip(colonnes, question["choix"]):
+                colonne.button(choix, key=f"question-{question['id']}-{choix}", on_click=affiner,
+                               args=(choix,), width="stretch",
+                               type="secondary" if choix.startswith("Je ne sais pas") else "primary")
+        return
     if etat and etat["etape"] == "relance":
         st.info(etat["reponse"])
     st.markdown("**Quel profil recherchez-vous ?**")

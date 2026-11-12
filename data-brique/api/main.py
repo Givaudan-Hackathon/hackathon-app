@@ -163,7 +163,7 @@ class MessageConversation(BaseModel):
         return self
 
 
-Etape = Literal["relance", "pistes", "recapitulatif", "echantillons"]
+Etape = Literal["relance", "affiner", "pistes", "recapitulatif", "echantillons"]
 Intention = Literal["nouvelle_demande", "precision", "question", "question_piste", "choix_piste",
                     "demande_echantillons", "hors_sujet"]
 
@@ -209,6 +209,16 @@ class Piste(BaseModel):
     image: None = Field(default=None, description="Toujours null en V2 : visuel par défaut côté front.")
 
 
+class QuestionAffiner(BaseModel):
+    id: str = Field(examples=["gout"], description="« gout » ou « intensite ».")
+    question: str = Field(examples=["Quel goût de fraise imaginez-vous ?"])
+    choix: list[str] = Field(description="Choix a afficher en boutons ; le dernier est toujours "
+                                         "« Je ne sais pas, proposez-moi ». Le choix clique est "
+                                         "envoye tel quel comme message.",
+                             examples=[["fraise des bois", "fraise mûre", "sucrée", "juteuse",
+                                        "Je ne sais pas, proposez-moi"]])
+
+
 class Brief(BaseModel):
     type_produit: str | None
     piste_id: str
@@ -236,6 +246,8 @@ class ReponseConversation(BaseModel):
     intention: Intention = Field(description="Intention du dernier message du client.")
     reponse: str = Field(description="Texte à afficher (paragraphes séparés par \\n).")
     compris: Compris
+    questions: list[QuestionAffiner] = Field(
+        default=[], description="Ajout V2.3 : questions Affiner quand etape = affiner, vide sinon.")
     pistes: list[Piste]
     solutions: list[Reference]
     brief: Brief | None = Field(description="null tant qu'aucune piste n'est choisie.")
@@ -299,6 +311,7 @@ def vers_contrat(session_id: str, r: dict) -> ReponseConversation:
                         "brief_client": r["demande_echantillons"]["brief_du_client"]}
     return ReponseConversation(
         session_id=session_id, etape=r["etape"], intention=r["intention"], reponse=r["texte"],
+        questions=r["questions"],
         compris=r["compris"], pistes=pistes, solutions=r["solutions"], brief=brief,
         echantillons=echantillons, version_modele=VERSION_V22, attribution=ATTRIBUTION_V22)
 

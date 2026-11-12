@@ -34,7 +34,8 @@ def test_recommander(client, brief, division):
 
 
 CLES_REPONSE = {"session_id", "etape", "intention", "reponse", "compris", "pistes", "solutions",
-                "brief", "echantillons", "version_modele", "attribution"}
+                "brief", "echantillons", "version_modele", "attribution",
+                "questions"}  # ajout V2.3 (etape Affiner)
 CLES_PISTE = {"id", "rang", "nom", "description", "explication", "aromes", "nb_produits_marche",
               "references", "sans_reference", "image",
               "references_sans_label"}  # ajout V2.2.2
@@ -93,6 +94,7 @@ def test_conversation_parcours_citron_vert(client):
 
 def test_id_de_piste_stable(client):
     session_id = _envoyer(client, None, "une boisson pétillante goût citron vert")["session_id"]
+    _envoyer(client, session_id, "Je ne sais pas, proposez-moi")  # etape Affiner
     avant = _envoyer(client, session_id, "c'est quoi la piste 2 ?")
     apres = _envoyer(client, session_id, "et la piste 3, pourquoi ?")
     assert [p["id"] for p in avant["pistes"]] == [p["id"] for p in apres["pistes"]]
@@ -104,6 +106,8 @@ def test_id_de_piste_stable(client):
 
 def test_choix_par_piste_id(client):
     corps = _envoyer(client, None, "une boisson pétillante goût citron vert")
+    assert corps["etape"] == "affiner" and corps["pistes"] == [] and corps["questions"]
+    corps = _envoyer(client, corps["session_id"], "Je ne sais pas, proposez-moi")
     session_id, piste = corps["session_id"], corps["pistes"][1]
     corps = _envoyer(client, session_id, "", piste_id=piste["id"])
     assert (corps["etape"], corps["intention"]) == ("recapitulatif", "choix_piste")
@@ -115,6 +119,7 @@ def test_choix_par_piste_id(client):
 
 def test_question_generale(client):
     session_id = _envoyer(client, None, "une boisson pétillante goût citron vert")["session_id"]
+    _envoyer(client, session_id, "Je ne sais pas, proposez-moi")  # etape Affiner
     corps = _envoyer(client, session_id, "c'est combien la livraison ?")
     assert (corps["etape"], corps["intention"]) == ("pistes", "question")
     assert "conseiller Givaudan" in corps["reponse"]
@@ -122,3 +127,13 @@ def test_question_generale(client):
 
 def test_conversation_message_vide(client):
     assert client.post("/conversation", json={"session_id": None, "message": ""}).status_code == 422
+
+
+def test_affiner_contrat(client):
+    corps = _envoyer(client, None, "un yaourt à la fraise")
+    assert corps["etape"] == "affiner" and corps["pistes"] == [] and corps["brief"] is None
+    assert [set(q) for q in corps["questions"]] == [{"id", "question", "choix"}] * len(corps["questions"])
+    assert corps["questions"][0]["choix"][-1] == "Je ne sais pas, proposez-moi"
+    corps = _envoyer(client, corps["session_id"], corps["questions"][0]["choix"][0])  # bouton
+    assert corps["etape"] == "pistes" and corps["pistes"] and corps["questions"] == []
+    assert corps["compris"]["profil"]

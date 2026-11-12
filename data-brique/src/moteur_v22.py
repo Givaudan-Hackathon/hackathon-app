@@ -39,7 +39,7 @@ from src.moteur_v2 import (CATALOGUE_COMPLET, CACHE_DEFAUT, MODELE_EMBEDDING, MO
                            N_MARCHE, OLLAMA_DEFAUT, PRODUITS, RACINE, SENSORIEL, MoteurV21,
                            OllamaIndisponible, a_la, ancre, extraire_aromes)
 
-VERSION_V22 = "v2.2.5-contexte"
+VERSION_V22 = "v2.3.0-affiner"
 BANQUE_DEFAUT = RACINE / "data" / "processed" / "banque_references_demo.csv"
 MIN_FILTRE = 10  # produits conformes requis pour appliquer une contrainte a l'etude
 KEEP_ALIVE = "2h"  # modeles gardes en memoire entre deux messages
@@ -271,7 +271,16 @@ def _produits(n: int) -> str:
 # --- Analyse du message (intention + extraction) -------------------------------------------------
 INTENTIONS = ["nouvelle_demande", "precision", "question", "question_piste", "choix_piste",
               "demande_echantillons", "hors_sujet"]
-ETAPES = ["relance", "pistes", "recapitulatif", "echantillons"]
+ETAPES = ["relance", "affiner", "pistes", "recapitulatif", "echantillons"]
+# --- etape Affiner : choix generes (variantes du catalogue, profils de la banque DEMO), completes
+# par des choix generiques ; jamais de liste ecrite a la main par arome
+JE_NE_SAIS_PAS = "Je ne sais pas, proposez-moi"
+CHOIX_GENERIQUES = ["fruité", "gourmand", "acidulé", "frais"]
+CHOIX_INTENSITE = ["intensité discrète", "intensité présente", "intensité marquée"]
+NE_SAIT_PAS = re.compile(r"\b(?:je ne sais pas|je sais pas|proposez|peu importe|pas d idee|aucune idee)\b")
+# contraintes qui precisent deja le gout (pas besoin d'Affiner)
+PRECISIONS_GOUT = {"peu sucré", "sans sucre"}
+MAX_CHOIX = 6
 SCHEMA_ANALYSE = {
     "type": "object",
     "properties": {"intention": {"type": "string", "enum": INTENTIONS},
@@ -558,7 +567,8 @@ class BanqueReferences:
 
 # --- Mecanismes generaux (vocabulaire, type inconnu, marques, intentions) -------------------------
 from src.mecanismes_v22 import (COUT, SERVICE, VAGUE, Marques, VocabulaireAromes, groupe_produit,  # noqa: E402
-                                ancre_dans, mot_de_contexte, mots_inconnus, rattacher_type)
+                                ancre_dans, mot_de_contexte, mots_inconnus, rattacher_type,
+                                variantes_arome)
 
 
 # le message evoque un gout : « gout X », « saveur X », « arome X », « au X », « a la X »
@@ -625,6 +635,23 @@ class MoteurV22(MoteurV21):
                 self.flavors, self.est_exclu, embed=self._embed,
                 cache=Path(self.dossier_cache) / f"vocabulaire_aromes_{self.catalogue}.json")
         return self._vocabulaire
+
+    def variantes(self, arome: str) -> list[str]:
+        """Variantes de l'arome tirees des noms de produits du catalogue (« fraise des bois »)."""
+        if not hasattr(self, "_variantes"):
+            self._variantes: dict[str, list[str]] = {}
+            self._noms_normalises = self.flavors["product_name"].fillna("").map(normaliser)
+        if arome not in self._variantes:
+            canonique = self.vocabulaire.extraire(arome)
+
+            def valide(terme: str) -> bool:
+                trouves = self.vocabulaire.extraire(terme)
+                if " " not in terme:  # mot ajoute : ni un autre arome, ni un mot du moteur
+                    return not trouves and not self.est_exclu(terme)
+                return trouves == canonique  # la variante entiere ne forme pas un autre arome
+
+            self._variantes[arome] = variantes_arome(arome, self._noms_normalises, valide)
+        return self._variantes[arome]
 
     def aromes_du_texte(self, texte: str, division: str = "flavors") -> list[str]:
         return self.vocabulaire.extraire(texte) if division == "flavors" else extraire_aromes(texte, division)
@@ -747,7 +774,9 @@ class AssistantV22:
 
     def reinitialiser(self) -> None:
         self.projet = {"division": None, "type": None, "produit": None, "arome": None, "profil": [],
-                       "contraintes": [], "aromes_cites": [], "volume": None, "messages": []}
+                       "contraintes": [], "aromes_cites": [], "volume": None, "messages": [],
+                       "affiner_fait": False}
+        self.questions: list[dict] = []  # questions Affiner en attente de reponse
         self.etude: dict | None = None  # derniere sortie de MoteurV22.etude (ou relance)
         self.etudes_precedentes: list[tuple[str, dict]] = []  # (resume, frequence des aromes)
         self.piste_choisie: dict | None = None
@@ -833,6 +862,16 @@ class AssistantV22:
         mots_q = _mots_normalises(message)
         texte = " ".join(re.findall(r"[a-z]+", normaliser(message)))
         projet_en_cours = bool(self.projet["messages"])
+        if self.questions:
+            # « je prends la piste 1 » pendant Affiner : aucune piste n'est encore proposee, on
+            # passe la question et on montre les pistes (sans choix implicite)
+            choix = JE_NE_SAIS_PAS if numero_cite(message) else self._choix_affiner(texte)
+            if choix is not None:  # bouton Affiner : precision sans nouvelle analyse
+                return {"intention": "precision", "numero": None, "division": None, "type": None,
+                        "arome": None, "aromes": [], "application": None, "contraintes": [],
+                        "retraits": [], "profil": [], "volume": None, "marques": [],
+                        "choix_affiner": choix,
+                        "trace": {"modele_appele": False, "intention": "precision (choix Affiner)"}}
         moteur = self.moteur
         marques = moteur.marques.trouvees(texte)
         texte = moteur.marques.masquer(texte)  # jamais d'arome tire d'un nom de marque
@@ -881,7 +920,7 @@ class AssistantV22:
             a["intention"] = "question"  # « c'est combien un echantillon ? » : question de service
         elif ECHANTILLON.search(mots_q) and not nouveau_projet:
             a["intention"] = "demande_echantillons"
-        elif self.pistes and cite and (CHOIX.search(mots_q) or len(mots_q.split()) <= 4):
+        elif self.pistes and not self.questions and cite and (CHOIX.search(mots_q) or len(mots_q.split()) <= 4):
             a["intention"], a["numero"] = "choix_piste", cite  # numero hors bornes : voir repondre
         elif nouveau_projet and not changement and not inconnus:
             a["intention"] = "nouvelle_demande"  # « nouveau projet » seul : projet vide, relance
@@ -964,6 +1003,54 @@ class AssistantV22:
         a["intention"], a["numero"] = intention, llm["numero"] if intention == "choix_piste" else None
         a["trace"]["intention"] = intention
         return a
+
+    def _choix_affiner(self, texte: str) -> str | None:
+        """Choix Affiner reconnu dans le message (texte normalise), ou None."""
+        choix = [c for q in self.questions for c in q["choix"]]
+        for c in sorted(choix, key=len, reverse=True):
+            forme = " ".join(re.findall(r"[a-z]+", normaliser(c)))
+            if texte == forme or (len(forme) > 3 and f" {forme} " in f" {texte} "):
+                return JE_NE_SAIS_PAS if c == JE_NE_SAIS_PAS else c
+        return JE_NE_SAIS_PAS if NE_SAIT_PAS.search(texte) else None
+
+    def _doit_affiner(self) -> bool:
+        """Type et arome connus, sans profil ni precision de gout : une question avant les pistes."""
+        p = self.projet
+        return bool(p["type"] and p["arome"] and self.pistes and p["division"] == "flavors"
+                    and not p["affiner_fait"] and not p["profil"]
+                    and not set(p["contraintes"]) & PRECISIONS_GOUT and len(p["aromes_cites"]) <= 1)
+
+    def _questions_affiner(self) -> list[dict]:
+        """Questions Affiner generees : variantes de l'arome (catalogue), profils de la banque
+        DEMO, choix generiques ; intensite. Liste vide si le client a deja cite une variante."""
+        p, arome = self.projet, self.projet["arome"]
+        variantes = self.moteur.variantes(arome)
+        messages = " ".join(re.findall(r"[a-z]+", normaliser(" ".join(p["messages"]))))
+        deja = [v for v in variantes if " ".join(re.findall(r"[a-z]+", normaliser(v))) in messages]
+        if deja:  # « fraise des bois » deja dit : la precision de gout est donnee
+            _ajouter(p["profil"], deja)
+            return []
+        trouve = self.banque.chercher([arome], self._application(), self._labels_demandes())
+        profils = [segment.strip() for r in trouve["references"] + trouve["sans_label"]
+                   for segment in r["profil_sensoriel"].split(",")]
+        choix = list(dict.fromkeys(variantes[:3] + [c for c in profils if c][:3]))
+        for generique in CHOIX_GENERIQUES:
+            if len(choix) >= 4:
+                break
+            if generique not in choix:
+                choix.append(generique)
+        return [{"id": "gout", "question": f"Quel goût de {arome} imaginez-vous ?",
+                 "choix": choix[:MAX_CHOIX] + [JE_NE_SAIS_PAS]},
+                {"id": "intensite", "question": f"Quelle intensité pour le goût {arome} ?",
+                 "choix": CHOIX_INTENSITE + [JE_NE_SAIS_PAS]}]
+
+    def _brouillon_affiner(self) -> str:
+        lignes = [f"Votre projet : {self._resume_projet()}.",
+                  "Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :"]
+        lignes += [f"- {q['question']} {', '.join(c for c in q['choix'] if c != JE_NE_SAIS_PAS)}."
+                   for q in self.questions]
+        lignes.append(f"Vous pouvez aussi répondre « {JE_NE_SAIS_PAS} » : je vous propose les pistes tout de suite.")
+        return "\n".join(lignes)
 
     def _nouveau_ou_precision(self, a: dict, nouveau_projet: bool) -> str:
         projet = self.projet
@@ -1127,6 +1214,8 @@ class AssistantV22:
     @property
     def etape(self) -> str:
         """Etat de la conversation apres le dernier message (voir ETAPES)."""
+        if self.questions:
+            return "affiner"
         if self.demande_echantillons:
             return "echantillons"
         if self.piste_choisie:
@@ -1318,7 +1407,8 @@ class AssistantV22:
                      self._brouillon_relance())
             return f"{debut} {suite}"
         if intention in ("nouvelle_demande", "precision"):
-            texte = self._brouillon_pistes() if self.pistes else self._brouillon_relance()
+            texte = (self._brouillon_affiner() if self.questions else
+                     self._brouillon_pistes() if self.pistes else self._brouillon_relance())
             if self.marque_citee:
                 texte = ("Je ne travaille pas à partir d'une marque : je me base sur le goût que vous "
                          "décrivez.\n" + texte)
@@ -1489,12 +1579,19 @@ class AssistantV22:
             self.demande_echantillons = None  # pas de brouillon ; piste et brief conserves
         intention = analyse["intention"]
         self.hors_bornes = None
+        choix_affiner = analyse.get("choix_affiner")
+        self.questions = []  # une seule serie de questions Affiner : le message suivant y repond
         seulement_volume = intention == "precision" and analyse.get("volume") and not any(
             analyse.get(cle) for cle in ("type", "arome", "application", "contraintes", "retraits",
                                          "profil"))
         if intention == "nouvelle_demande":
             self.reinitialiser()
-        if seulement_volume:  # le volume complete le brief sans relancer l'etude ni le choix
+        if choix_affiner is not None:  # reponse Affiner : profil precise, puis les pistes
+            if choix_affiner != JE_NE_SAIS_PAS:
+                _ajouter(self.projet["profil"], [choix_affiner])
+            self.projet["messages"].append(message)
+            self._lancer_etude()
+        elif seulement_volume:  # le volume complete le brief sans relancer l'etude ni le choix
             self.projet["volume"] = analyse["volume"]
             self.projet["messages"].append(message)
             if self.demande_echantillons:
@@ -1502,6 +1599,13 @@ class AssistantV22:
         elif intention in ("nouvelle_demande", "precision"):
             self._mettre_a_jour(message, analyse)
             self._lancer_etude()
+            if self._doit_affiner():
+                self.questions = self._questions_affiner()
+                self.projet["affiner_fait"] = True  # une seule serie de questions par projet
+                if self.questions:
+                    self._lancer_etude()  # requete inchangee ; pistes retenues jusqu'a la reponse
+                else:
+                    self._lancer_etude()  # variante deja citee : ajoutee au profil
         elif intention == "choix_piste" and not 1 <= analyse["numero"] <= len(self.pistes):
             self.hors_bornes = analyse["numero"]  # « piste 9 » : rien n'est choisi
         elif intention == "choix_piste":
@@ -1523,8 +1627,10 @@ class AssistantV22:
                    + [a for a in p["aromes_cites"] if a != p["arome"]],
                    "contraintes": list(p["contraintes"]), "profil": list(p["profil"])}
         return {"intention": intention, "etape": self.etape, "compris": compris,
-                "texte": texte, "projet": self._projet_affiche(),
-                "pistes": self._pistes_affichees(), "solutions": (self.etude or {}).get("solutions", []),
+                "texte": texte, "projet": self._projet_affiche(), "questions": self.questions,
+                # pendant Affiner, les pistes ne sont pas encore proposees
+                "pistes": [] if self.questions else self._pistes_affichees(),
+                "solutions": (self.etude or {}).get("solutions", []),
                 "piste_choisie": self.piste_choisie, "brief_final": self.brief_final(),
                 # le brouillon reste renvoye tant qu'il est valide (objet complet)
                 "demande_echantillons": self.demande_echantillons,
