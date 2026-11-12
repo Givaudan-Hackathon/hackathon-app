@@ -479,8 +479,8 @@ class MoteurV21(MoteurV2):
 
     version = VERSION_V21
 
-    def _marche(self, division: str, requete: str, n: int = N_MARCHE) -> tuple[list[list[str]], str]:
-        """Aromes cites par chacun des n produits les plus proches (etude interne, non affichee)."""
+    def _proches(self, division: str, requete: str, n: int) -> tuple[pd.DataFrame, str]:
+        """Les n produits les plus proches de la requete (bge-m3 pour Flavors, sinon TF-IDF V1)."""
         if division == "flavors":
             try:
                 sims = self._vecteurs() @ self._embed([requete])[0]
@@ -494,6 +494,11 @@ class MoteurV21(MoteurV2):
             df_div, vectoriseur, matrice = self.v1.index[division]
             sims = cosine_similarity(vectoriseur.transform([normaliser(requete)]), matrice).ravel()
             proches = df_div.iloc[sims.argsort()[::-1][:n]]
+        return proches, recherche
+
+    def _marche(self, division: str, requete: str, n: int = N_MARCHE) -> tuple[list[list[str]], str]:
+        """Aromes cites par chacun des n produits les plus proches (etude interne, non affichee)."""
+        proches, recherche = self._proches(division, requete, n)
         textes = proches["product_name"].fillna("") + " | " + proches["ingredients_text"].fillna("")
         return [extraire_aromes(t, division) for t in textes], recherche
 
@@ -530,6 +535,13 @@ class MoteurV21(MoteurV2):
 
         requete = brief if arome is None or normaliser(arome) in normaliser(brief) else f"{brief} {arome}"
         marche, etapes["recherche"] = self._marche(division, requete)
+        return self._pistes_depuis(division, arome, application, marche, scores_division, etapes,
+                                   mode, k)
+
+    def _pistes_depuis(self, division: str, arome: str | None, application: str | None,
+                       marche: list[list[str]], scores_division: dict, etapes: dict, mode: str,
+                       k: int = 3) -> dict:
+        """Pistes a partir des aromes cites par chaque produit du marche proche (V2.1 et V2.2)."""
         frequence = Counter(a for aromes in marche for a in aromes)
         etude = {"nb_produits_analyses": len(marche),
                  "aromes_frequents": frequence.most_common(5)}
@@ -593,9 +605,11 @@ class MoteurV21(MoteurV2):
                                    f"{principal.capitalize()} + {frequente} : le goût {frequente} "
                                    f"est le plus présent dans les produits proches de votre projet "
                                    f"({_produits(autres[frequente])}). L'association avec "
-                                   f"{principal} n'y apparaît pas encore "
-                                   f"({_produits(n_principal)} seulement {a_la(principal)}) : "
-                                   "à valider en dégustation.")})
+                                   f"{principal} n'y apparaît pas encore ("
+                                   + (f"{_produits(n_principal)} seulement {a_la(principal)}"
+                                      if n_principal else
+                                      f"aucun produit proche n'est {a_la(principal)}")
+                                   + ") : à valider en dégustation.")})
                 rares = sorted((a for a in autres if a != frequente), key=lambda a: (autres[a], a))
                 if rares:
                     originale = rares[0]
