@@ -1,11 +1,28 @@
-# PostgreSQL de développement
+# PostgreSQL commun aux Data et aux Tech leads
 
 Configuration reprise du [cours : la base de données](https://learn.glassworks.tech/fullstack-setup/environnement/base-de-donnees).
 
+## Responsabilité commune
+
+La base définie par `db/` et le service `db` de `compose.yaml` est destinée à
+l’API applicative et au service Data du même prototype. Les Data et les Tech
+leads maintiennent ensemble le schéma SQL et les données initiales. Les deux
+équipes sont identifiées dans CODEOWNERS pour `db/` et ce guide.
+
+Une évolution du schéma se coordonne entre les deux équipes et précise comment
+mettre à jour une base déjà initialisée. Les scripts `db/init/` ne constituent
+pas un mécanisme de migration pour une base existante.
+
+Chaque environnement de développement utilise son instance locale PostgreSQL
+lancée par Compose. L’API applicative s’y connecte déjà ; la connexion du service
+Data reste à intégrer et à vérifier dans sa branche. Les fichiers d’échantillons
+de `data-brique/data/` restent distincts du stockage PostgreSQL `db/data/`.
+
 ## Démarrer et vérifier
 
-Après ajout du service `db`, lancer `Dev Containers: Rebuild Container` depuis
-la palette de commandes VS Code. Le service `dev` attend le healthcheck PostgreSQL.
+Ouvrir le projet avec `Dev Containers: Reopen in Container` depuis la palette
+de commandes VS Code. Après une modification de Compose, utiliser
+`Dev Containers: Rebuild Container`. Le service `dev` attend le healthcheck PostgreSQL.
 
 Dans le terminal du conteneur :
 
@@ -13,8 +30,9 @@ Dans le terminal du conteneur :
 psql postgres://app:app@db:5432/app -v ON_ERROR_STOP=1 -c "SELECT id, question, answer, created_at FROM questions ORDER BY id"
 ```
 
-Résultat attendu : deux lignes, avec les réponses `Paris.` et `Deux semaines.`.
-Ces lignes sont des données de démonstration du cours.
+Sur une base nouvellement initialisée, les exemples incluent les réponses
+`Paris.` et `Deux semaines.`. Les échanges créés ensuite apparaissent également
+dans cette liste ; les exemples sont des données de démonstration du cours.
 
 Depuis un terminal WSL, dans le dépôt, les contrôles Docker sont :
 
@@ -54,11 +72,3 @@ docker compose logs db
 
 La ligne doit être présente après reconstruction. Les données de test ne sont
 pas réinsérées à chaque démarrage.
-
-## État de validation
-
-Le 9 novembre 2026, la connexion depuis le dev container et les deux questions
-de démonstration ont été vérifiées directement par SQL. Christopher a confirmé
-que la question temporaire reste présente après `Dev Containers: Rebuild Container` :
-le test de persistance est réussi. La base contient de nouveau uniquement les
-deux questions de démonstration après nettoyage.

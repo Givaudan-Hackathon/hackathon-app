@@ -7,7 +7,7 @@ import tseslint from 'typescript-eslint';
 export default defineConfig(
   // db/data : les fichiers de PostgreSQL, illisibles hors de son conteneur
   // .venv : les paquets Python de l'équipe Data/IA
-  globalIgnores(['**/dist/', 'db/data/', '**/.venv/']),
+  globalIgnores(['**/dist/', 'db/data/', '**/.venv/', '**/.scratch/**']),
   eslint.configs.recommended,
   tseslint.configs.recommended,
   // Désactive les règles de forme : c'est le travail de Prettier

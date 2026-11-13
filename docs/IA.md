@@ -1,7 +1,7 @@
-# Étape 8 — Ollama sur Windows
+# Fournisseur IA local — Ollama sur Windows
 
 Source : [L'IA — cours HETIC](https://learn.glassworks.tech/fullstack-setup/environnement/ia).
-Décision : [ADR 0002](ADR/0002-fournisseur-ia.md).
+Décision : [ADR 0002](adr/0002-fournisseur-ia.md).
 
 ## La chaîne à comprendre
 
@@ -113,26 +113,3 @@ réussite de la demande.
 
 Références : [compatibilité OpenAI](https://docs.ollama.com/api/openai-compatibility),
 [Ollama sous Windows](https://docs.ollama.com/windows).
-
-## Vérifications du 9 novembre 2026
-
-- Ollama Windows `0.40.15` est disponible. Une installation existante a été
-  détectée avant l'installation automatique et conservée. Le serveur natif a été
-  démarré avec `ollama serve` ; il écoute sur `127.0.0.1:11434` et répond depuis
-  le dev container via `host.docker.internal`, sans modification de son écoute.
-- Le modèle `llama3.2:1b` a été téléchargé et apparaît dans `/v1/models`.
-- La requête du professeur, envoyée via le proxy Vite, reçoit HTTP 201 en
-  34 secondes au premier appel : « La capitale du Japon est Tokyo. ».
-  L'échange est conservé sous l'identifiant 3 et relu dans PostgreSQL et par l'API.
-- `ollama ps` indique `100% GPU`, environ 1,5 Go chargés et un contexte de
-  4096 jetons sur ce poste. Ce constat ne garantit pas les performances d'un
-  autre modèle ou d'une autre machine.
-- Une instance Edge avec un profil temporaire affiche « API OK », le formulaire
-  et la vraie réponse. Le profil temporaire est supprimé après ce contrôle.
-- La compilation API/front et la validation Compose réussissent. Les erreurs
-  400, 502, 503 et le délai réel de 60 secondes (504) ont été contrôlés avec un
-  fournisseur simulé et des schémas SQL temporaires supprimés ensuite.
-- Christopher a confirmé la saisie, la réponse et l'enregistrement par une
-  capture du 9 novembre. Le test humain d'un clone neuf reste à effectuer.
-  L'alias ajouté dans Compose sera pris en compte lors de la
-  prochaine reconstruction ; Docker Desktop fournit déjà ce nom sur ce poste.

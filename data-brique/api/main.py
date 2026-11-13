@@ -10,6 +10,9 @@ Swagger : http://127.0.0.1:8000/docs
 import threading
 import time
 import uuid
+import re
+import unicodedata
+from functools import lru_cache
 from contextlib import asynccontextmanager
 from typing import Literal
 
@@ -22,6 +25,7 @@ from src.moteur_v1 import CATALOGUE_DEFAUT, VERSION_MODELE, MoteurV1
 from src.moteur_v2 import CATALOGUE_COMPLET
 from src.moteur_v22 import ATTRIBUTION as ATTRIBUTION_V22
 from src.moteur_v22 import VERSION_V22, AssistantV22, MoteurV22, NomsDuCommerce
+from src.moteur_v22 import BANQUE_DEFAUT, TYPES, SOUS_TYPES, PROFILS
 
 ATTRIBUTION = "Contient des données d'Open Food Facts / Open Beauty Facts, licence ODbL"
 
@@ -146,6 +150,7 @@ EXEMPLES_DEMANDE = {
 
 
 class MessageConversation(BaseModel):
+    guidage: bool = Field(default=False, description="Active les questions à choix issues du catalogue avant les pistes.")
     session_id: str | None = Field(
         default=None, max_length=64,
         description="null, absent ou inconnu : nouvelle session (l'identifiant est renvoyé).")
@@ -191,6 +196,7 @@ class Compris(BaseModel):
     contraintes: list[str] = Field(examples=[["peu sucré", "bio"]])
     profil: list[str] = Field(default=[], description="Ajout V2.2.2 : profil recherché.",
                               examples=[["frais", "exotique", "acidulé"]])
+    volume: str | None = Field(default=None, description="Volume exprimé par le client, avec son unité.")
 
 
 class Piste(BaseModel):
@@ -240,6 +246,12 @@ class Echantillons(Brief):
     brief_client: str = Field(description="Messages du client qui ont construit le brief.")
 
 
+class QuestionClarification(BaseModel):
+    id: str
+    question: str
+    choix: list[str] = Field(default_factory=list)
+
+
 class ReponseConversation(BaseModel):
     session_id: str
     etape: Etape = Field(description="État de la session après ce message.")
@@ -247,7 +259,8 @@ class ReponseConversation(BaseModel):
     reponse: str = Field(description="Texte à afficher (paragraphes séparés par \\n).")
     compris: Compris
     questions: list[QuestionAffiner] = Field(
-        default=[], description="Ajout V2.3 : questions Affiner quand etape = affiner, vide sinon.")
+        default=[], description="Ajout V2.3 : questions Affiner quand etape = affiner ; avec "
+                    "guidage, question de type de produit sur une relance ; vide sinon.")
     pistes: list[Piste]
     solutions: list[Reference]
     brief: Brief | None = Field(description="null tant qu'aucune piste n'est choisie.")
@@ -280,7 +293,8 @@ def _session(session_id: str | None) -> tuple[str, dict]:
         if session_id not in sessions:
             if len(sessions) >= MAX_SESSIONS:
                 del sessions[min(sessions, key=lambda c: sessions[c]["vu"])]
-            session_id = session_id or uuid.uuid4().hex[:12]
+            # Un identifiant oublié doit signaler une nouvelle session au front.
+            session_id = uuid.uuid4().hex
             sessions[session_id] = {"assistant": AssistantV22(moteur_v22, noms_du_commerce),
                                     "verrou": threading.Lock()}
         sessions[session_id]["vu"] = maintenant
@@ -309,11 +323,72 @@ def vers_contrat(session_id: str, r: dict) -> ReponseConversation:
         echantillons = {**brief, "statut": "brouillon_non_envoye",
                         "date": r["demande_echantillons"]["date"],
                         "brief_client": r["demande_echantillons"]["brief_du_client"]}
+    compris = {**r["compris"], "volume": r["projet"].get("volume")}
     return ReponseConversation(
         session_id=session_id, etape=r["etape"], intention=r["intention"], reponse=r["texte"],
         questions=r["questions"],
-        compris=r["compris"], pistes=pistes, solutions=r["solutions"], brief=brief,
+        compris=compris, pistes=pistes, solutions=r["solutions"], brief=brief,
         echantillons=echantillons, version_modele=VERSION_V22, attribution=ATTRIBUTION_V22)
+
+
+def _normaliser_question(texte: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFD", texte.lower())
+                   if not unicodedata.combining(c))
+
+
+@lru_cache(maxsize=1)
+def _references_questions() -> list[dict]:
+    return pd.read_csv(BANQUE_DEFAUT).fillna("").to_dict("records")
+
+
+def _guider(reponse: ReponseConversation, session: dict, demande: MessageConversation) -> ReponseConversation:
+    """Guidage optionnel : les choix viennent des types et des profils Data, pas du front."""
+    if not demande.guidage:
+        return reponse
+    compris = reponse.compris
+    if reponse.intention == "nouvelle_demande":
+        session.pop("guidage_cle", None)
+        session.pop("question_profil", None)
+    if reponse.etape == "relance":
+        produit = compris.type_produit
+        if not produit or produit in SOUS_TYPES:
+            choix = [nom for nom, configuration in TYPES.items()
+                     if configuration[-1] == produit][:6]
+            reponse.questions = [QuestionClarification(id="type_produit", question=reponse.reponse,
+                                                       choix=choix)]
+        return reponse
+    if reponse.etape != "pistes" or demande.piste_id:
+        return reponse
+    if session["assistant"].projet.get("affiner_fait"):
+        return reponse  # etape Affiner du moteur (V2.3) deja faite : pas de 2e serie de questions
+    pending = session.pop("question_profil", None)
+    if pending and demande.message.strip() != "Je ne sais pas, proposez-moi" and reponse.intention in ("question", "question_piste", "hors_sujet"):
+        reponse.etape = "affiner"
+        reponse.pistes = []
+        reponse.questions = [pending]
+        reponse.reponse += "\n" + pending.question
+        session["question_profil"] = pending
+        return reponse
+    cle = (compris.type_produit, tuple(compris.aromes))
+    if compris.profil or compris.contraintes or session.get("guidage_cle") == cle:
+        return reponse
+    textes = " ".join(str(reference["profil_sensoriel"]) for reference in _references_questions()
+                      if compris.arome and _normaliser_question(compris.arome)
+                      in _normaliser_question(str(reference["nom"])))
+    choix = [profil for profil, motif in PROFILS.items()
+             if re.search(motif, _normaliser_question(textes))][:3]
+    if not choix:
+        return reponse
+    question = QuestionClarification(id="profil", question=f"Quel profil recherchez-vous pour {compris.arome} ?",
+                                     choix=[*choix, "Je ne sais pas, proposez-moi"])
+    session["guidage_cle"] = cle
+    session["question_profil"] = question
+    reponse.etape = "affiner"
+    reponse.pistes = []
+    reponse.questions = [question]
+    reponse.reponse = question.question
+    session["assistant"].historique[-1]["content"] = reponse.reponse
+    return reponse
 
 
 def _valeur(v):
@@ -356,4 +431,4 @@ def conversation(demande: MessageConversation = Body(openapi_examples=EXEMPLES_C
             r = session["assistant"].repondre(demande.message.strip(), piste_id=demande.piste_id)
         except ValueError as erreur:
             raise HTTPException(status_code=422, detail=str(erreur)) from erreur
-    return vers_contrat(session_id, r)
+        return _guider(vers_contrat(session_id, r), session, demande)
