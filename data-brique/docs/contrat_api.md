@@ -10,7 +10,7 @@ produits du catalogue. Version du modèle : `baseline-v1` (mots-clés + TF-IDF).
 ## Ngrok : en-tête à ajouter
 
 L'offre gratuite de ngrok affiche une page d'avertissement aux navigateurs. Pour l'éviter, ajouter
-à chaque requête du front l'en-tête `ngrok-skip-browser-warning: true` (déjà autorisé par le CORS).
+aux appels serveur Nest vers Python ; le navigateur appelle `/api/conversation` sur Nest. Pour les appels directs de diagnostic, ajouter à chaque requête l'en-tête `ngrok-skip-browser-warning: true` (déjà autorisé par le CORS).
 
 ## `GET /sante`
 
@@ -206,6 +206,7 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | ------------ | -------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
 | `session_id` | string \| null | non         | `null`, absent ou inconnu : nouvelle session. L'identifiant est renvoyé ; le renvoyer à chaque message suivant.  |
 | `message`    | string         | oui\*       | Message du client, en français, 500 caractères au plus. \*Peut être vide (`""`) si `piste_id` est fourni.        |
+| `guidage`    | boolean        | non         | `false` par défaut ; `true` active les questions à choix issues des types et profils Data avant les pistes.      |
 | `piste_id`   | string \| null | non         | `id` d'une piste de la dernière réponse : vaut choix de cette piste, quel que soit le message (bouton du front). |
 
 ```json
@@ -214,20 +215,37 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 
 ## Réponse `200`
 
-| Champ            | Type                | Description                                                                                       |
-| ---------------- | ------------------- | ------------------------------------------------------------------------------------------------- |
-| `session_id`     | string              | Identifiant de la session, à renvoyer au message suivant                                          |
-| `etape`          | string              | État de la session **après** ce message (valeurs ci-dessous)                                      |
-| `intention`      | string              | Intention du **dernier** message du client (valeurs ci-dessous)                                   |
-| `reponse`        | string              | Texte à afficher au client ; paragraphes séparés par `\n`                                         |
-| `compris`        | objet               | Ce que l'assistant a compris du projet (voir ci-dessous)                                          |
-| `questions`      | liste (0 à 2)       | **Ajout V2.3.** Questions Affiner `[{id, question, choix}]` quand `etape = "affiner"`, vide sinon |
-| `pistes`         | liste (0 à 3)       | Pistes d'arômes proposées, triées par `rang` ; vide tant qu'il en manque pour étudier le marché   |
-| `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon            |
-| `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                         |
-| `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                    |
-| `version_modele` | string              | `v2.3.0-affiner`                                                                                  |
-| `attribution`    | string              | Mention ODbL **à afficher**                                                                       |
+| Champ            | Type                | Description                                                                                                                                                             |
+| ---------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `session_id`     | string              | Identifiant de la session, à renvoyer au message suivant                                                                                                                |
+| `etape`          | string              | État de la session **après** ce message (valeurs ci-dessous)                                                                                                            |
+| `intention`      | string              | Intention du **dernier** message du client (valeurs ci-dessous)                                                                                                         |
+| `reponse`        | string              | Texte à afficher au client ; paragraphes séparés par `\n`                                                                                                               |
+| `compris`        | objet               | Ce que l'assistant a compris du projet (voir ci-dessous)                                                                                                                |
+| `questions`      | liste (0 à 2)       | **Ajout V2.3.** Questions à choix `[{id, question, choix}]` : étape Affiner du moteur, ou question de type de produit sur une relance avec `guidage: true` ; vide sinon |
+| `pistes`         | liste (0 à 3)       | Pistes d'arômes proposées, triées par `rang` ; vide tant qu'il en manque pour étudier le marché                                                                         |
+| `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon                                                                                  |
+| `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                                                                                               |
+| `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                                                                                          |
+| `version_modele` | string              | `v2.3.0-affiner`                                                                                                                                                        |
+| `attribution`    | string              | Mention ODbL **à afficher**                                                                                                                                             |
+
+### Guidage optionnel
+
+Avec `guidage: true`, une réponse peut avoir `etape: affiner`, sans pistes ni
+brief, et `questions: [{ id, question, choix: string[] }]` (au plus deux
+questions). Les choix de type viennent de la hiérarchie Data ; les profils de la
+banque de références. La réponse suivante reste un message texte, sans nouveau
+format d’entrée. « Je ne sais pas, proposez-moi » permet de continuer.
+
+Depuis V2.3 (`v2.3.0-affiner`), l'étape Affiner est faite par le moteur, avec ou sans
+`guidage` : questions `gout` puis `intensite` (voir « Changements pour le front »). Avec
+`guidage: true`, l'API ajoute seulement la question de type de produit sur une relance ;
+elle ne pose pas de 2e question de profil quand le moteur a déjà affiné le projet.
+
+Un identifiant inconnu ou expiré produit un **nouvel** identifiant UUID hexadécimal
+de 32 caractères. Le front peut ainsi signaler le redémarrage de la session ;
+les sessions restent en mémoire, limitées à 500 et à deux heures d’inactivité.
 
 ### `compris`
 
@@ -239,6 +257,8 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | `aromes`       | string[]                             | Arômes cités par le client, le principal en premier                        |
 | `contraintes`  | string[]                             | Ex. `["peu sucré", "bio"]`                                                 |
 | `profil`       | string[]                             | **Ajout V2.2.2.** Profil recherché, ex. `["frais", "exotique", "acidulé"]` |
+
+`compris.volume` contient également le volume exprimé avec son unité, ou `null`.
 
 ### `pistes[]`
 
@@ -296,13 +316,13 @@ applicative (équipe Tech).
 
 ### Valeurs de `etape` (état après le message)
 
-| Valeur          | Signification                                                                                  | `pistes` | `brief` | `echantillons` |
-| --------------- | ---------------------------------------------------------------------------------------------- | -------- | ------- | -------------- |
-| `relance`       | Il manque une information (type de produit, goût) ; `reponse` pose au plus 2 questions         | vide     | null    | null           |
-| `affiner`       | **V2.3.** Type et arôme connus, goût pas encore précisé : `questions` à choix avant les pistes | vide     | null    | null           |
-| `pistes`        | Les pistes sont proposées ; le client peut préciser, poser une question ou choisir             | 1 à 3    | null    | null           |
-| `recapitulatif` | Une piste est choisie ; `reponse` récapitule le brief et propose des échantillons              | 1 à 3    | objet   | null           |
-| `echantillons`  | Le brouillon de demande d'échantillons est prêt (non envoyé)                                   | 1 à 3    | objet   | objet          |
+| Valeur          | Signification                                                                                                           | `pistes` | `brief` | `echantillons` |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------- | -------- | ------- | -------------- |
+| `relance`       | Il manque une information (type de produit, goût) ; `reponse` pose au plus 2 questions                                  | vide     | null    | null           |
+| `affiner`       | **V2.3.** Type et arôme connus, goût pas encore précisé : `questions` à choix avant les pistes (avec ou sans `guidage`) | vide     | null    | null           |
+| `pistes`        | Les pistes sont proposées ; le client peut préciser, poser une question ou choisir                                      | 1 à 3    | null    | null           |
+| `recapitulatif` | Une piste est choisie ; `reponse` récapitule le brief et propose des échantillons                                       | 1 à 3    | objet   | null           |
+| `echantillons`  | Le brouillon de demande d'échantillons est prêt (non envoyé)                                                            | 1 à 3    | objet   | objet          |
 
 ### Règles de comportement
 

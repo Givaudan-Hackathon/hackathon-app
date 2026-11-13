@@ -1,9 +1,9 @@
-# La stack de développement. Versions figées : les mêmes qu'en production.
 name: hackathon
 
 services:
-  # Le poste de travail : VS Code s'y attache, on y lance l'API et le front
+  # VS Code uniquement ; les services applicatifs démarrent sans ce profil.
   dev:
+    profiles: [devcontainer]
     build:
       context: .
       dockerfile: .devcontainer/Dockerfile
@@ -11,11 +11,92 @@ services:
     volumes:
       - .:/workspace:cached
     extra_hosts:
-      # Rend l'hôte joignable sous Linux (Docker Desktop le fait déjà)
       - host.docker.internal:host-gateway
     depends_on:
       db:
         condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    environment:
+      DATABASE_URL: postgres://app:app@db:5432/app
+      DATA_API_BASE_URL: http://data:8000
+      AI_BASE_URL: http://host.docker.internal:11434/v1
+      AI_MODEL: llama3.2:1b
+      PORT: '3000'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - '${API_PORT:-3000}:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+      data:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+    environment:
+      VITE_CONVERSATION_MODE: http
+      API_PROXY_TARGET: http://api:3000
+    ports:
+      - '${WEB_PORT:-5173}:5173'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:5173').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+
+  data:
+    build:
+      context: .
+      dockerfile: Dockerfile.data
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - '${DATA_PORT:-8000}:8000'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/sante', timeout=2)",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
 
   db:
     image: postgres:17
@@ -24,9 +105,7 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: app
     volumes:
-      # Données locales persistantes, ignorées par Git
       - ./db/data:/var/lib/postgresql/data
-      # Schéma et données de test, joués au premier démarrage
       - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U app -d app']
