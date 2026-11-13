@@ -1,11 +1,5 @@
 import { useId, useRef, type FormEvent, type KeyboardEvent } from 'react';
-import {
-  ArrowUp,
-  Check,
-  LoaderCircle,
-  MessageCircle,
-  Sparkles,
-} from 'lucide-react';
+import { ArrowUp, Check, MessageCircle, Leaf } from 'lucide-react';
 import type { ConversationState } from './model.ts';
 
 export function ConversationPanel({
@@ -14,12 +8,14 @@ export function ConversationPanel({
   draft,
   onDraftChange,
   compact = false,
+  mode = 'demo',
 }: {
   state: ConversationState;
   onSend: (message: string) => Promise<boolean>;
   draft: string;
   onDraftChange: (value: string) => void;
   compact?: boolean;
+  mode?: 'demo' | 'http';
 }) {
   const id = useId();
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -47,7 +43,7 @@ export function ConversationPanel({
     >
       <div className="conversation-label">
         <span className="assistant-mark">
-          <Sparkles size={18} aria-hidden="true" />
+          <Leaf size={18} aria-hidden="true" />
         </span>
         <div>
           <strong>Votre assistant arômes</strong>
@@ -55,7 +51,9 @@ export function ConversationPanel({
             <span className="online-dot" /> À l’écoute de votre projet
           </span>
         </div>
-        <span className="conversation-demo">Échanges simulés</span>
+        <span className="conversation-demo">
+          {mode === 'demo' ? 'Échanges simulés' : 'Assistant IA'}
+        </span>
       </div>
       {state.messages.length > 2 ? (
         <details className="conversation-history">
@@ -92,30 +90,19 @@ export function ConversationPanel({
                 'Vous'
               ) : (
                 <>
-                  <Sparkles size={13} aria-hidden="true" /> Notre assistant
+                  <Leaf size={13} aria-hidden="true" /> Notre assistant
                 </>
               )}
             </span>
             <p>{message.text}</p>
           </div>
         ))}
-        {state.pending ? (
-          <div className="assistant-loading">
-            <LoaderCircle size={17} className="spinner" aria-hidden="true" />{' '}
-            L’assistant prépare votre réponse…
-          </div>
-        ) : null}
       </div>
       {state.sessionReset ? (
         <p className="notice" role="status">
           La session a redémarré. Reprécisez votre projet pour retrouver des
           propositions.
         </p>
-      ) : null}
-      {state.error ? (
-        <div className="error-notice" role="alert">
-          {state.error}
-        </div>
       ) : null}
       <details
         className="chat-composer-disclosure"
@@ -129,7 +116,7 @@ export function ConversationPanel({
           className="chat-composer"
         >
           <label htmlFor={id}>
-            {state.snapshot?.etape === 'relance'
+            {['relance', 'affiner'].includes(state.snapshot?.etape ?? '')
               ? 'Précisons votre idée'
               : 'Une précision ou une question ?'}
           </label>

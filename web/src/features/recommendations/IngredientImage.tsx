@@ -24,17 +24,23 @@ export const ingredientVisuals = {
 };
 export type IngredientKey = keyof typeof ingredientVisuals;
 const byCode: Record<string, IngredientKey> = {
+  'DEMO-001': 'lemon',
   'DEMO-002': 'lemon',
+  'DEMO-003': 'lime',
   'DEMO-004': 'lime',
   'DEMO-008': 'grapefruit',
+  'DEMO-007': 'grapefruit',
+  'DEMO-013': 'vanilla',
   'DEMO-014': 'vanilla',
   'DEMO-024': 'strawberry',
+  'DEMO-023': 'strawberry',
 };
 const byOption: Record<string, IngredientKey> = {
   'citron-vert': 'lime',
   'citron-vert+citron': 'lemon',
   'citron-vert+pamplemousse': 'grapefruit',
   citron: 'lemon',
+  'citron-jaune': 'lemon',
   pamplemousse: 'grapefruit',
   vanille: 'vanilla',
   fraise: 'strawberry',
@@ -44,23 +50,39 @@ export function resolveIngredient(
   codes: string[],
 ): IngredientKey | null {
   return (
-    byOption[id] ?? codes.map((code) => byCode[code]).find(Boolean) ?? null
+    byOption[id] ??
+    byOption[id.trim().toLowerCase().replace(/\s+/g, '-')] ??
+    codes.map((code) => byCode[code]).find(Boolean) ??
+    null
   );
 }
 export function IngredientImage({
   ingredient,
+  source,
+  label,
   className = '',
   decorative = false,
   eager = false,
 }: {
   ingredient: IngredientKey | null;
+  source?: string | null;
+  label?: string;
   className?: string;
   decorative?: boolean;
   eager?: boolean;
 }) {
-  const [failed, setFailed] = useState(false);
+  const [failedSource, setFailedSource] = useState<string | null>(null);
   const visual = ingredient ? ingredientVisuals[ingredient] : null;
-  if (failed || !visual)
+  let imageSource = visual?.src ?? null;
+  if (source) {
+    try {
+      const url = new URL(source, window.location.origin);
+      if (['http:', 'https:'].includes(url.protocol)) imageSource = url.href;
+    } catch {
+      /* Le visuel local ou neutre reste disponible. */
+    }
+  }
+  if (!imageSource || failedSource === imageSource)
     return (
       <div
         className={`ingredient-fallback ${className}`}
@@ -68,7 +90,7 @@ export function IngredientImage({
         aria-label={
           decorative
             ? undefined
-            : (visual?.alt ?? 'Illustration d’arôme indisponible')
+            : (label ?? visual?.alt ?? 'Illustration d’arôme indisponible')
         }
       >
         <span aria-hidden="true">✳</span>
@@ -76,13 +98,13 @@ export function IngredientImage({
     );
   return (
     <img
-      src={visual.src}
-      alt={decorative ? '' : visual.alt}
+      src={imageSource}
+      alt={decorative ? '' : (label ?? visual?.alt ?? 'Illustration d’arôme')}
       width={800}
       height={800}
       loading={eager ? 'eager' : 'lazy'}
       className={className}
-      onError={() => setFailed(true)}
+      onError={() => setFailedSource(imageSource)}
     />
   );
 }

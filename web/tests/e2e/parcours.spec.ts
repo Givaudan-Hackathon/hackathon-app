@@ -1,4 +1,31 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createMockConversationService } from '../../src/services/adapters/mock-conversation.ts';
+
+test.beforeEach(async ({ page }) => {
+  const service = createMockConversationService({ delay: 80 });
+  await page.route('**/api/conversation', async (route) => {
+    const data = await service.send(route.request().postDataJSON());
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(data),
+    });
+  });
+});
+
+async function selectPiste(page: Page, index = 0) {
+  await page
+    .getByRole('button', { name: /Explorer :/ })
+    .nth(index)
+    .click();
+  await page
+    .getByRole('button', { name: 'Choisir cette piste', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Vérifier mon brief', exact: true })
+    .first()
+    .click();
+}
 
 async function noOverflow(page: Page) {
   expect(
@@ -11,7 +38,7 @@ async function start(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: 'Une boisson fraîche' }).click();
   await expect(
-    page.getByRole('heading', { name: 'Trois pistes, à vous d’explorer.' }),
+    page.getByRole('heading', { name: '3 pistes pour votre projet' }),
   ).toBeVisible();
 }
 async function pay(page: Page) {
@@ -65,9 +92,9 @@ test('sans piste, les questions affinent le besoin avant de proposer des arômes
   await answer.fill('Citron vert');
   await page.getByRole('button', { name: 'Envoyer ma précision' }).click();
   await expect(
-    page.getByRole('heading', { name: 'Trois pistes, à vous d’explorer.' }),
+    page.getByRole('heading', { name: '3 pistes pour votre projet' }),
   ).toBeVisible();
-  await expect(page.locator('.option-card')).toHaveCount(3);
+  await expect(page.locator('.atelier-option')).toHaveCount(3);
   await expect(nav.getByRole('button', { name: '4. Paiement' })).toBeDisabled();
   await noOverflow(page);
 });
@@ -176,7 +203,7 @@ test('propositions en premier, étapes lisibles, paiement refusé puis accepté 
     path: `../.scratch/qa/v2/pistes-${testInfo.project.name}.png`,
     fullPage: true,
   });
-  await page.getByRole('button', { name: 'Choisir cet arôme' }).first().click();
+  await selectPiste(page, 0);
   await page.getByRole('button', { name: 'Passer au paiement fictif' }).click();
   await expect(
     nav.getByRole('button', { name: '4. Paiement' }),
@@ -264,7 +291,7 @@ test('retours sans perte, corrections du brief et nouvelle validation du paiemen
   await page
     .getByRole('button', { name: 'Poursuivre avec cette idée' })
     .click();
-  await page.getByRole('button', { name: 'Choisir cet arôme' }).first().click();
+  await selectPiste(page, 0);
   await page.getByRole('button', { name: 'Passer au paiement fictif' }).click();
   await pay(page);
   await fillContact(page);
@@ -285,7 +312,7 @@ test('retours sans perte, corrections du brief et nouvelle validation du paiemen
   await expect(
     page.getByRole('button', { name: '4. Paiement' }),
   ).toBeDisabled();
-  await page.getByRole('button', { name: 'Choisir cet arôme' }).nth(1).click();
+  await selectPiste(page, 1);
   await page.getByRole('button', { name: 'Passer au paiement fictif' }).click();
   await expect(
     page.getByText('Paiement déjà simulé pour ce projet.'),
@@ -304,8 +331,10 @@ test('refuser puis demander un contact sans paiement, avec images de remplacemen
 }) => {
   await page.route('**/*.webp', (route) => route.abort());
   await start(page);
-  await expect(page.locator('.ingredient-fallback')).toHaveCount(3);
-  await page.getByRole('button', { name: 'Aucun ne me convient' }).click();
+  await expect(page.locator('.ingredient-fallback').first()).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Aucune de ces pistes ne me convient' })
+    .click();
   await expect(
     page.getByText('Dites-moi ce qui manque', { exact: false }),
   ).toBeVisible();
@@ -395,3 +424,122 @@ test('footer en bas des pages courtes, étapes persistantes et réinitialisation
   ).toBeGreaterThanOrEqual(0);
   await noOverflow(page);
 });
+
+test('une indisponibilité conserve la saisie et permet une reprise explicite', async ({
+  page,
+}) => {
+  const service = createMockConversationService({ delay: 0 });
+  const sent: string[] = [];
+  await page.route('**/api/conversation', async (route) => {
+    const input = route.request().postDataJSON();
+    sent.push(input.message);
+    if (sent.length === 1) {
+      await route.fulfill({
+        status: 503,
+        json: { error: 'Assistant indisponible. Réessayez.' },
+      });
+    } else {
+      await route.fulfill({ json: await service.send(input) });
+    }
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Une boisson fraîche' }).click();
+  await expect(page.getByRole('alert')).toContainText('Assistant indisponible');
+  await expect(page.locator('.atelier-option')).toHaveCount(0);
+  await expect(page.locator('.chat-composer textarea')).toHaveValue(sent[0]);
+  expect(sent).toHaveLength(1);
+  await page.getByRole('button', { name: 'Réessayer', exact: true }).click();
+  await expect(page.locator('.atelier-option')).toHaveCount(3);
+  expect(sent).toEqual([sent[0], sent[0]]);
+  await page
+    .getByRole('button', { name: 'Préciser mon projet', exact: true })
+    .click();
+  await page.locator('.chat-composer textarea').fill('Finalement bio');
+  await page.route('**/api/conversation', (route) =>
+    route.fulfill({
+      status: 502,
+      json: { error: 'Réponse incomplète. Réessayez.' },
+    }),
+  );
+  await page.getByRole('button', { name: 'Envoyer ma précision' }).click();
+  await expect(page.getByRole('alert')).toContainText('Réponse incomplète');
+  await expect(page.locator('.chat-composer textarea')).toHaveValue(
+    'Finalement bio',
+  );
+  await expect(page.locator('.project-summary')).toContainText(
+    'boisson pétillante',
+  );
+  await noOverflow(page);
+});
+
+test('annuler l’attente conserve le texte et ignore la réponse tardive', async ({
+  page,
+}) => {
+  const service = createMockConversationService({ delay: 0 });
+  let release!: () => void;
+  let completed!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const settled = new Promise<void>((resolve) => {
+    completed = resolve;
+  });
+  let calls = 0;
+  await page.route('**/api/conversation', async (route) => {
+    calls++;
+    if (calls === 1) {
+      const data = await service.send(route.request().postDataJSON());
+      await gate;
+      await route.fulfill({ json: data }).catch(() => undefined);
+      completed();
+    } else {
+      await route.fulfill({
+        json: await service.send(route.request().postDataJSON()),
+      });
+    }
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Une boisson fraîche' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Annuler l’attente' }),
+  ).toBeVisible();
+  await expect.poll(() => calls).toBe(1);
+  await expect(page.locator('.chat-composer textarea')).toBeDisabled();
+  await page.getByRole('button', { name: 'Annuler l’attente' }).click();
+  await expect(
+    page.getByRole('status').filter({ hasText: 'L’attente a été annulée' }),
+  ).toContainText('L’attente a été annulée');
+  const composer = page.locator('.chat-composer textarea');
+  await expect(composer).not.toHaveValue('');
+  await composer.fill('Un yaourt à la fraise');
+  await page.getByRole('button', { name: 'Envoyer ma précision' }).click();
+  await expect(page.locator('.project-summary')).toContainText('yaourt');
+  release();
+  await settled;
+  await expect(page.locator('.project-summary')).toContainText('yaourt');
+  await expect(page.locator('.atelier-sheet')).toContainText('Fraise');
+  expect(calls).toBe(2);
+});
+
+for (const count of [1, 2]) {
+  test(`${count} piste(s) : le titre et les alternatives suivent la réponse Data`, async ({
+    page,
+  }) => {
+    const service = createMockConversationService({ delay: 0 });
+    await page.route('**/api/conversation', async (route) => {
+      const data = await service.send(route.request().postDataJSON());
+      data.pistes = data.pistes.slice(0, count);
+      await route.fulfill({ json: data });
+    });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Une boisson fraîche' }).click();
+    await expect(
+      page.getByRole('heading', {
+        name: `${count} ${count === 1 ? 'piste' : 'pistes'} pour votre projet`,
+      }),
+    ).toBeVisible();
+    await expect(page.locator('.atelier-option')).toHaveCount(count);
+    await expect(page.locator('.atelier-sheet')).toHaveCount(1);
+    await noOverflow(page);
+  });
+}

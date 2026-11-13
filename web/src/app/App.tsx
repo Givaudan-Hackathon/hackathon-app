@@ -21,7 +21,7 @@ import { BriefReview } from '../features/request/BriefReview.tsx';
 import { RequestForm } from '../features/request/RequestForm.tsx';
 import { Confirmation } from '../features/request/Confirmation.tsx';
 import { PaymentPanel } from '../features/payment/PaymentPanel.tsx';
-import { createMockConversationService } from '../services/adapters/mock-conversation.ts';
+import { createConversationRuntime } from '../services/conversation-runtime.ts';
 import { createMockRequestService } from '../services/adapters/mock-request.ts';
 import { createMockPaymentService } from '../services/adapters/mock-payment.ts';
 import {
@@ -39,16 +39,19 @@ import { Home } from './Home.tsx';
 
 type View = 'home' | JourneyPage | 'done';
 export function App() {
+  const [runtime] = useState(() => createConversationRuntime());
   const [services] = useState(() => ({
-    conversation: createMockConversationService(),
+    conversation: runtime.service,
     request: createMockRequestService(),
     payment: createMockPaymentService(),
   }));
-  const { state, send, reset } = useConversation(services.conversation);
-  const [view, setView] = useState<View>('home');
-  const [dialog, setDialog] = useState<'help' | 'reset' | 'privacy' | null>(
-    null,
+  const { state, send, reset, cancel, retry } = useConversation(
+    services.conversation,
   );
+  const [view, setView] = useState<View>('home');
+  const [dialog, setDialog] = useState<
+    'help' | 'reset' | 'privacy' | 'brief' | null
+  >(null);
   const [kind, setKind] = useState<'sample' | 'expert'>('sample');
   const [receipt, setReceipt] = useState<RequestReceipt | null>(null);
   const [payment, setPayment] = useState<PaymentReceipt | null>(null);
@@ -125,24 +128,31 @@ export function App() {
         ?.focus(),
     );
   }
+  function showSnapshot(result: NonNullable<typeof snapshot>) {
+    if (!paymentMatchesBrief(payment, result.brief)) setPayment(null);
+    if (snapshot && snapshot.session_id !== result.session_id)
+      setCommittedIdea('');
+    changeView(result.pistes.length ? 'choose' : 'refine');
+  }
   async function sendText(message: string) {
     const result = await send(message);
     if (!result) return false;
-    if (!paymentMatchesBrief(payment, result.brief)) setPayment(null);
-    if (result.etape === 'echantillons') {
-      setKind('sample');
-      changeView(
-        paymentMatchesBrief(payment, result.brief) ? 'request' : 'payment',
-      );
-    } else changeView(result.etape === 'relance' ? 'refine' : 'choose');
+    showSnapshot(result);
     return true;
+  }
+  async function retryConversation() {
+    const result = await retry();
+    if (result) showSnapshot(result);
   }
   function start(message: string) {
     setIdea(message);
     setCommittedIdea(message);
     setKind('sample');
     changeView('refine');
-    void sendText(message);
+    setConversationDraft(message);
+    void sendText(message).then((success) => {
+      if (success) setConversationDraft('');
+    });
   }
   async function choose(piste: FlavorOption) {
     if (pending) return;
@@ -152,7 +162,9 @@ export function App() {
     if (!paymentMatchesBrief(payment, result.brief)) setPayment(null);
     changeView('choose');
     requestAnimationFrame(() =>
-      document.getElementById('brief-title')?.focus(),
+      document
+        .querySelector<HTMLButtonElement>('.inline-brief-review')
+        ?.focus({ preventScroll: true }),
     );
   }
   function expert() {
@@ -160,12 +172,24 @@ export function App() {
     setKind('expert');
     changeView('request');
   }
-  function beginCheckout(reviewPayment = false) {
+  async function beginCheckout(reviewPayment = false) {
     if (pending || !snapshot?.brief) return;
     setKind('sample');
-    if (snapshot.echantillons)
+    setDialog(null);
+    if (snapshot.echantillons) {
       changeView(reviewPayment || !validPayment ? 'payment' : 'request');
-    else void sendText('Je souhaite préparer ma demande d’échantillon.');
+      return;
+    }
+    const result = await send('Je souhaite préparer ma demande d’échantillon.');
+    if (!result) return;
+    if (!paymentMatchesBrief(payment, result.brief)) setPayment(null);
+    if (result.brief && result.echantillons)
+      changeView(
+        paymentMatchesBrief(payment, result.brief) && !reviewPayment
+          ? 'request'
+          : 'payment',
+      );
+    else showSnapshot(result);
   }
   function navigate(page: JourneyPage) {
     if (
@@ -195,7 +219,10 @@ export function App() {
     else {
       setCommittedIdea(text);
       changeView('refine');
-      void sendText(text);
+      setConversationDraft(text);
+      void sendText(text).then((success) => {
+        if (success) setConversationDraft('');
+      });
     }
   }
   function paid(next: PaymentReceipt) {
@@ -218,6 +245,7 @@ export function App() {
       draft={conversationDraft}
       onDraftChange={setConversationDraft}
       compact={view === 'choose'}
+      mode={runtime.mode}
     />
   );
   const isWorkspace = view === 'idea' || view === 'refine' || view === 'choose';
@@ -252,7 +280,9 @@ export function App() {
       <div className="demo-banner">
         <span className="demo-dot" /> Démonstration interactive{' '}
         <span className="demo-banner-detail">
-          — échanges, paiements et demandes simulés
+          {runtime.mode === 'http'
+            ? '— assistant IA · paiement et envoi simulés'
+            : '— échanges, paiements et demandes simulés'}
         </span>
       </div>
       {view !== 'home' ? (
@@ -276,16 +306,49 @@ export function App() {
             </div>
             <div className="workspace-title">
               <div>
-                <span className="eyebrow">Créons les bonnes connexions</span>
                 <h1 tabIndex={-1}>
                   {view === 'idea'
                     ? 'Tout commence par votre idée.'
                     : view === 'choose'
-                      ? 'Les possibilités prennent goût.'
-                      : 'Faisons grandir votre idée.'}
+                      ? 'Choisissez votre direction de goût.'
+                      : 'Précisons votre projet.'}
                 </h1>
               </div>
             </div>
+            {state.error ? (
+              <div className="conversation-error" role="alert">
+                <p>{state.error}</p>
+                <div>
+                  <button
+                    className="text-button"
+                    disabled={pending}
+                    onClick={() => void retryConversation()}
+                  >
+                    Réessayer
+                  </button>
+                  <button
+                    className="text-button"
+                    disabled={pending}
+                    onClick={edit}
+                  >
+                    Préciser mon projet
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            {state.notice ? (
+              <p className="notice" role="status">
+                {state.notice}
+              </p>
+            ) : null}
+            {state.pending ? (
+              <div className="conversation-progress" role="status">
+                <span>L’assistant analyse votre projet…</span>
+                <button className="text-button" onClick={cancel}>
+                  Annuler l’attente
+                </button>
+              </div>
+            ) : null}
             {view === 'idea' ? (
               <IdeaEditor
                 value={idea}
@@ -295,11 +358,10 @@ export function App() {
               />
             ) : (
               <div
-                className={`workspace-grid ${view === 'choose' ? 'is-choosing' : ''}`}
+                className={
+                  view === 'choose' ? 'atelier-layout' : 'workspace-grid'
+                }
               >
-                {view === 'choose' ? (
-                  <ProjectSummary snapshot={snapshot} onEdit={edit} compact />
-                ) : null}
                 <div className="workspace-content">
                   {view === 'choose' && snapshot?.pistes.length ? (
                     <OptionCards
@@ -310,19 +372,14 @@ export function App() {
                         void sendText('Aucun de ces arômes ne me convient.')
                       }
                       onExpert={expert}
-                    />
-                  ) : null}
-                  {view === 'choose' && snapshot?.brief ? (
-                    <BriefReview
-                      snapshot={snapshot}
-                      pending={pending}
-                      onContinue={() => beginCheckout()}
-                      onEdit={edit}
-                      paid={Boolean(validPayment)}
+                      onReview={() => setDialog('brief')}
                     />
                   ) : null}
                   {view === 'choose' ? (
-                    <details className="conversation-drawer">
+                    <details
+                      className="conversation-drawer"
+                      open={Boolean(state.error)}
+                    >
                       <summary>
                         <MessageCircle size={18} aria-hidden="true" /> Retrouver
                         la conversation ou préciser mon idée
@@ -332,33 +389,51 @@ export function App() {
                   ) : (
                     conversation
                   )}
-                  {view === 'refine' && !state.pending ? (
-                    <div className="quick-answers">
-                      <span>Pour vous aider :</span>
-                      {(!snapshot?.compris.type_produit
-                        ? ['Une boisson pétillante', 'Un dessert végétal']
-                        : !snapshot.compris.arome
-                          ? ['Citron vert', 'Vanille', 'Fraise']
-                          : ['Plus de fraîcheur', 'Je ne sais pas encore']
-                      ).map((answer) => (
-                        <button
-                          key={answer}
-                          onClick={() => void sendText(answer)}
-                        >
-                          {answer}
-                          <ArrowRight size={12} aria-hidden="true" />
-                        </button>
+                  {view === 'refine' ? (
+                    <div className="clarification-questions">
+                      {snapshot?.questions.map((question) => (
+                        <fieldset key={question.id}>
+                          <legend
+                            className={
+                              question.question.trim() ===
+                              snapshot.reponse.trim()
+                                ? 'sr-only'
+                                : undefined
+                            }
+                          >
+                            {question.question}
+                          </legend>
+                          <div className="quick-answers">
+                            {question.choix.map((choice) => (
+                              <button
+                                key={choice}
+                                disabled={pending}
+                                onClick={() => void sendText(choice)}
+                              >
+                                {choice}
+                              </button>
+                            ))}
+                          </div>
+                        </fieldset>
                       ))}
-                      <button onClick={expert}>
-                        En parler avec un expert{' '}
-                        <ArrowRight size={12} aria-hidden="true" />
+                      <button
+                        className="text-button"
+                        disabled={pending}
+                        onClick={expert}
+                      >
+                        En parler avec un expert
                       </button>
                     </div>
                   ) : null}
                 </div>
-                {view === 'refine' ? (
-                  <ProjectSummary snapshot={snapshot} onEdit={edit} />
-                ) : null}
+                <ProjectSummary
+                  snapshot={snapshot}
+                  onEdit={edit}
+                  pending={pending}
+                  onReview={
+                    view === 'choose' ? () => setDialog('brief') : undefined
+                  }
+                />
               </div>
             )}
           </div>
@@ -444,6 +519,24 @@ export function App() {
         </div>
       </footer>
       <Dialog
+        open={dialog === 'brief'}
+        onClose={() => setDialog(null)}
+        title="Vérifier votre brief"
+      >
+        {snapshot?.brief ? (
+          <BriefReview
+            snapshot={snapshot}
+            pending={pending}
+            onContinue={() => void beginCheckout()}
+            onEdit={() => {
+              setDialog(null);
+              edit();
+            }}
+            paid={Boolean(validPayment)}
+          />
+        ) : null}
+      </Dialog>
+      <Dialog
         open={dialog === 'help'}
         onClose={() => setDialog(null)}
         title="Votre projet, pas à pas"
@@ -466,8 +559,10 @@ export function App() {
         </ol>
         <p>Vous pouvez aussi demander l’avis d’un expert sans paiement.</p>
         <div className="notice">
-          Ce prototype utilise des réponses et références fictives. Aucun débit
-          réel, commercial contacté ou échantillon envoyé.
+          {runtime.mode === 'http'
+            ? 'La conversation utilise le service IA. Les références DEMO, le paiement et le dépôt restent illustratifs.'
+            : 'Ce prototype utilise des réponses et références fictives.'}{' '}
+          Aucun débit réel ni envoi au commercial.
         </div>
         <Button onClick={() => setDialog(null)}>
           J’ai compris <Check size={16} aria-hidden="true" />
@@ -479,9 +574,9 @@ export function App() {
         title="Vos données dans cette démonstration"
       >
         <p>
-          Votre description et vos coordonnées restent dans la mémoire de cette
-          page. Elles ne sont envoyées ni à une IA, ni à un commercial, et ne
-          sont pas enregistrées en base.
+          {runtime.mode === 'http'
+            ? 'Les messages décrivant votre projet sont transmis à notre service IA pour préciser le besoin. Vos coordonnées restent dans cette page et ne sont pas envoyées au commercial.'
+            : 'Votre description et vos coordonnées restent dans la mémoire de cette page. Aucun message n’est envoyé à une IA ou à un commercial.'}
         </p>
         <p>
           Le paiement est entièrement fictif. Aucune donnée bancaire n’est

@@ -7,6 +7,8 @@ export type ConversationState = {
   pending: boolean;
   error: string | null;
   sessionReset: boolean;
+  notice: string | null;
+  pendingMessageId: string | null;
 };
 export const initialConversation: ConversationState = {
   snapshot: null,
@@ -14,6 +16,8 @@ export const initialConversation: ConversationState = {
   pending: false,
   error: null,
   sessionReset: false,
+  notice: null,
+  pendingMessageId: null,
 };
 export type ConversationAction =
   | { type: 'start'; message: Message }
@@ -24,6 +28,7 @@ export type ConversationAction =
       previousSession: string | null;
     }
   | { type: 'failure'; error: string }
+  | { type: 'cancel' }
   | { type: 'reset' };
 export function conversationReducer(
   state: ConversationState,
@@ -35,6 +40,8 @@ export function conversationReducer(
         ...state,
         pending: true,
         error: null,
+        notice: null,
+        pendingMessageId: action.message.id,
         messages: [...state.messages, action.message],
       };
     case 'success': {
@@ -48,13 +55,39 @@ export function conversationReducer(
         pending: false,
         error: null,
         sessionReset,
+        pendingMessageId: null,
+        notice: null,
         messages: sessionReset
-          ? [action.message]
+          ? [
+              ...state.messages.filter(
+                (message) => message.id === state.pendingMessageId,
+              ),
+              action.message,
+            ]
           : [...state.messages, action.message],
       };
     }
     case 'failure':
-      return { ...state, pending: false, error: action.error };
+      return {
+        ...state,
+        pending: false,
+        error: action.error,
+        pendingMessageId: null,
+        messages: state.messages.filter(
+          (message) => message.id !== state.pendingMessageId,
+        ),
+      };
+    case 'cancel':
+      return {
+        ...state,
+        pending: false,
+        error: null,
+        pendingMessageId: null,
+        notice: 'L’attente a été annulée. Votre saisie est conservée.',
+        messages: state.messages.filter(
+          (message) => message.id !== state.pendingMessageId,
+        ),
+      };
     case 'reset':
       return { ...initialConversation, messages: [] };
   }

@@ -13,18 +13,18 @@ se trouvent dans le [journal des ADR](docs/adr/README.md).
 
 ## État du code et choix proposés
 
-| Partie           | Code actuellement présent                        | Proposition pour le produit                      |
-| ---------------- | ------------------------------------------------ | ------------------------------------------------ |
-| Interface `web/` | React/TypeScript/Tailwind, parcours simulé       | Branchement à l’API applicative, ADR 0008        |
-| API `api/`       | NestJS 12, PostgreSQL et appel IA                | Migration du socle réalisée, ADR 0009 acceptée   |
-| Data             | Python/FastAPI dans `data-brique/`               | Relais Nest–Python à réaliser dans le ticket #31 |
-| Organisation     | Workspaces npm `api/` et `web/`, base dans `db/` | Dépôt commun par composant, ADR 0007             |
+| Partie           | Code actuellement présent                        | Proposition pour le produit                    |
+| ---------------- | ------------------------------------------------ | ---------------------------------------------- |
+| Interface `web/` | React/TypeScript/Tailwind, atelier connecté      | Conversation via Nest et Python, ADR 0008      |
+| API `api/`       | NestJS 12, PostgreSQL et appel IA                | Migration du socle réalisée, ADR 0009 acceptée |
+| Data             | Python/FastAPI dans `data-brique/`               | Relais HTTP Nest–Python et guidage optionnel   |
+| Organisation     | Workspaces npm `api/` et `web/`, base dans `db/` | Dépôt commun par composant, ADR 0007           |
 
 Les deux Tech leads maîtrisent React et NestJS. Le choix React/Tailwind est
 confirmé par Christopher pour le prototype et réalisé dans le ticket #20.
 L’ADR 0009 est acceptée et la migration du socle API vers NestJS est fusionnée
-(PR #27). Les ADR 0007 et 0010 restent proposés. La présence des sources Python
-ne constitue pas encore un branchement du parcours React à leur conversation.
+(PR #27). Les ADR 0007 et 0010 restent proposés. Le parcours React appelle `POST /api/conversation` dans Nest, qui relaie vers
+Python. Le paiement et le dépôt restent simulés.
 
 Le diagnostic API affiche l’état de PostgreSQL et les échanges enregistrés.
 Son formulaire appelle `POST /api/questions`, interroge Ollama puis conserve la
@@ -54,21 +54,35 @@ tester un paiement accepté ou refusé. Un paiement réussi débloque le formula
 puis le client confirme explicitement sa demande. Une demande de contact avec
 un expert reste accessible sans paiement.
 
+Le mode par défaut est connecté : configurer `api/.env` depuis son exemple,
+notamment `DATA_API_BASE_URL`, puis démarrer Python et les deux workspaces :
+
 ```bash
-npm ci
-npm run dev -w web
+# Dans un terminal, depuis data-brique/ (environnement Python séparé)
+python -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000
 ```
 
-Ouvrir http://localhost:5173. Le prototype fonctionne sans backend : réponses,
-références et dépôts sont simulés en mémoire. Recharger la page réinitialise
-le projet. Les coordonnées ne sont ni transmises ni stockées ; aucun e-mail,
+```bash
+# Dans un autre terminal, depuis la racine (PostgreSQL pour le socle)
+npm ci
+npm run dev
+```
+
+Ouvrir http://localhost:5173. `web/.env.example` décrit le proxy Vite vers Nest,
+le délai navigateur et le mode `VITE_CONVERSATION_MODE=demo` explicite pour
+travailler sans backend. Une panne HTTP n’active jamais ce simulateur. Le délai
+Nest inclut la lecture du corps Python ; une réponse invalide est refusée.
+Recharger la page réinitialise le projet. Les coordonnées ne sont ni transmises ni stockées ; aucun e-mail,
 échantillon ou commande n’est envoyé. Les photos et les fontes sont locales ;
 les [prompts des visuels](web/src/assets/README.md) sont conservés.
 
 Le contrat V2 de la [PR Data #18](https://github.com/Givaudan-Hackathon/hackathon-app/pull/18)
 a servi à construire le simulateur (source `09d22f3`). La brique Python est
-maintenant présente dans le dépôt, mais le parcours reste simulé : le relais
-Nest–Python est suivi dans #31 et le raccordement HTTP du front dans #32.
+reliée par Nest au front : le contrat Zod commun dans
+`api/src/contracts/conversation.ts` valide chaque snapshot. Les questions à choix
+sont fournies par Python avec `guidage: true`, sans liste métier codée dans React.
 Les composants dépendent d’une interface de service indépendante des fixtures.
 Le brouillon Data reste distinct du dépôt applicatif et de l’acceptation
 commerciale d’une commande.
@@ -77,7 +91,7 @@ Le test technique historique est accessible à http://localhost:5173/diagnostic.
 et requiert l’API NestJS/PostgreSQL démarrée. Le build produit les deux pages.
 La préparation Compose et le tag `m2` sont suivis dans le
 [ticket #21](https://github.com/Givaudan-Hackathon/hackathon-app/issues/21) : ce
-front simulé ne vaut pas intégration de la tranche jusqu’aux données.
+parcours connecté ne prouve pas encore la persistance des demandes dans PostgreSQL.
 
 ```bash
 npm run lint
@@ -91,7 +105,11 @@ npm run build
 
 Pour les vérifications navigateur, installer le Chromium Playwright et ses
 bibliothèques système dans l’environnement de test, puis lancer `npm run test:e2e`.
-Les tests couvrent les formats 1440 et 360 px. Les captures et traces restent
+Les tests contrôlés couvrent les formats 1440 et 360 px, les pannes HTTP,
+la reprise et l’annulation. Le scénario réel s’exécute sur les trois services
+déjà démarrés : `GIVAUDAN_LIVE_URL=http://127.0.0.1:5173 npx playwright test
+--config web/playwright.live.config.ts`. Il contacte Python, qui peut utiliser
+son moteur de repli si Ollama est absent ; ce test ne mesure pas la qualité du LLM. Les captures et traces restent
 sous `.scratch/qa/`. Les validations Product et la revue restent humaines.
 Si le prototype est déjà ouvert sur 5173, utiliser
 `GIVAUDAN_TEST_PORT=5184 npm run test:e2e` pour tester cette copie séparément.
@@ -102,12 +120,14 @@ Si le prototype est déjà ouvert sur 5173, utiliser
 web/                     Prototype React/Tailwind et dépendances npm du front
 api/                     API NestJS et dépendances npm du back
   src/main.ts            Bootstrap NestJS et préfixe /api
-  src/app.module.ts      Modules Database, Health et Questions
+  src/app.module.ts      Modules Database, Health, Questions et Conversation
+  src/conversation/      POST /api/conversation, relais vers Python
+  src/contracts/         Contrat Zod partagé avec React
   src/database/          Pool PostgreSQL partagé
   src/health/            GET /api/health
   src/questions/         GET|POST /api/questions et fournisseur IA
   src/shared/            Filtre d’erreurs { error }
-data-brique/             Service Python/FastAPI, relais Nest à réaliser
+data-brique/             Service Python/FastAPI relié via Nest
   api/                   API FastAPI
   src/                   Moteur Python
   notebooks/             Expérimentations
@@ -121,7 +141,7 @@ docs/adr/                Décisions et alternatives
 .github/                 CI, formulaires et responsabilités de revue
 .devcontainer/           Environnement de référence
 compose.yaml             Dev container et PostgreSQL actuels
-openapi.yaml             Contrat des trois opérations de l’API actuelle
+openapi.yaml             Contrat des opérations de l’API actuelle
 AGENTS.md                Instructions adaptées aux assistants de code
 ```
 
@@ -211,7 +231,8 @@ node scripts/verifier-api-data.mjs http://127.0.0.1:8000
 
 Les résultats de l’essai et la procédure de reproduction sont dans le ticket #13.
 Le [ticket #31](https://github.com/Givaudan-Hackathon/hackathon-app/issues/31)
-porte le relais Nest vers Python ; #32 porte son consommateur React. Le
+porte le relais Nest vers Python ; #32 porte son consommateur React, regroupé
+dans la PR #28 avec l’atelier #33. Le
 [Spike #12](https://github.com/Givaudan-Hackathon/hackathon-app/issues/12)
 conserve l’étude initiale. Les dépendances et tests Python restent séparés
 des workspaces npm. Le démarrage commun relève de #21.

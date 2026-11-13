@@ -1,90 +1,93 @@
-import { Check, ChevronDown, Leaf, PencilLine, Sparkles } from 'lucide-react';
+import { Check, ClipboardList, PencilLine } from 'lucide-react';
 import type { ConversationSnapshot } from '../../services/conversation-service.ts';
+import { Button } from '../../components/ui/Button.tsx';
+import { FlavorWarnings } from '../recommendations/FlavorWarnings.tsx';
 
 export function ProjectSummary({
   snapshot,
   onEdit,
-  compact = false,
+  onReview,
+  pending = false,
 }: {
   snapshot: ConversationSnapshot | null;
   onEdit: () => void;
-  compact?: boolean;
+  onReview?: () => void;
+  pending?: boolean;
 }) {
   const understood = snapshot?.compris;
   const selected = snapshot?.pistes.find(
     (piste) => piste.id === snapshot.brief?.piste_id,
   );
+  const volume =
+    snapshot?.brief?.volume ??
+    (typeof understood?.volume === 'string' ? understood.volume : null);
   return (
-    <aside className={`project-summary ${compact ? 'is-compact' : ''}`}>
-      <details open={!compact}>
-        <summary>
-          <span>
-            <Leaf size={18} strokeWidth={1.5} aria-hidden="true" />{' '}
-            {compact
-              ? `Votre projet : ${understood?.type_produit ?? 'à préciser'} · ${understood?.aromes.join(', ') || 'arôme à préciser'}`
-              : 'Votre idée prend forme'}
-          </span>
-          <ChevronDown size={17} aria-hidden="true" />
-        </summary>
-        <div className="summary-body">
-          <p className="summary-intro">
-            Ce que nous avons compris, au fil de nos échanges.
-          </p>
-          <dl>
-            <div>
-              <dt>Votre produit</dt>
-              <dd>{understood?.type_produit ?? 'À préciser ensemble'}</dd>
-            </div>
-            <div>
-              <dt>Le goût recherché</dt>
-              <dd>
-                {understood?.aromes.length
-                  ? understood.aromes.join(', ')
-                  : 'À imaginer'}
-              </dd>
-            </div>
-            <div>
-              <dt>Ce qui compte pour vous</dt>
-              <dd>
-                {understood?.contraintes.length ? (
-                  <div className="constraint-tags">
-                    {understood.contraintes.map((item) => (
-                      <span key={item}>
-                        <Check size={11} aria-hidden="true" />
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  'Aucune préférence précisée'
-                )}
-              </dd>
-            </div>
-          </dl>
-          {selected ? (
-            <div className="summary-selection">
-              <span>
-                <Check size={14} aria-hidden="true" /> Votre sélection
-              </span>
-              <strong>{selected.nom}</strong>
-              <small>
-                {selected.references.map((ref) => ref.code).join(' · ')}
-              </small>
-            </div>
-          ) : null}
-          <button className="text-button summary-edit" onClick={onEdit}>
-            <PencilLine size={14} aria-hidden="true" /> Préciser mon projet
-          </button>
-          <div className="summary-foot">
-            <Sparkles size={16} strokeWidth={1.4} aria-hidden="true" />
-            <p>
-              Votre idée reste le fil conducteur.
-              <br />
-              Le choix final se construit avec vous.
-            </p>
-          </div>
+    <aside
+      className="project-summary atelier-sidebar"
+      aria-labelledby="project-title"
+    >
+      <h2 id="project-title" tabIndex={-1}>
+        <ClipboardList size={20} aria-hidden="true" />
+        {onReview ? 'Votre brief' : 'Votre projet'}
+      </h2>
+      <dl>
+        <div>
+          <dt>Votre produit</dt>
+          <dd>{understood?.type_produit || 'À préciser'}</dd>
         </div>
-      </details>
+        <div>
+          <dt>Le goût recherché</dt>
+          <dd>{understood?.aromes.join(', ') || 'À préciser'}</dd>
+        </div>
+        {understood?.profil.length ? (
+          <div>
+            <dt>Profil recherché</dt>
+            <dd>{understood.profil.join(', ')}</dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>Contraintes de recette</dt>
+          <dd>{understood?.contraintes.join(', ') || 'À préciser'}</dd>
+        </div>
+        <div>
+          <dt>Volume envisagé</dt>
+          <dd>{volume || 'À préciser'}</dd>
+        </div>
+      </dl>
+      {onReview ? (
+        <>
+          <div className={`atelier-brief-slot ${selected ? 'has-choice' : ''}`}>
+            {selected ? (
+              <>
+                <span>
+                  <Check size={14} aria-hidden="true" /> Piste ajoutée au brief
+                </span>
+                <strong>{selected.nom}</strong>
+                <FlavorWarnings
+                  missing={snapshot?.brief?.creation_sur_mesure}
+                  labels={snapshot?.brief?.references_sans_label}
+                />
+              </>
+            ) : (
+              <p>Choisissez une piste pour compléter votre brief.</p>
+            )}
+          </div>
+          <Button onClick={onReview} disabled={pending || !selected}>
+            Vérifier mon brief
+          </Button>
+          <p className="atelier-next">
+            Puis un engagement de <strong>10 € fictifs</strong>, avant de
+            préparer la demande.
+          </p>
+        </>
+      ) : null}
+      <button
+        className="text-button summary-edit"
+        disabled={pending}
+        onClick={onEdit}
+      >
+        <PencilLine size={14} aria-hidden="true" /> Préciser mon projet
+      </button>
     </aside>
   );
 }

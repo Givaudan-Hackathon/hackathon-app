@@ -1,6 +1,7 @@
 import { ArrowRight, Check, PencilLine } from 'lucide-react';
 import type { ConversationSnapshot } from '../../services/conversation-service.ts';
 import { Button } from '../../components/ui/Button.tsx';
+import { FlavorWarnings } from '../recommendations/FlavorWarnings.tsx';
 import {
   IngredientImage,
   resolveIngredient,
@@ -42,7 +43,19 @@ export function BriefReview({
           {selected.nom}
         </h2>
         <p>{selected.references[0]?.profil_sensoriel}</p>
+        <FlavorWarnings
+          missing={snapshot.brief.creation_sur_mesure}
+          labels={snapshot.brief.references_sans_label}
+        />
         <dl>
+          <div>
+            <dt>Profil recherché</dt>
+            <dd>{snapshot.brief.profil.join(', ') || 'À préciser'}</dd>
+          </div>
+          <div>
+            <dt>Volume envisagé</dt>
+            <dd>{snapshot.brief.volume || 'À préciser'}</dd>
+          </div>
           <div>
             <dt>Pour votre</dt>
             <dd>{snapshot.brief.type_produit}</dd>

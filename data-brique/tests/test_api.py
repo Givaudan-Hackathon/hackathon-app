@@ -34,7 +34,7 @@ def test_recommander(client, brief, division):
 
 
 CLES_REPONSE = {"session_id", "etape", "intention", "reponse", "compris", "pistes", "solutions",
-                "brief", "echantillons", "version_modele", "attribution"}
+                "brief", "echantillons", "version_modele", "attribution", "questions"}
 CLES_PISTE = {"id", "rang", "nom", "description", "explication", "aromes", "nb_produits_marche",
               "references", "sans_reference", "image",
               "references_sans_label"}  # ajout V2.2.2
@@ -70,7 +70,7 @@ def test_conversation_parcours_citron_vert(client):
     assert (corps["etape"], corps["intention"]) == ("pistes", "precision")
     assert corps["compris"] == {"division": "flavors", "type_produit": "boisson pétillante",
                                 "arome": "citron vert", "aromes": ["citron vert"],
-                                "contraintes": ["peu sucré"], "profil": []}
+                                "contraintes": ["peu sucré"], "profil": [], "volume": None}
     assert corps["pistes"][0]["id"] == "citron-vert" and corps["pistes"][0]["rang"] == 1
     assert [s["code"] for s in corps["solutions"]] == ["DEMO-028"]
 
@@ -122,3 +122,35 @@ def test_question_generale(client):
 
 def test_conversation_message_vide(client):
     assert client.post("/conversation", json={"session_id": None, "message": ""}).status_code == 422
+
+
+def test_guidage_optionnel_questions_puis_pistes(client):
+    response = client.post("/conversation", json={"message": "une boisson pétillante au citron vert", "guidage": True})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["etape"] == "affiner" and body["pistes"] == []
+    assert body["compris"]["arome"] == "citron vert"
+    question = body["questions"][0]
+    assert question["choix"] and "Je ne sais pas, proposez-moi" in question["choix"]
+    response = client.post("/conversation", json={"session_id": body["session_id"], "message": question["choix"][0], "guidage": True})
+    assert response.status_code == 200
+    assert response.json()["etape"] == "pistes"
+    assert response.json()["compris"]["profil"]
+
+
+def test_guidage_type_produit_issue_des_types_data(client):
+    body = client.post("/conversation", json={"message": "je veux créer une boisson", "guidage": True}).json()
+    assert body["etape"] == "relance"
+    assert "boisson pétillante" in body["questions"][0]["choix"]
+
+
+def test_session_inconnue_signale_un_nouvel_identifiant(client):
+    body = client.post("/conversation", json={"session_id": "session-perimee", "message": "bonjour"}).json()
+    assert body["session_id"] != "session-perimee"
+
+
+def test_guidage_accepte_je_ne_sais_pas(client):
+    body = client.post("/conversation", json={"message": "une boisson pétillante au citron vert", "guidage": True}).json()
+    assert body["etape"] == "affiner"
+    body = client.post("/conversation", json={"session_id": body["session_id"], "message": "Je ne sais pas, proposez-moi", "guidage": True}).json()
+    assert body["etape"] == "pistes"

@@ -15,7 +15,7 @@ et déposent un brief. Lire `README.md` pour l’état du socle et les choix pro
 
 - Avant de modifier `web/` ou `api/`, lire aussi leur `AGENTS.md` : la racine porte les règles communes et le fichier local précise son composant.
 - Les Data rédigent et maintiennent `data-brique/AGENTS.md` dans leur branche. Consulter ce fichier dès qu’il existe avant de modifier leur code ; son absence actuelle ne vaut pas validation des choix Data.
-- Le prototype web utilise React/TypeScript et Tailwind ; son mode conversationnel reste simulé. Le socle API est migré vers NestJS (ADR 0009) ; le relais conversationnel vers Python reste à réaliser dans #31.
+- Le prototype web utilise React/TypeScript et Tailwind ; la conversation passe par NestJS vers Python via HTTP. `VITE_CONVERSATION_MODE=demo` active explicitement le simulateur ; paiement et dépôt restent fictifs. Le socle NestJS suit l’ADR 0009.
 - `db/` définit la base PostgreSQL commune à l’API applicative et au service Data. Les Data et les Tech leads coordonnent ses évolutions de schéma et ses données initiales ; la connexion Data reste à intégrer et à vérifier.
 - `db/init/` n’est joué qu’à l’initialisation de PostgreSQL ; modifier ses scripts ne met pas à jour une base existante. Toute évolution doit préciser comment mettre à jour une base déjà initialisée.
 - Le fournisseur IA du socle est appelé par `QuestionsService.ask()` dans `api/src/questions/questions.service.ts` ; ses valeurs viennent de `api/.env`.

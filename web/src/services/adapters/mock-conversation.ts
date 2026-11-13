@@ -56,11 +56,13 @@ export function createMockConversationService({
               arome: null,
               aromes: [],
               contraintes: [],
+              profil: [],
             },
             pistes: [],
             solutions: [],
             brief: null,
             echantillons: null,
+            questions: [],
             version_modele: 'demo-web-v2',
             attribution:
               'Simulation du contrat Data V2. Références DEMO fictives ; aucune étude de marché exécutée.',
@@ -84,6 +86,9 @@ export function createMockConversationService({
           codes_references: selected.references.map((ref) => ref.code),
           codes_solutions: [],
           creation_sur_mesure: [],
+          profil: [...snapshot.compris.profil],
+          volume: null,
+          references_sans_label: [],
         };
         snapshot.brief = brief;
         snapshot.echantillons = null;
@@ -170,6 +175,7 @@ export function createMockConversationService({
             arome: null,
             aromes: [],
             contraintes: [],
+            profil: [],
           };
         snapshot.compris.type_produit =
           product ?? snapshot.compris.type_produit;

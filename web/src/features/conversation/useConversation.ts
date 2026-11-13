@@ -10,10 +10,16 @@ export function useConversation(service: ConversationService) {
   const pendingRef = useRef(false);
   const controller = useRef<AbortController | null>(null);
   const generation = useRef(0);
+  const lastInput = useRef<{
+    message: string;
+    pisteId?: string;
+    displayText?: string;
+  } | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
   const send = useCallback(
     async (message: string, pisteId?: string, displayText?: string) => {
       if (pendingRef.current) return null;
+      lastInput.current = { message, pisteId, displayText };
       pendingRef.current = true;
       const currentGeneration = ++generation.current;
       controller.current = new AbortController();
@@ -67,7 +73,20 @@ export function useConversation(service: ConversationService) {
     generation.current++;
     controller.current?.abort();
     pendingRef.current = false;
+    lastInput.current = null;
     dispatch({ type: 'reset' });
   }, []);
-  return { state, send, reset };
+  const cancel = useCallback(() => {
+    generation.current++;
+    controller.current?.abort();
+    pendingRef.current = false;
+    dispatch({ type: 'cancel' });
+  }, []);
+  const retry = useCallback(() => {
+    const input = lastInput.current;
+    return input
+      ? send(input.message, input.pisteId, input.displayText)
+      : Promise.resolve(null);
+  }, [send]);
+  return { state, send, reset, cancel, retry };
 }

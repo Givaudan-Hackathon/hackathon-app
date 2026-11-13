@@ -99,6 +99,7 @@ export function createOptions(flavorKey: string): FlavorOption[] {
       nb_produits_marche: 0,
       references: refs,
       sans_reference: [],
+      references_sans_label: [],
       image: null,
     };
   });
