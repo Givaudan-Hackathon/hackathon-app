@@ -5,6 +5,8 @@ et déposent un brief. Lire `README.md` pour l’état du socle et les choix pro
 
 ## Lancer
 
+- `docker compose up` démarre PostgreSQL, Python, Nest et React ; voir README pour les limites de démonstration. `dev` est réservé au profil `devcontainer`.
+
 - L’environnement de référence est `.devcontainer/` avec Node 24, npm 11 et PostgreSQL 17 via `compose.yaml`.
 - `npm ci` utilise le lockfile racine ; conserver les workspaces `api/` et `web/` de `package.json`.
 - `npm run dev` lance NestJS sur 3000 et Vite sur 5173 ; `api/.env.example` décrit la configuration locale.

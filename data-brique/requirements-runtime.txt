@@ -1,0 +1,8 @@
+# Dépendances du service HTTP ; notebooks et outils de démo restent séparés.
+pandas<3
+requests
+python-dotenv
+fastapi==0.162.2
+uvicorn==0.54.0
+scikit-learn==1.9.1
+duckdb==2.0.0

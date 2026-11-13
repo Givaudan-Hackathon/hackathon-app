@@ -32,6 +32,39 @@ réponse. Ce test technique ne démontre pas encore le parcours de brief client.
 Ollama Windows avec `llama3.2:1b` est le choix d’atelier décrit dans l’ADR 0002 ;
 le fournisseur et le modèle du produit restent à évaluer avec la Data.
 
+## Démarrage automatique de la démonstration
+
+Docker Desktop doit être démarré. Depuis la racine, sans installer Node ou Python
+sur le poste et sans fichier `.env` obligatoire :
+
+```bash
+docker compose up
+```
+
+La première exécution construit les images et installe les dépendances. Puis
+ouvrir http://localhost:5173 ; Swagger Python : http://localhost:8000/docs.
+Compose attend PostgreSQL et Python, démarre Nest, puis React. Le front utilise
+`http://api:3000` dans le réseau Docker et Nest appelle `http://data:8000`.
+`docker compose ps` affiche leur état. Après modification des sources :
+`docker compose up --build`. Ctrl+C arrête les services ; `docker compose down`
+retire les conteneurs sans effacer `db/data/`.
+
+Libérer les ports 5173, 3000 et 8000 si des serveurs locaux tournent déjà, ou
+utiliser `WEB_PORT=5187 API_PORT=3187 DATA_PORT=8187 docker compose up`.
+Les fichiers `.env` locaux et les sauvegardes sont exclus des images.
+
+Le service Python et son catalogue sont réels. Sans Ollama disponible à
+`host.docker.internal:11434`, il utilise son moteur de repli : aucun modèle LLM
+n’est téléchargé automatiquement. `OLLAMA_URL` permet de fournir un autre serveur.
+Les références DEMO, le paiement de 10 € et le dépôt sont fictifs ; aucune demande
+n’est enregistrée en base ou envoyée au commercial. PostgreSQL reste utilisé
+par les routes de diagnostic `/api/health` et `/api/questions`.
+
+Le service `dev` avec `sleep infinity` est réservé au profil `devcontainer` ;
+VS Code le démarre explicitement avec `db` via `runServices`.
+Le tag `m2` publié sur `0283185` précède ce changement : il ne sera pas déplacé
+sans validation de la nouvelle version, avant le passage de l’équipe.
+
 ## Prototype client React
 
 Le [cadrage web](docs/ARCHITECTURE-WEB.md), livré dans le ticket #19 / PR #22,
@@ -213,9 +246,8 @@ préserver ce contrat ou rendre ses changements explicites.
 ne modifie pas une base existante. Les données locales sont dans `db/data/`,
 ignoré par Git. Voir le [guide PostgreSQL](docs/BASE-DE-DONNEES.md).
 
-Le Compose actuel démarre `dev` et `db`, puis attend le lancement manuel des
-serveurs. Le démarrage complet avec `docker compose up` seul reste à préparer
-pour la tranche verticale m2.
+Le Compose démarre automatiquement la démonstration avec `docker compose up`.
+Le dev container conserve le lancement manuel pour le travail de développement.
 
 ## Travail avec la Data
 
