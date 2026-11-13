@@ -215,6 +215,16 @@ class Piste(BaseModel):
     image: None = Field(default=None, description="Toujours null en V2 : visuel par défaut côté front.")
 
 
+class QuestionAffiner(BaseModel):
+    id: str = Field(examples=["gout"], description="« gout » ou « intensite ».")
+    question: str = Field(examples=["Quel goût de fraise imaginez-vous ?"])
+    choix: list[str] = Field(description="Choix a afficher en boutons ; le dernier est toujours "
+                                         "« Je ne sais pas, proposez-moi ». Le choix clique est "
+                                         "envoye tel quel comme message.",
+                             examples=[["fraise des bois", "fraise mûre", "sucrée", "juteuse",
+                                        "Je ne sais pas, proposez-moi"]])
+
+
 class Brief(BaseModel):
     type_produit: str | None
     piste_id: str
@@ -248,6 +258,9 @@ class ReponseConversation(BaseModel):
     intention: Intention = Field(description="Intention du dernier message du client.")
     reponse: str = Field(description="Texte à afficher (paragraphes séparés par \\n).")
     compris: Compris
+    questions: list[QuestionAffiner] = Field(
+        default=[], description="Ajout V2.3 : questions Affiner quand etape = affiner ; avec "
+                    "guidage, question de type de produit sur une relance ; vide sinon.")
     pistes: list[Piste]
     solutions: list[Reference]
     brief: Brief | None = Field(description="null tant qu'aucune piste n'est choisie.")
@@ -255,7 +268,6 @@ class ReponseConversation(BaseModel):
         description="Brouillon de demande d'échantillons ; rien n'est envoyé.")
     version_modele: str
     attribution: str
-    questions: list[QuestionClarification] = Field(default_factory=list)
 
 
 DESCRIPTIONS_PISTE = {"principal": "L'arôme seul", "association_frequente": "L'association la plus courante",
@@ -314,6 +326,7 @@ def vers_contrat(session_id: str, r: dict) -> ReponseConversation:
     compris = {**r["compris"], "volume": r["projet"].get("volume")}
     return ReponseConversation(
         session_id=session_id, etape=r["etape"], intention=r["intention"], reponse=r["texte"],
+        questions=r["questions"],
         compris=compris, pistes=pistes, solutions=r["solutions"], brief=brief,
         echantillons=echantillons, version_modele=VERSION_V22, attribution=ATTRIBUTION_V22)
 
@@ -346,6 +359,8 @@ def _guider(reponse: ReponseConversation, session: dict, demande: MessageConvers
         return reponse
     if reponse.etape != "pistes" or demande.piste_id:
         return reponse
+    if session["assistant"].projet.get("affiner_fait"):
+        return reponse  # etape Affiner du moteur (V2.3) deja faite : pas de 2e serie de questions
     pending = session.pop("question_profil", None)
     if pending and demande.message.strip() != "Je ne sais pas, proposez-moi" and reponse.intention in ("question", "question_piste", "hors_sujet"):
         reponse.etape = "affiner"

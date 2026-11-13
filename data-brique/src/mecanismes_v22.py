@@ -72,6 +72,72 @@ def _affichages(textes: pd.Series) -> dict[str, str]:
     return {cle: c.most_common(1)[0][0] for cle, c in compte.items()}
 
 
+# --- synonymes par la forme ---------------------------------------------------------------------
+# Le motif d'un arome de reference liste deja ses noms (« citrons? verts?|\blimes?\b|combava ») :
+# un terme forme d'un de ces noms + une terminaison de pluriel ou de diminutif en est un synonyme
+# (« lime » + « ette » -> limette = citron vert), mais pas un autre mot qui commence pareil
+# (« citron » + « nelle » : citronnelle n'est pas du citron). bge-m3 seul ne relie pas ces mots.
+TERMINAISONS_SYNONYMES = ("", "s", "x", "e", "es", "ette", "ettes", "et", "ets")
+
+
+def _noms_du_motif(motif: str) -> list[str]:
+    """Noms litteraux d'un motif : « citrons? verts?|\\blimes?\\b|combava » -> citron, lime, combava."""
+    noms = []
+    for alternative in motif.split("|"):
+        alternative = re.sub(r"[a-z]\?", "", alternative.replace("\\b", ""))  # « limes? » -> « lime »
+        tete = re.match(r"[a-z]+", alternative)
+        if tete and len(tete.group(0)) >= 4:
+            noms.append(tete.group(0))
+    return noms
+
+
+def synonyme_par_forme(terme: str) -> str | None:
+    """Arome de reference dont le terme est une variante de forme (« limette » -> citron vert)."""
+    if " " in terme:
+        return None
+    for nom, motif in AROMES_FLAVORS.items():
+        if normaliser(nom) == terme:
+            return None
+        for racine in _noms_du_motif(motif):
+            fin = terme[len(racine):] if terme.startswith(racine) else None
+            if fin is not None and fin in TERMINAISONS_SYNONYMES:
+                return nom
+            # diminutif qui remplace le « e » final : lim(e) + ette -> limette (seulement « ette »,
+            # pour que « frais » ne devienne pas « fraise »)
+            if racine.endswith("e") and terme.startswith(racine[:-1]) \
+                    and terme[len(racine) - 1:] in ("ette", "ettes"):
+                return nom
+    return None
+
+
+# --- variantes d'un arome (choix de l'etape Affiner) -------------------------------------------
+# mots de format ou d'emballage dans les noms de produits : jamais une variante de gout
+MOTS_DE_FORMAT = set("""
+bidon bouteille bouteilles pet format pot pots brique briques canette canettes sachet sachets pack
+lot lots cl ml sur nappe nappage saveur saveurs gout max select zero light sans bio extra pur pure
+soluble aromatise aromatisee aromatises aromatisees pointe cereales frappe pulpe beurre
+""".split())
+
+
+def variantes_arome(arome: str, noms: pd.Series, est_variante_valide, minimum: int = 3) -> list[str]:
+    """Variantes d'un arome tirees des noms de produits du catalogue : « fraise des bois »,
+    « chocolat noir », « vanille bourbon ». noms : noms de produits normalises.
+    est_variante_valide(mot) : faux pour un autre arome (association), une marque, un mot du moteur."""
+    cle = normaliser(arome)
+    compte = Counter()
+    for nom in noms:
+        for m in re.finditer(rf"\b{re.escape(cle)} ((?:des|de|d) [a-z]{{3,}}|[a-z]{{3,}})", nom):
+            suite = m.group(1)
+            mot = suite.split()[-1]
+            if mot in MOTS_DE_FORMAT or mot in MOTS_VIDES or mot in TECHNIQUES or mot in MOTS_DE_CONTEXTE \
+                    or not est_variante_valide(mot):
+                continue
+            compte[suite] += 1
+    # la variante entiere ne doit pas etre un autre arome (« citron » + « vert » = citron vert)
+    return [f"{arome} {suite}" for suite, n in compte.most_common()
+            if n >= minimum and est_variante_valide(f"{cle} {suite}")]
+
+
 # --- vocabulaire d'aromes ---------------------------------------------------------------------
 CUE = re.compile(r"\b(?:aromes?|gouts?|saveurs?)(?: naturels?| naturelles?| artificiels?)?"
                  r"(?: (?:de|d|du|des|a la|a l|au|aux))? ((?:fleurs?|noix|fruits?|feuilles?|graines?"
@@ -110,6 +176,8 @@ class VocabulaireAromes:
         candidats = sorted(t for t, n in compte.items() if n >= MIN_OCCURRENCES and self._valide(t, est_exclu))
         candidats = [t for t in candidats if not self.extraire(t)]  # deja reconnus par un motif
         alias = self._alias(candidats, embed, cache)
+        alias.update({t: c for t in candidats if t not in alias
+                      for c in [synonyme_par_forme(t)] if c})  # « limette » -> citron vert
         affichage = _affichages(textes_bruts)
         self.alias: dict[str, str] = {}
         self.depuis_catalogue = []

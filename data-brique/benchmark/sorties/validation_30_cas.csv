@@ -1,34 +1,34 @@
-id,categorie,phrase_client,type_attendu,type_obtenu,aromes_attendus,aromes_obtenus,contraintes_attendues,contraintes_obtenues,comportement_attendu,comportement_obtenu,etape,intention,type_ok,arome_principal_ok,aromes_ok,contraintes_ok,comportement_ok,division_ok,sans_marque,marques_citees,sans_chiffre_invente,chiffres_inventes,sans_prix,modele_appele,secondes,reponse,cas_reussi,v1_division,v1_division_ok,v1_arome_top5_ok,v21_secondes,v21_division_ok,v21_arome,v21_arome_principal_ok,v21_comportement,v21_comportement_ok,v22_comparable_ok,v21_sans_marque
-C01,boisson_agrumes,je voudrais créer une boisson pétillante au citron vert pas trop sucrée,boisson pétillante,boisson pétillante,citron vert,citron vert,peu sucré,peu sucré,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.542,"Votre projet : boisson pétillante au citron vert, peu sucrée.
+id,categorie,phrase_client,type_attendu,type_obtenu,aromes_attendus,aromes_obtenus,contraintes_attendues,contraintes_obtenues,comportement_attendu,comportement_obtenu,etape,intention,passe_par_affiner,type_ok,arome_principal_ok,aromes_ok,contraintes_ok,comportement_ok,division_ok,sans_marque,marques_citees,sans_chiffre_invente,chiffres_inventes,sans_prix,modele_appele,secondes,reponse,cas_reussi,v1_division,v1_division_ok,v1_arome_top5_ok,v21_secondes,v21_division_ok,v21_arome,v21_arome_principal_ok,v21_comportement,v21_comportement_ok,v22_comparable_ok,v21_sans_marque
+C01,boisson_agrumes,je voudrais créer une boisson pétillante au citron vert pas trop sucrée,boisson pétillante,boisson pétillante,citron vert,citron vert,peu sucré,peu sucré,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.701,"Votre projet : boisson pétillante au citron vert, peu sucrée.
 J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.
 Voici mes pistes :
-1. Citron vert seul : un goût franc, facile à reconnaître. 37 des 50 produits les plus proches de votre projet l'utilisent.
+1. Citron vert seul : un goût franc, facile à reconnaître. 38 des 50 produits les plus proches de votre projet l'utilisent.
    Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau).
-2. Citron vert + citron : l'association la plus fréquente sur le marché (23 produits sur 37 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.
+2. Citron vert + citron : l'association la plus fréquente sur le marché (24 produits sur 38 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.
    Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau).
 3. Citron vert + concombre : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau). Aucune référence proche pour l'arôme concombre dans la banque : une création sur mesure est possible.
 Pour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).
-Laquelle vous tente ?",True,flavors,True,True,4.329,True,citron vert,True,pistes,True,True,True
-C02,boisson_agrumes,une limonade bio au citron jaune,boisson pétillante,boisson pétillante,citron,citron,bio,bio,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.581,"Votre projet : boisson pétillante au citron, bio.
+Laquelle vous tente ?",True,flavors,True,True,4.227,True,citron vert,True,pistes,True,True,True
+C02,boisson_agrumes,une limonade bio au citron jaune,boisson pétillante,boisson pétillante,citron,citron,bio,bio,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,1.022,"Votre projet : boisson pétillante au citron, citron jaune, bio.
 J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes bio.
 Voici mes pistes :
-1. Citron seul : un goût franc, facile à reconnaître. 36 des 50 produits les plus proches de votre projet l'utilisent.
+1. Citron seul : un goût franc, facile à reconnaître. 34 des 50 produits les plus proches de votre projet l'utilisent.
    Référence : DEMO-002 Citron jaune bio (citron jaune juteux, notes de zeste, acidulé ; soluble eau).
-2. Citron + citron vert : l'association la plus fréquente sur le marché (10 produits sur 36 au citron). Un choix rassurant, que les consommateurs connaissent déjà.
+2. Citron + citron vert : l'association la plus fréquente sur le marché (11 produits sur 34 au citron). Un choix rassurant, que les consommateurs connaissent déjà.
    Références : DEMO-002 Citron jaune bio (citron jaune juteux, notes de zeste, acidulé ; soluble eau) + DEMO-004 Citron vert bio (citron vert juteux, frais, légèrement amer ; soluble eau).
 3. Citron + malt : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-002 Citron jaune bio (citron jaune juteux, notes de zeste, acidulé ; soluble eau). Aucune référence proche pour l'arôme malt dans la banque : une création sur mesure est possible.
-Laquelle vous tente ?",True,indeterminee,False,True,2.634,True,citron,True,pistes,True,True,True
-C03,boisson_agrumes,thé glacé saveur pêche et citron,thé glacé,thé glacé,pêche|citron,pêche|citron,,,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.278,"Votre projet : thé glacé à la pêche.
+Laquelle vous tente ?",True,indeterminee,False,True,2.619,True,citron,True,pistes,True,True,True
+C03,boisson_agrumes,thé glacé saveur pêche et citron,thé glacé,thé glacé,pêche|citron,pêche|citron,,,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.294,"Votre projet : thé glacé à la pêche.
 J'ai étudié les 50 thés glacés du marché les plus proches de votre projet.
 Voici mes pistes :
 1. Pêche seule : un goût franc, facile à reconnaître. 50 des 50 produits les plus proches de votre projet l'utilisent.
    Référence : DEMO-018 Thé noir pêche (thé noir infusé, pêche juteuse ; soluble eau).
 2. Pêche + thé : l'association la plus fréquente sur le marché (49 produits sur 50 à la pêche). Un choix rassurant, que les consommateurs connaissent déjà.
    Référence : DEMO-018 Thé noir pêche (thé noir infusé, pêche juteuse ; soluble eau).
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,2.72,True,pêche,True,pistes,True,True,True
-C04,boisson_agrumes,un sirop au pamplemousse rose,sirop,sirop,pamplemousse,pamplemousse|rose,,,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.477,"Votre projet : sirop au pamplemousse.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,2.749,True,pêche,True,pistes,True,True,True
+C04,boisson_agrumes,un sirop au pamplemousse rose,sirop,sirop,pamplemousse,pamplemousse|rose,,,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.493,"Votre projet : sirop au pamplemousse.
 J'ai étudié les 50 sirops du marché les plus proches de votre projet.
 Voici mes pistes :
 1. Pamplemousse seul : un goût franc, facile à reconnaître. 46 des 50 produits les plus proches de votre projet l'utilisent.
@@ -37,8 +37,8 @@ Voici mes pistes :
    Référence : DEMO-008 Pamplemousse (pamplemousse frais, amertume légère, zeste ; soluble eau). Aucune référence proche pour l'arôme rose dans la banque : une création sur mesure est possible.
 3. Pamplemousse + framboise : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Références : DEMO-008 Pamplemousse (pamplemousse frais, amertume légère, zeste ; soluble eau) + DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.776,True,pamplemousse,True,pistes,True,True,True
-C05,boisson_agrumes,une eau aromatisée à l'orange sans sucre ajouté,boisson,boisson pétillante,orange,orange,peu sucré,peu sucré,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,,True,,True,True,4.616,"Votre projet : boisson pétillante à l'orange, peu sucrée.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.777,True,pamplemousse,True,pistes,True,True,True
+C05,boisson_agrumes,une eau aromatisée à l'orange sans sucre ajouté,boisson,boisson pétillante,orange,orange,peu sucré,peu sucré,pistes,pistes,pistes,nouvelle_demande,False,False,True,True,True,True,True,True,,True,,True,True,4.793,"Votre projet : boisson pétillante à l'orange, peu sucrée.
 J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes peu sucrées.
 Voici mes pistes :
 1. Orange seul : un goût franc, facile à reconnaître. 20 des 50 produits les plus proches de votre projet l'utilisent.
@@ -48,8 +48,13 @@ Voici mes pistes :
 3. Orange + figue : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-006 Orange douce (orange mûre, juteuse, sucrée ; soluble eau). Aucune référence proche pour l'arôme figue dans la banque : une création sur mesure est possible.
 Pour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).
-Laquelle vous tente ?",False,flavors,True,True,2.326,False,orange,True,pistes,True,True,True
-C06,boisson_agrumes,je cherche un goût yuzu pour une boisson gazeuse,boisson pétillante,boisson pétillante,yuzu,yuzu,,,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.514,"Votre projet : boisson pétillante à l'yuzu.
+Laquelle vous tente ?",False,flavors,True,True,2.299,False,orange,True,pistes,True,True,True
+C06,boisson_agrumes,je cherche un goût yuzu pour une boisson gazeuse,boisson pétillante,boisson pétillante,yuzu,yuzu,,,pistes,pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.136,"Votre projet : boisson pétillante à l'yuzu.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de yuzu imaginez-vous ? yuzu floral, acidulé, notes de mandarine, fruité.
+- Quelle intensité pour le goût yuzu ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : boisson pétillante à l'yuzu.
 J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet.
 Voici mes pistes :
 1. Yuzu seul : un goût franc, facile à reconnaître. 3 des 50 produits les plus proches de votre projet l'utilisent.
@@ -58,8 +63,13 @@ Voici mes pistes :
    Références : DEMO-010 Yuzu (yuzu floral, acidulé, notes de mandarine ; soluble eau) + DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau).
 3. Yuzu + concombre : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-010 Yuzu (yuzu floral, acidulé, notes de mandarine ; soluble eau). Aucune référence proche pour l'arôme concombre dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.916,True,yuzu,True,pistes,True,True,True
-C07,boisson_agrumes,boisson végétale vegan goût orange,boisson végétale,boisson végétale,orange,orange,végétal,végétal,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.505,"Votre projet : boisson végétale à l'orange, végétale.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.615,True,yuzu,True,pistes,True,True,True
+C07,boisson_agrumes,boisson végétale vegan goût orange,boisson végétale,boisson végétale,orange,orange,végétal,végétal,pistes,pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.096,"Votre projet : boisson végétale à l'orange, végétale.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de orange imaginez-vous ? orange mûre, juteuse, sucrée, fruité.
+- Quelle intensité pour le goût orange ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : boisson végétale à l'orange, végétale.
 J'ai étudié les 50 boissons végétales du marché les plus proches de votre projet, toutes végétales.
 Voici mes pistes :
 1. Orange seul : un goût franc, facile à reconnaître. 3 des 50 produits les plus proches de votre projet l'utilisent.
@@ -68,8 +78,8 @@ Voici mes pistes :
    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau).
 3. Orange + agrumes : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau).
-Laquelle vous tente ?",True,flavors,True,False,3.017,True,orange,True,pistes,True,True,True
-C08,boisson_agrumes,un thé glacé bio peu sucré au citron,thé glacé,thé glacé,citron,citron,bio|peu sucré,bio|peu sucré,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.542,"Votre projet : thé glacé au citron, peu sucré et bio.
+Laquelle vous tente ?",True,flavors,True,False,3.011,True,orange,True,pistes,True,True,True
+C08,boisson_agrumes,un thé glacé bio peu sucré au citron,thé glacé,thé glacé,citron,citron,bio|peu sucré,bio|peu sucré,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.56,"Votre projet : thé glacé au citron, peu sucré et bio.
 J'ai étudié les 50 thés glacés du marché les plus proches de votre projet, tous peu sucrés.
 Je n'ai pas pu filtrer l'étude sur « bio » : seulement 7 produits du marché la respectent. Je reste sur les thés glacés et je garde cette contrainte dans votre brief.
 Voici mes pistes :
@@ -80,8 +90,8 @@ Voici mes pistes :
 3. Citron + cassis : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-002 Citron jaune bio (citron jaune juteux, notes de zeste, acidulé ; soluble eau). Pas de version bio de l'arôme cassis dans la banque : DEMO-023 Fruits rouges existe sans ce label.
 Pour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).
-Laquelle vous tente ?",True,flavors,True,False,3.389,True,citron,True,pistes,True,True,True
-C09,boisson_agrumes,soda au citron et au gingembre,boisson pétillante,boisson pétillante,citron|gingembre,citron|gingembre,,,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.482,"Votre projet : boisson pétillante au citron.
+Laquelle vous tente ?",True,flavors,True,False,3.28,True,citron,True,pistes,True,True,True
+C09,boisson_agrumes,soda au citron et au gingembre,boisson pétillante,boisson pétillante,citron|gingembre,citron|gingembre,,,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.427,"Votre projet : boisson pétillante au citron.
 J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet.
 Voici mes pistes :
 1. Citron seul : un goût franc, facile à reconnaître. 31 des 50 produits les plus proches de votre projet l'utilisent.
@@ -90,8 +100,13 @@ Voici mes pistes :
    Références : DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau) + DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau).
 3. Citron + cola : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau). Aucune référence proche pour l'arôme cola dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.746,True,citron,True,pistes,True,True,True
-C10,boisson_agrumes,sirop de mandarine pour cocktails sans alcool,sirop,sirop,mandarine,mandarine,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.462,"Votre projet : sirop à la mandarine.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.679,True,citron,True,pistes,True,True,True
+C10,boisson_agrumes,sirop de mandarine pour cocktails sans alcool,sirop,sirop,mandarine,mandarine,,,pistes,creation_sur_mesure|pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.038,"Votre projet : sirop à la mandarine.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de mandarine imaginez-vous ? fruité, gourmand, acidulé, frais.
+- Quelle intensité pour le goût mandarine ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : sirop à la mandarine.
 J'ai étudié les 50 sirops du marché les plus proches de votre projet.
 Voici mes pistes :
 1. Mandarine seule : un goût franc, facile à reconnaître. 13 des 50 produits les plus proches de votre projet l'utilisent.
@@ -100,8 +115,13 @@ Voici mes pistes :
    Référence : DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau). Aucune référence proche pour l'arôme mandarine dans la banque : une création sur mesure est possible.
 3. Mandarine + quassia : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Aucune référence proche pour les arômes mandarine et quassia dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,2.522,True,mandarine,True,pistes,True,True,True
-C11,boisson_agrumes,"une boisson aux agrumes pour enfants, pas trop acide",boisson,boisson,agrumes,agrumes,,pour enfants,pistes,pistes,pistes,nouvelle_demande,True,True,True,False,True,True,True,,True,,True,False,0.495,"Votre projet : boisson aux agrumes, pour enfants.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,2.453,True,mandarine,True,pistes,True,True,True
+C11,boisson_agrumes,"une boisson aux agrumes pour enfants, pas trop acide",boisson,boisson,agrumes,agrumes,,pour enfants,pistes,pistes,affiner,nouvelle_demande,True,True,True,True,False,True,True,True,,True,,True,False,1.134,"Votre projet : boisson aux agrumes, pour enfants.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de agrumes imaginez-vous ? citron, orange et pamplemousse, frais et équilibré, fruité.
+- Quelle intensité pour le goût agrumes ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : boisson aux agrumes, pour enfants.
 J'ai étudié les 50 boissons du marché les plus proches de votre projet.
 Je n'ai pas pu filtrer l'étude sur « pour enfants » : les données du marché ne le précisent pas. Je reste sur les boissons et je garde cette contrainte dans votre brief.
 Voici mes pistes :
@@ -111,19 +131,24 @@ Voici mes pistes :
    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau).
 3. Agrumes + cerise : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau). Aucune référence proche pour l'arôme cerise dans la banque : une création sur mesure est possible.
-Laquelle vous tente ?",False,flavors,True,False,3.036,True,,False,relance,False,True,True
-C12,boisson_agrumes,je veux une boisson,boisson,boisson,,,,,relance,relance,relance,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.066,"J'ai bien noté votre projet : boisson. Parmi les 50 boissons du marché les plus proches, les arômes les plus courants sont : orange (13 produits), cola (11 produits) et citron (8 produits). Quel type de boisson : plutôt pétillante, thé glacé, sirop, lactée ou végétale ? Quel goût recherchez-vous ?",True,flavors,True,,3.179,True,,True,relance,True,True,True
-C13,boisson_agrumes,boisson pétillante citron vert et menthe façon mojito,boisson pétillante,boisson pétillante,citron vert|menthe,citron vert|menthe|mojito,,,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.501,"Votre projet : boisson pétillante au citron vert.
+Laquelle vous tente ?",False,flavors,True,False,3.021,True,,False,relance,False,True,True
+C12,boisson_agrumes,je veux une boisson,boisson,boisson,,,,,relance,relance,relance,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.068,"J'ai bien noté votre projet : boisson. Parmi les 50 boissons du marché les plus proches, les arômes les plus courants sont : orange (13 produits), cola (11 produits) et citron (8 produits). Quel type de boisson : plutôt pétillante, thé glacé, sirop, lactée ou végétale ? Quel goût recherchez-vous ?",True,flavors,True,,2.88,True,,True,relance,True,True,True
+C13,boisson_agrumes,boisson pétillante citron vert et menthe façon mojito,boisson pétillante,boisson pétillante,citron vert|menthe,citron vert|menthe|mojito,,,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.462,"Votre projet : boisson pétillante au citron vert.
 J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet.
 Voici mes pistes :
 1. Citron vert seul : un goût franc, facile à reconnaître. 32 des 50 produits les plus proches de votre projet l'utilisent.
    Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau).
 2. Citron vert + citron : l'association la plus fréquente sur le marché (22 produits sur 32 au citron vert). Un choix rassurant, que les consommateurs connaissent déjà.
    Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-001 Citron jaune zesté (citron frais, zeste, légèrement acidulé ; soluble eau).
-3. Citron vert + limette : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
-   Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau). Aucune référence proche pour l'arôme limette dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,4.301,True,citron vert,True,pistes,True,True,True
-C14,boisson_agrumes,une boisson à la bergamote halal,boisson,boisson,bergamote,bergamote,halal,halal,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.456,"Votre projet : boisson à la bergamote, halal.
+3. Citron vert + framboise : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
+   Références : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau) + DEMO-023 Fruits rouges (fraise, framboise et cassis, fruité, légèrement acidulé ; soluble eau).
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,4.599,True,citron vert,True,pistes,True,True,True
+C14,boisson_agrumes,une boisson à la bergamote halal,boisson,boisson,bergamote,bergamote,halal,halal,pistes,pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.036,"Votre projet : boisson à la bergamote, halal.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de bergamote imaginez-vous ? bergamote fleurie, zeste, légèrement poivrée, fruité.
+- Quelle intensité pour le goût bergamote ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : boisson à la bergamote, halal.
 J'ai étudié les 10 boissons du marché les plus proches de votre projet, toutes halal.
 Voici mes pistes :
 1. Bergamote seule : un goût franc, facile à reconnaître. Aucun des 10 produits les plus proches de votre projet ne l'utilise : c'est une place encore libre sur ce marché.
@@ -132,8 +157,13 @@ Voici mes pistes :
    Pas de version halal de l'arôme bergamote dans la banque : DEMO-011 Bergamote existe sans ce label. Aucune référence proche pour l'arôme aloe vera dans la banque : une création sur mesure est possible.
 3. Bergamote + citron vert : un goût rare dans les produits proches (1 produit) et jamais associé à la bergamote : une piste originale, à tester.
    Référence : DEMO-003 Citron vert frais (citron vert vif, zeste, acidulé, notes vertes ; soluble eau). Pas de version halal de l'arôme bergamote dans la banque : DEMO-011 Bergamote existe sans ce label.
-Laquelle vous tente ?",True,flavors,True,False,2.632,True,bergamote,True,pistes,True,True,True
-C15,boisson_agrumes,jus pétillant orange sanguine bio et vegan,boisson pétillante,boisson pétillante,orange,orange,bio|végétal,bio|végétal,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.538,"Votre projet : boisson pétillante à l'orange, végétale et bio.
+Laquelle vous tente ?",True,flavors,True,False,2.635,True,bergamote,True,pistes,True,True,True
+C15,boisson_agrumes,jus pétillant orange sanguine bio et vegan,boisson pétillante,boisson pétillante,orange,orange,bio|végétal,bio|végétal,pistes,pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.164,"Votre projet : boisson pétillante à l'orange, végétale et bio.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de orange imaginez-vous ? orange pressée, zeste, douce, fruité.
+- Quelle intensité pour le goût orange ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : boisson pétillante à l'orange, végétale et bio.
 J'ai étudié les 50 boissons pétillantes du marché les plus proches de votre projet, toutes végétales et bio.
 Voici mes pistes :
 1. Orange seul : un goût franc, facile à reconnaître. 14 des 50 produits les plus proches de votre projet l'utilisent.
@@ -142,8 +172,13 @@ Voici mes pistes :
    Référence : DEMO-013 Agrumes mélangés bio (citron et orange, frais, zesté ; soluble eau).
 3. Orange + caramel : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-007 Orange bio (orange pressée, zeste, douce ; soluble eau). Aucune référence proche pour l'arôme caramel dans la banque : une création sur mesure est possible.
-Laquelle vous tente ?",True,indeterminee,False,True,3.264,True,orange,True,pistes,True,True,True
-C16,autre_produit,une crème dessert végétale à la vanille,crème dessert,crème dessert,vanille,vanille,végétal,végétal,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.54,"Votre projet : crème dessert à la vanille, végétale.
+Laquelle vous tente ?",True,indeterminee,False,True,3.257,True,orange,True,pistes,True,True,True
+C16,autre_produit,une crème dessert végétale à la vanille,crème dessert,crème dessert,vanille,vanille,végétal,végétal,pistes,pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.211,"Votre projet : crème dessert à la vanille, végétale.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de vanille imaginez-vous ? vanille de madagascar, vanille bourbon, vanille douce, gourmande.
+- Quelle intensité pour le goût vanille ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : crème dessert à la vanille, végétale.
 J'ai étudié les 50 crèmes dessert du marché les plus proches de votre projet, toutes végétales.
 Voici mes pistes :
 1. Vanille seule : un goût franc, facile à reconnaître. 38 des 50 produits les plus proches de votre projet l'utilisent.
@@ -152,8 +187,13 @@ Voici mes pistes :
    Références : DEMO-015 Vanille bio (vanille douce, gourmande ; poudre) + DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau).
 3. Vanille + banane : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-015 Vanille bio (vanille douce, gourmande ; poudre). Aucune référence proche pour l'arôme banane dans la banque : une création sur mesure est possible.
-Laquelle vous tente ?",True,flavors,True,True,2.509,True,vanille,True,pistes,True,True,True
-C17,autre_produit,glace au caramel beurre salé,glace,glace,caramel,caramel,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.527,"Votre projet : glace au caramel.
+Laquelle vous tente ?",True,flavors,True,True,2.486,True,vanille,True,pistes,True,True,True
+C17,autre_produit,glace au caramel beurre salé,glace,glace,caramel,caramel,,,pistes,creation_sur_mesure|pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.181,"Votre projet : glace au caramel.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de caramel imaginez-vous ? caramel macchiato, fruité, gourmand, acidulé.
+- Quelle intensité pour le goût caramel ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : glace au caramel.
 J'ai étudié les 45 glaces du marché les plus proches de votre projet.
 Le catalogue ne compte que 45 glaces : l'étude est donc limitée.
 Voici mes pistes :
@@ -163,8 +203,8 @@ Voici mes pistes :
    Référence : DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau). Aucune référence proche pour l'arôme caramel dans la banque : une création sur mesure est possible.
 3. Caramel + praliné : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Aucune référence proche pour les arômes caramel et praliné dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.909,True,caramel,True,pistes,True,True,True
-C18,autre_produit,yaourt à boire fraise banane,yaourt à boire,yaourt à boire,fraise|banane,banane|fraise,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.48,"Votre projet : yaourt à boire à la banane.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,True,2.824,True,caramel,True,pistes,True,True,True
+C18,autre_produit,yaourt à boire fraise banane,yaourt à boire,yaourt à boire,fraise|banane,banane|fraise,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.469,"Votre projet : yaourt à boire à la banane.
 J'ai étudié les 50 yaourts à boire du marché les plus proches de votre projet.
 Voici mes pistes :
 1. Banane seule : un goût franc, facile à reconnaître. 10 des 50 produits les plus proches de votre projet l'utilisent.
@@ -173,8 +213,13 @@ Voici mes pistes :
    Référence : DEMO-024 Fraise mûre (fraise mûre, sucrée, juteuse ; soluble eau). Aucune référence proche pour l'arôme banane dans la banque : une création sur mesure est possible.
 3. Banane + abricot : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Aucune référence proche pour les arômes banane et abricot dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,2.773,True,fraise,True,pistes,True,True,True
-C19,autre_produit,un yaourt bio à la framboise,yaourt,yaourt,framboise,framboise,bio,bio,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.601,"Votre projet : yaourt à la framboise, bio.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,flavors,True,False,2.745,True,fraise,True,pistes,True,True,True
+C19,autre_produit,un yaourt bio à la framboise,yaourt,yaourt,framboise,framboise,bio,bio,pistes,pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,False,1.211,"Votre projet : yaourt à la framboise, bio.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de framboise imaginez-vous ? fraise, framboise et cassis, fruité, gourmand.
+- Quelle intensité pour le goût framboise ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : yaourt à la framboise, bio.
 J'ai étudié les 50 yaourts du marché les plus proches de votre projet, tous bio.
 Voici mes pistes :
 1. Framboise seule : un goût franc, facile à reconnaître. 7 des 50 produits les plus proches de votre projet l'utilisent.
@@ -183,8 +228,8 @@ Voici mes pistes :
    Pas de version bio de l'arôme framboise dans la banque : DEMO-023 Fruits rouges existe sans ce label. Pas de version bio de l'arôme fraise dans la banque : DEMO-024 Fraise mûre existe sans ce label.
 3. Framboise + fruits rouges : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Pas de version bio de l'arôme framboise dans la banque : DEMO-023 Fruits rouges existe sans ce label. Pas de version bio de l'arôme fruits rouges dans la banque : DEMO-023 Fruits rouges existe sans ce label.
-Laquelle vous tente ?",True,flavors,True,True,2.717,True,framboise,True,pistes,True,True,True
-C20,autre_produit,boisson lactée au chocolat peu sucrée,boisson lactée,boisson lactée,chocolat,chocolat,peu sucré,peu sucré,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.5,"Votre projet : boisson lactée au chocolat, peu sucrée.
+Laquelle vous tente ?",True,flavors,True,True,2.716,True,framboise,True,pistes,True,True,True
+C20,autre_produit,boisson lactée au chocolat peu sucrée,boisson lactée,boisson lactée,chocolat,chocolat,peu sucré,peu sucré,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.521,"Votre projet : boisson lactée au chocolat, peu sucrée.
 J'ai étudié les 50 boissons lactées du marché les plus proches de votre projet, toutes peu sucrées.
 Voici mes pistes :
 1. Chocolat seul : un goût franc, facile à reconnaître. 11 des 50 produits les plus proches de votre projet l'utilisent.
@@ -194,8 +239,8 @@ Voici mes pistes :
 3. Chocolat + cannelle : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-020 Chocolat noir (cacao intense, notes torréfiées ; poudre). Aucune référence proche pour l'arôme cannelle dans la banque : une création sur mesure est possible.
 Pour votre contrainte de recette : DEMO-028 Sweetness (renforce la perception sucrée pour réduire le sucre ajouté ; soluble eau).
-Laquelle vous tente ?",True,flavors,True,True,3.226,True,chocolat,True,pistes,True,True,True
-C21,autre_produit,chips goût barbecue,snack salé,chips,barbecue,barbecue,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,,True,,True,True,4.594,"Votre projet : chips au barbecue.
+Laquelle vous tente ?",True,flavors,True,True,3.135,True,chocolat,True,pistes,True,True,True
+C21,autre_produit,chips goût barbecue,snack salé,chips,barbecue,barbecue,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,False,False,True,True,True,True,True,True,,True,,True,True,4.501,"Votre projet : chips au barbecue.
 J'ai étudié les 50 produits du marché les plus proches de votre projet.
 Notre catalogue ne contient pas de produits de ce type (« chips ») : j'ai étudié les produits les plus proches, le marché étudié est donc limité.
 Voici mes pistes :
@@ -205,8 +250,13 @@ Voici mes pistes :
    Référence : DEMO-018 Thé noir pêche (thé noir infusé, pêche juteuse ; soluble eau). Aucune référence proche pour l'arôme barbecue dans la banque : une création sur mesure est possible.
 3. Barbecue + café : un goût rare dans les produits proches (1 produit) et jamais associé au barbecue : une piste originale, à tester.
    Référence : DEMO-016 Café torréfié (café torréfié, notes grillées, légère amertume ; soluble eau). Aucune référence proche pour l'arôme barbecue dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",False,flavors,True,False,2.595,True,barbecue,True,pistes,True,True,True
-C22,autre_produit,une glace au durian,glace,glace,durian,durian,,,creation_sur_mesure,creation_sur_mesure|pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,True,5.038,"Votre projet : glace au durian.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",False,flavors,True,False,2.363,True,barbecue,True,pistes,True,True,True
+C22,autre_produit,une glace au durian,glace,glace,durian,durian,,,creation_sur_mesure,creation_sur_mesure|pistes,affiner,nouvelle_demande,True,True,True,True,True,True,True,True,,True,,True,True,16.067,"Votre projet : glace au durian.
+Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+- Quel goût de durian imaginez-vous ? fruité, gourmand, acidulé, frais.
+- Quelle intensité pour le goût durian ? intensité discrète, intensité présente, intensité marquée.
+Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+[après « Je ne sais pas, proposez-moi »] Votre projet : glace au durian.
 J'ai étudié les 45 glaces du marché les plus proches de votre projet.
 Le catalogue ne compte que 45 glaces : l'étude est donc limitée.
 Voici mes pistes :
@@ -216,8 +266,8 @@ Voici mes pistes :
    Référence : DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau). Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.
 3. Durian + agrumes : un goût rare dans les produits proches (1 produit) et jamais associé au durian : une piste originale, à tester.
    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau). Aucune référence proche pour l'arôme durian dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,indeterminee,False,False,3.033,True,durian,True,pistes,,,True
-C23,autre_produit,dessert à la noix de coco et mangue vegan,dessert,dessert,coco|mangue,coco|mangue,végétal,végétal,pistes,pistes,pistes,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.499,"Votre projet : dessert au coco, végétal.
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",True,indeterminee,False,False,3.731,True,durian,True,pistes,,,True
+C23,autre_produit,dessert à la noix de coco et mangue vegan,dessert,dessert,coco|mangue,coco|mangue,végétal,végétal,pistes,pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.883,"Votre projet : dessert au coco, végétal.
 J'ai étudié les 50 desserts du marché les plus proches de votre projet, tous végétaux.
 Voici mes pistes :
 1. Coco seul : un goût franc, facile à reconnaître. 47 des 50 produits les plus proches de votre projet l'utilisent.
@@ -226,8 +276,8 @@ Voici mes pistes :
    Références : DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau) + DEMO-015 Vanille bio (vanille douce, gourmande ; poudre).
 3. Coco + banane : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Référence : DEMO-026 Noix de coco (coco lactée, douce, exotique ; soluble eau). Aucune référence proche pour l'arôme banane dans la banque : une création sur mesure est possible.
-Laquelle vous tente ?",True,flavors,True,True,2.957,True,coco,True,pistes,True,True,True
-C24,autre_produit,"je fais des biscuits, je veux un goût noisette",biscuit,biscuits,noisette,noisette,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,False,True,True,True,True,True,True,,True,,True,True,4.577,"Votre projet : biscuits à la noisette.
+Laquelle vous tente ?",True,flavors,True,True,3.537,True,coco,True,pistes,True,True,True
+C24,autre_produit,"je fais des biscuits, je veux un goût noisette",biscuit,biscuits,noisette,noisette,,,pistes,creation_sur_mesure|pistes,pistes,nouvelle_demande,False,False,True,True,True,True,True,True,,True,,True,True,6.544,"Votre projet : biscuits à la noisette.
 J'ai étudié les 50 produits du marché les plus proches de votre projet.
 Notre catalogue ne contient pas de produits de ce type (« biscuits ») : j'ai étudié les produits les plus proches, le marché étudié est donc limité.
 Voici mes pistes :
@@ -237,10 +287,10 @@ Voici mes pistes :
    Référence : DEMO-020 Chocolat noir (cacao intense, notes torréfiées ; poudre). Aucune référence proche pour l'arôme noisette dans la banque : une création sur mesure est possible.
 3. Noisette + abricot : une association rare sur le marché (1 produit), qui peut vous démarquer tout en restant crédible.
    Aucune référence proche pour les arômes noisette et abricot dans la banque : une création sur mesure est possible.
-Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",False,flavors,True,True,2.838,True,noisette,True,pistes,True,True,True
-C25,autre_produit,un dessert,dessert,dessert,,,,,relance,relance,relance,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.082,"J'ai bien noté votre projet : dessert. Parmi les 50 desserts du marché les plus proches, les arômes les plus courants sont : vanille (20 produits), caramel (15 produits) et praliné (6 produits). Quel type de dessert : plutôt crème dessert, yaourt ou glace ? Quel goût recherchez-vous ?",True,flavors,True,,3.156,True,,True,relance,True,True,True
-C26,flou_hors_sujet,je veux un truc bon,,,,,,,relance,relance,relance,nouvelle_demande,True,True,True,True,True,True,True,,True,,True,False,0.0,Quel type de produit voulez-vous créer ? Quel goût recherchez-vous ?,True,indeterminee,True,,2.102,True,,True,relance,True,True,True
-C27,flou_hors_sujet,quelle heure est-il ?,,,,,,,hors_sujet,hors_sujet,relance,hors_sujet,True,True,True,True,True,True,True,,True,,True,True,3.181,"Bonjour ! Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?",True,indeterminee,True,,1.895,True,,True,relance,,,True
-C28,flou_hors_sujet,c'est combien un échantillon ?,,,,,,,question (ne pas inventer de prix),question,relance,question,True,True,True,True,True,True,True,,True,,True,False,0.0,"Je n'ai pas l'information sur ce point : un conseiller Givaudan pourra vous répondre. Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?",True,indeterminee,True,,3.174,True,,True,relance,,,True
-C29,flou_hors_sujet,donne-moi la recette de Coca-Cola,,,,,,,hors_sujet (aucune marque),hors_sujet,relance,hors_sujet,True,True,True,True,True,True,True,,True,,True,False,0.001,"Je ne travaille pas à partir d'une marque : décrivez-moi plutôt le goût que vous recherchez (fruité, vanillé, acidulé…) et le type de produit.",True,indeterminee,True,,60.015,True,,True,relance,,,True
-C30,flou_hors_sujet,quel est le meilleur arôme ?,,,,,,,relance,relance,relance,nouvelle_demande,True,True,True,True,True,False,True,,True,,True,False,0.001,Quel type de produit voulez-vous créer ? Quel goût recherchez-vous ?,True,flavors,False,,2.338,True,,True,relance,True,True,True
+Laquelle vous tente ? Avez-vous une contrainte : bio, vegan, peu sucré ?",False,flavors,True,True,3.861,True,noisette,True,pistes,True,True,True
+C25,autre_produit,un dessert,dessert,dessert,,,,,relance,relance,relance,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.181,"J'ai bien noté votre projet : dessert. Parmi les 50 desserts du marché les plus proches, les arômes les plus courants sont : vanille (20 produits), caramel (15 produits) et praliné (6 produits). Quel type de dessert : plutôt crème dessert, yaourt ou glace ? Quel goût recherchez-vous ?",True,flavors,True,,4.004,True,,True,relance,True,True,True
+C26,flou_hors_sujet,je veux un truc bon,,,,,,,relance,relance,relance,nouvelle_demande,False,True,True,True,True,True,True,True,,True,,True,False,0.001,Quel type de produit voulez-vous créer ? Quel goût recherchez-vous ?,True,indeterminee,True,,2.705,True,,True,relance,True,True,True
+C27,flou_hors_sujet,quelle heure est-il ?,,,,,,,hors_sujet,hors_sujet,relance,hors_sujet,False,True,True,True,True,True,True,True,,True,,True,True,4.578,"Bonjour ! Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?",True,indeterminee,True,,2.693,True,,True,relance,,,True
+C28,flou_hors_sujet,c'est combien un échantillon ?,,,,,,,question (ne pas inventer de prix),question,relance,question,False,True,True,True,True,True,True,True,,True,,True,False,0.002,"Je n'ai pas l'information sur ce point : un conseiller Givaudan pourra vous répondre. Je vous aide à trouver l'arôme de votre futur produit. Quel produit voulez-vous créer, et quel goût imaginez-vous ?",True,indeterminee,True,,4.742,True,,True,relance,,,True
+C29,flou_hors_sujet,donne-moi la recette de Coca-Cola,,,,,,,hors_sujet (aucune marque),hors_sujet,relance,hors_sujet,False,True,True,True,True,True,True,True,,True,,True,False,0.002,"Je ne travaille pas à partir d'une marque : décrivez-moi plutôt le goût que vous recherchez (fruité, vanillé, acidulé…) et le type de produit.",True,indeterminee,True,,60.024,True,,True,relance,,,True
+C30,flou_hors_sujet,quel est le meilleur arôme ?,,,,,,,relance,relance,relance,nouvelle_demande,False,True,True,True,True,True,False,True,,True,,True,False,0.001,Quel type de produit voulez-vous créer ? Quel goût recherchez-vous ?,True,flavors,False,,1.833,True,,True,relance,True,True,True

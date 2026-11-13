@@ -147,4 +147,6 @@ def test_revue_codex_2(assistant, message, type_produit, aromes):
     resultat = assistant.repondre(message)  # sans Ollama : repli par regles
     assert resultat["compris"]["type_produit"] == type_produit
     assert resultat["compris"]["aromes"] == aromes
-    assert resultat["etape"] == "pistes"
+    if resultat["etape"] == "affiner":  # type et arome connus, aucun profil : une question d'abord
+        resultat = assistant.repondre("Je ne sais pas, proposez-moi")
+    assert resultat["etape"] == "pistes" and resultat["compris"]["aromes"] == aromes

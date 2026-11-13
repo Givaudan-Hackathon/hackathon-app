@@ -1,25 +1,25 @@
-# Validation sur les 30 cas de référence (V2.2, `v2.2.4-revue`)
+# Validation sur les 30 cas de référence (V2.2, `v2.3.0-affiner`)
 
 Mesure du 2026-11-12. Les cas (`benchmark/cas_reference_30.csv`) ont été écrits avant le test et n'ont pas été modifiés. Le résultat **avant correction** (V2.2.2, 18/30) est conservé dans `benchmark/sorties/validation_30_cas_avant.csv`.
 
 ## Avant / après les corrections par mécanismes
 
-| Critère                       | Avant (V2.2.2) | Après (v2.2.4-revue) |
-| ----------------------------- | -------------- | -------------------- |
-| Type de produit               | 27/30 (90%)    | 27/30 (90%)          |
-| Arôme(s), tous trouvés        | 25/30 (83%)    | 30/30 (100%)         |
-| Arôme principal               | 23/30 (77%)    | 30/30 (100%)         |
-| Contraintes                   | 29/30 (97%)    | 29/30 (97%)          |
-| Comportement                  | 21/30 (70%)    | 30/30 (100%)         |
-| Aucune marque                 | 30/30 (100%)   | 30/30 (100%)         |
-| Aucun chiffre inventé         | 30/30 (100%)   | 30/30 (100%)         |
-| Aucun prix inventé            | 30/30 (100%)   | 30/30 (100%)         |
-| **Cas entièrement réussi**    | 18/30 (60%)    | 26/30 (87%)          |
-| Cas réussis — boisson_agrumes | 11/15 (73%)    | 13/15 (87%)          |
-| Cas réussis — autre_produit   | 7/10 (70%)     | 8/10 (80%)           |
-| Cas réussis — flou_hors_sujet | 0/5 (0%)       | 5/5 (100%)           |
-| Temps moyen par cas           | 0.80 s         | 1.06 s               |
-| Temps médian par cas          | 0.60 s         | 0.50 s               |
+| Critère                       | Avant (V2.2.2) | Après (v2.3.0-affiner) |
+| ----------------------------- | -------------- | ---------------------- |
+| Type de produit               | 27/30 (90%)    | 27/30 (90%)            |
+| Arôme(s), tous trouvés        | 25/30 (83%)    | 30/30 (100%)           |
+| Arôme principal               | 23/30 (77%)    | 30/30 (100%)           |
+| Contraintes                   | 29/30 (97%)    | 29/30 (97%)            |
+| Comportement                  | 21/30 (70%)    | 30/30 (100%)           |
+| Aucune marque                 | 30/30 (100%)   | 30/30 (100%)           |
+| Aucun chiffre inventé         | 30/30 (100%)   | 30/30 (100%)           |
+| Aucun prix inventé            | 30/30 (100%)   | 30/30 (100%)           |
+| **Cas entièrement réussi**    | 18/30 (60%)    | 26/30 (87%)            |
+| Cas réussis — boisson_agrumes | 11/15 (73%)    | 13/15 (87%)            |
+| Cas réussis — autre_produit   | 7/10 (70%)     | 8/10 (80%)             |
+| Cas réussis — flou_hors_sujet | 0/5 (0%)       | 5/5 (100%)             |
+| Temps moyen par cas           | 0.80 s         | 1.76 s                 |
+| Temps médian par cas          | 0.60 s         | 0.95 s                 |
 
 Cas gagnés : C10, C14, C22, C26, C27, C28, C29, C30. Cas perdus : aucun.
 
@@ -34,6 +34,7 @@ Cas gagnés : C10, C14, C22, C26, C27, C28, C29, C30. Cas perdus : aucun.
 - **Aucune marque** : aucune marque du catalogue (mot à mot) dans la réponse, y compris une marque citée par le client (ex. « Coca-Cola », 153 produits au catalogue). Le champ `brands` d'Open Food Facts contient aussi des mots génériques : une « marque » identique au vocabulaire du moteur (arôme, type, contrainte, profil) est ignorée. Formes ignorées présentes au catalogue : « aucun », « bio », « cola », « creme dessert », « delice », « delices », « ensemble », « fruite », « gourmand », « original », « proteines », « santal », « simple », « vanille », « vegetal », « vrai », « yaourt ».
 - **Aucun chiffre inventé** : chaque nombre de la réponse vient des données de l'étude de marché (comptages), d'un numéro de piste ou du message du client. **Aucun prix** : ni « € », ni « euros », ni « prix de ».
 - **Cas réussi** : tous les critères ci-dessus à la fois.
+- **Étape Affiner (V2.3)** : quand le 1er message donne `etape = affiner` (type et arôme connus, aucun profil), la mesure répond « Je ne sais pas, proposez-moi », comme le bouton du front. Le comportement est jugé sur cette 2e réponse. Type, arômes et contraintes sont jugés sur la 1re. Marques, chiffres et prix sont contrôlés dans les deux textes. Les cas n'ont pas été modifiés.
 - **V1** (`MoteurV1`) : division ; l'arôme est jugé sur les 5 produits recommandés (tous les arômes attendus présents dans leurs noms), car V1 n'extrait pas d'arôme.
 - **V2.1** (`MoteurV21.pistes`, catalogue complet) : division, arôme principal, pistes ou relance. V2.1 n'a ni type de produit, ni contraintes, ni intention `hors_sujet` / `question`, ni références : ces critères ne sont pas comparables.
 
@@ -51,18 +52,18 @@ Cas gagnés : C10, C14, C22, C26, C27, C28, C29, C30. Cas perdus : aucun.
 | Aucun prix inventé            | 30/30 (100%) | 15/15 (100%)    | 10/10 (100%)  | 5/5 (100%)      |
 | **Cas entièrement réussi**    | 26/30 (87%)  | 13/15 (87%)     | 8/10 (80%)    | 5/5 (100%)      |
 
-Temps de réponse V2.2 : moyenne 1.06 s, médiane 0.50 s, max 5.04 s ; modèle appelé pour 5 cas sur 30 (moyenne 4.40 s ces fois-là, 0.39 s sinon).
+Temps de réponse V2.2 : moyenne 1.76 s, médiane 0.95 s, max 16.07 s ; modèle appelé pour 5 cas sur 30 (moyenne 7.30 s ces fois-là, 0.65 s sinon).
 
-## Comparaison V1 / V2.1 / V2.2
+## Comparaison V1 / V2.1 / v2.3.0-affiner
 
-| Critère comparable                                     | V1                           | V2.1         | V2.2         |
-| ------------------------------------------------------ | ---------------------------- | ------------ | ------------ |
-| Division (flavors, ou aucune pour les cas flous)       | 26/30 (87%)                  | 29/30 (97%)  | 29/30 (97%)  |
-| Arôme principal                                        | —                            | 29/30 (97%)  | 30/30 (100%) |
-| Arôme(s) attendus dans les 5 produits recommandés (V1) | 13/23 (57%)                  | —            | —            |
-| Pistes ou relance, cas qui l'attendent                 | —                            | 25/26 (96%)  | 26/26 (100%) |
-| Aucune marque citée                                    | (produits du commerce : non) | 30/30 (100%) | 30/30 (100%) |
-| Temps moyen par cas                                    | < 0,1 s                      | 4.80 s       | 1.06 s       |
+| Critère comparable                                     | V1                           | V2.1         | v2.3.0-affiner |
+| ------------------------------------------------------ | ---------------------------- | ------------ | -------------- |
+| Division (flavors, ou aucune pour les cas flous)       | 26/30 (87%)                  | 29/30 (97%)  | 29/30 (97%)    |
+| Arôme principal                                        | —                            | 29/30 (97%)  | 30/30 (100%)   |
+| Arôme(s) attendus dans les 5 produits recommandés (V1) | 13/23 (57%)                  | —            | —              |
+| Pistes ou relance, cas qui l'attendent                 | —                            | 25/26 (96%)  | 26/26 (100%)   |
+| Aucune marque citée                                    | (produits du commerce : non) | 30/30 (100%) | 30/30 (100%)   |
+| Temps moyen par cas                                    | < 0,1 s                      | 4.95 s       | 1.76 s         |
 
 ## Échecs (réponse obtenue)
 
@@ -90,13 +91,19 @@ Temps de réponse V2.2 : moyenne 1.06 s, médiane 0.50 s, max 5.04 s ; modèle a
 
 - Échec : Contraintes (égalité stricte)
 - Attendu : type `boisson`, arômes `agrumes`, contraintes `—`, comportement `pistes`
-- Obtenu : type `boisson`, arômes `agrumes`, contraintes `pour enfants`, comportement `pistes` (etape `pistes`, intention `nouvelle_demande`)
+- Obtenu : type `boisson`, arômes `agrumes`, contraintes `pour enfants`, comportement `pistes` (etape `affiner`, intention `nouvelle_demande`)
 - Réponse :
 
 > Votre projet : boisson aux agrumes, pour enfants.
-> J'ai étudié les 50 boissons du marché les plus proches de votre projet.
-> Je n'ai pas pu filtrer l'étude sur « pour enfants » : les données du marché ne le précisent pas. Je reste sur les boissons et je garde cette contrainte dans votre brief.
-> Voici mes pistes :
+> Avant de vous proposer des arômes, précisez le goût si vous le souhaitez :
+>
+> - Quel goût de agrumes imaginez-vous ? citron, orange et pamplemousse, frais et équilibré, fruité.
+> - Quelle intensité pour le goût agrumes ? intensité discrète, intensité présente, intensité marquée.
+>   Vous pouvez aussi répondre « Je ne sais pas, proposez-moi » : je vous propose les pistes tout de suite.
+>   [après « Je ne sais pas, proposez-moi »] Votre projet : boisson aux agrumes, pour enfants.
+>   J'ai étudié les 50 boissons du marché les plus proches de votre projet.
+>   Je n'ai pas pu filtrer l'étude sur « pour enfants » : les données du marché ne le précisent pas. Je reste sur les boissons et je garde cette contrainte dans votre brief.
+>   Voici mes pistes :
 >
 > 1. Agrumes seuls : un goût franc, facile à reconnaître. 33 des 50 produits les plus proches de votre projet l'utilisent.
 >    Référence : DEMO-012 Agrumes mélangés (citron, orange et pamplemousse, frais et équilibré ; soluble eau).
