@@ -1,7 +1,7 @@
 # ADR 0008 — Construire l’interface produit avec React et Vite
 
 - Date : 10 novembre 2026
-- Statut : Proposée pour revue ; cadrage du prototype précisé le 12 novembre, migration non réalisée
+- Statut : Choix React/Tailwind confirmé par Christopher le 12 novembre ; réalisation du prototype proposée à la revue dans le ticket #20
 - Décideurs : les deux Tech leads, avec le Product pour le parcours
 
 ## Contexte
@@ -22,7 +22,7 @@ au 10 novembre à 18 h ; il exige des livrables cohérents avec le code au tag.
    Il faut migrer la page, ajouter JSX et le contrôle TypeScript, adapter la
    configuration et vérifier le formulaire et les erreurs.
 
-## Décision proposée
+## Décision confirmée pour le prototype
 
 Adopter React pour le front produit dans `web/`, en conservant Vite, TypeScript,
 le port 5173 et le proxy `/api`. La migration fera l’objet d’un changement de code
@@ -35,7 +35,7 @@ Le [cadrage de l’architecture](../ARCHITECTURE-WEB.md), préparé dans le
 précise les fonctionnalités, l’état React, les adaptateurs et le contrat Data.
 L’installation et les écrans relèvent du
 [ticket #20](https://github.com/Givaudan-Hackathon/hackathon-app/issues/20),
-après la revue de cette proposition. Cette séparation ne vaut pas migration.
+après la revue du cadrage. La réalisation reste soumise à la revue de la PR #28.
 
 Pour les styles, deux options ont été examinées : CSS classique par composant,
 qui limite les dépendances mais demande d’organiser manuellement les variantes,
@@ -58,3 +58,19 @@ serveur n’a été validé ; ajouter un autre framework de rendu n’est pas pr
   si des exigences de rendu côté serveur apparaissent.
 
 Source : [React avec un outil de build, dont Vite](https://react.dev/learn/build-a-react-app-from-scratch).
+
+## Précision pour le prototype du 12 novembre
+
+Christopher confirme le passage à la réalisation après le cadrage #19/PR #22.
+React/TypeScript et Tailwind sont installés dans le workspace web. La PR #28
+reprend désormais le socle NestJS fusionné dans develop (PR #27) ; les routes
+existantes restent conservées, sans ajouter de relais conversationnel. Le parcours client consomme un service simulé au
+contrat V2 de la PR Data #18, via une interface indépendante des composants.
+Les vérifications de réalisation et les limites restent dans le ticket #20.
+
+Pour les styles, CSS par composant et Tailwind ont été examinés dans le cadrage.
+Tailwind est retenu selon la demande de Christopher pour les tokens, utilitaires
+et composants partagés. Le coût est une dépendance et une convention de classes
+à maintenir. Les effets du MVP utilisent CSS ; aucune dépendance de moteur 3D,
+de routage ou de store global n’est ajoutée. Zod valide les objets reçus à
+l’exécution et les coordonnées, TypeScript vérifiant leurs usages dans le code.

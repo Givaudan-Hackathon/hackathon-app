@@ -2,76 +2,188 @@ import { Test } from '@nestjs/testing';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { ConversationService } from './conversation.service.js';
 
+const snapshot = () => ({
+  session_id: 'session-test',
+  etape: 'relance',
+  intention: 'precision',
+  reponse: 'Quel produit préparez-vous ?',
+  compris: {
+    division: null,
+    type_produit: null,
+    arome: null,
+    aromes: [],
+    contraintes: [],
+    profil: ['frais'],
+  },
+  pistes: [],
+  solutions: [],
+  brief: null,
+  echantillons: null,
+  version_modele: 'test',
+  attribution: 'Données de démonstration',
+  extra_field: { conserve: true },
+});
+
 describe('ConversationService', () => {
   let service: ConversationService;
-
   beforeEach(async () => {
-    process.env.DATA_API_BASE_URL = 'http://fake-python';
-    const moduleRef = await Test.createTestingModule({
+    vi.stubEnv('DATA_API_BASE_URL', 'http://fake-python/');
+    vi.stubEnv('DATA_API_TIMEOUT_MS', '30000');
+    const module = await Test.createTestingModule({
       providers: [ConversationService],
     }).compile();
-    service = moduleRef.get(ConversationService);
+    service = module.get(ConversationService);
   });
-
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
-
-  it('rejette un message vide sans piste_id', async () => {
-    await expect(
-      service.relayToPython({ message: '  ' }),
-    ).rejects.toMatchObject({
-      status: 400,
-    });
+  it('rejette un message vide sans piste', async () => {
+    await expect(service.relayToPython({ message: ' ' })).rejects.toMatchObject(
+      { status: 400 },
+    );
   });
-
-  it('transmet correctement et préserve la réponse complète', async () => {
-    const mockResponse = {
-      etape: 'pistes',
-      pistes: [1, 2],
-      extra_field: 'test',
-    };
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => mockResponse,
-    });
+  it('préserve le snapshot complet et transmet les identifiants', async () => {
+    const data = snapshot();
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => data });
     vi.stubGlobal('fetch', fetchMock);
-
-    const res = await service.relayToPython({ message: 'Je veux une boisson' });
-
-    expect(res).toEqual(mockResponse);
+    expect(
+      await service.relayToPython({
+        session_id: 'session-test',
+        message: '  Frais  ',
+        piste_id: null,
+      }),
+    ).toEqual(data);
     expect(fetchMock).toHaveBeenCalledWith(
       'http://fake-python/conversation',
       expect.objectContaining({
         method: 'POST',
+        body: JSON.stringify({
+          session_id: 'session-test',
+          message: 'Frais',
+          piste_id: null,
+        }),
         headers: expect.objectContaining({
           'ngrok-skip-browser-warning': 'true',
         }),
       }),
     );
   });
-
-  it('renvoie 504 si timeout', async () => {
+  it.each([
+    null,
+    [],
+    {},
+    'texte',
+    { ...snapshot(), reponse: null },
+    { ...snapshot(), pistes: [1, 2] },
+    { ...snapshot(), etape: 'inconnue' },
+    { ...snapshot(), session_id: '' },
+  ])('refuse une réponse inexploitable : %j', async (data) => {
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockRejectedValue(
-          Object.assign(new Error(), { name: 'TimeoutError' }),
-        ),
+      vi.fn().mockResolvedValue({ ok: true, json: async () => data }),
     );
     await expect(
-      service.relayToPython({ message: 'test' }),
-    ).rejects.toMatchObject({ status: 504 });
+      service.relayToPython({ message: 'Bonjour' }),
+    ).rejects.toMatchObject({ status: 502 });
   });
-
-  it('renvoie 503 si service injoignable', async () => {
+  it.each([500, 503, 429])(
+    'classe HTTP %s comme panne du service',
+    async (status) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status,
+          json: async () => ({ detail: 'trace interne' }),
+        }),
+      );
+      await expect(
+        service.relayToPython({ message: 'Bonjour' }),
+      ).rejects.toMatchObject({ status: 503 });
+    },
+  );
+  it.each([400, 422])(
+    'distingue HTTP %s d’une panne serveur',
+    async (status) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status,
+          json: async () => ({ detail: 'piste inconnue' }),
+        }),
+      );
+      await expect(
+        service.relayToPython({ message: '', piste_id: 'ancienne-piste' }),
+      ).rejects.toMatchObject({ status: 422 });
+    },
+  );
+  it.each(['TimeoutError', 'AbortError'])(
+    'préserve 504 pendant fetch : %s',
+    async (name) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockRejectedValue(Object.assign(new Error(), { name })),
+      );
+      await expect(
+        service.relayToPython({ message: 'Bonjour' }),
+      ).rejects.toMatchObject({ status: 504 });
+    },
+  );
+  it.each([true, false])(
+    'préserve 504 pendant la lecture du corps, succès=%s',
+    async (ok) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok,
+          status: ok ? 200 : 500,
+          json: async () => {
+            throw Object.assign(new Error(), { name: 'AbortError' });
+          },
+        }),
+      );
+      await expect(
+        service.relayToPython({ message: 'Bonjour' }),
+      ).rejects.toMatchObject({ status: 504 });
+    },
+  );
+  it('classe un JSON invalide en 502', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockRejectedValue(new Error('Network error')),
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => {
+          throw new SyntaxError();
+        },
+      }),
     );
     await expect(
-      service.relayToPython({ message: 'test' }),
+      service.relayToPython({ message: 'Bonjour' }),
+    ).rejects.toMatchObject({ status: 502 });
+  });
+  it('ne transforme pas une panne HTML en erreur client', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 503,
+        json: async () => {
+          throw new SyntaxError();
+        },
+      }),
+    );
+    await expect(
+      service.relayToPython({ message: 'Bonjour' }),
+    ).rejects.toMatchObject({ status: 503 });
+  });
+  it('classe une panne réseau en 503', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('network')));
+    await expect(
+      service.relayToPython({ message: 'Bonjour' }),
     ).rejects.toMatchObject({ status: 503 });
   });
 });

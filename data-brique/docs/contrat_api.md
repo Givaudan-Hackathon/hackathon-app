@@ -10,7 +10,7 @@ produits du catalogue. Version du modèle : `baseline-v1` (mots-clés + TF-IDF).
 ## Ngrok : en-tête à ajouter
 
 L'offre gratuite de ngrok affiche une page d'avertissement aux navigateurs. Pour l'éviter, ajouter
-à chaque requête du front l'en-tête `ngrok-skip-browser-warning: true` (déjà autorisé par le CORS).
+aux appels serveur Nest vers Python ; le navigateur appelle `/api/conversation` sur Nest. Pour les appels directs de diagnostic, ajouter à chaque requête l'en-tête `ngrok-skip-browser-warning: true` (déjà autorisé par le CORS).
 
 ## `GET /sante`
 
@@ -143,6 +143,7 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | ------------ | -------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
 | `session_id` | string \| null | non         | `null`, absent ou inconnu : nouvelle session. L'identifiant est renvoyé ; le renvoyer à chaque message suivant.  |
 | `message`    | string         | oui\*       | Message du client, en français, 500 caractères au plus. \*Peut être vide (`""`) si `piste_id` est fourni.        |
+| `guidage`    | boolean        | non         | `false` par défaut ; `true` active les questions à choix issues des types et profils Data avant les pistes.      |
 | `piste_id`   | string \| null | non         | `id` d'une piste de la dernière réponse : vaut choix de cette piste, quel que soit le message (bouton du front). |
 
 ```json
@@ -162,8 +163,22 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | `solutions`      | liste de références | TasteSolutions ajoutées selon les contraintes (« peu sucré » → Sweetness) ; vide sinon          |
 | `brief`          | objet \| null       | `null` tant qu'aucune piste n'est choisie                                                       |
 | `echantillons`   | objet \| null       | `null`, ou brouillon de demande d'échantillons (statut `brouillon_non_envoye`)                  |
+| `questions`      | liste               | Questions guidées optionnelles ; vide hors guidage                                              |
 | `version_modele` | string              | `v2.2.5-contexte`                                                                               |
 | `attribution`    | string              | Mention ODbL **à afficher**                                                                     |
+
+### Guidage optionnel
+
+Avec `guidage: true`, une réponse peut avoir `etape: affiner`, sans pistes ni
+brief, et `questions: [{ id, question, choix: string[] }]` (au plus deux
+questions). Les choix de type viennent de la hiérarchie Data ; les profils de la
+banque de références. La réponse suivante reste un message texte, sans nouveau
+format d’entrée. « Je ne sais pas, proposez-moi » permet de continuer. Les appels
+sans guidage conservent le parcours antérieur ; `questions` vaut alors `[]`.
+
+Un identifiant inconnu ou expiré produit un **nouvel** identifiant UUID hexadécimal
+de 32 caractères. Le front peut ainsi signaler le redémarrage de la session ;
+les sessions restent en mémoire, limitées à 500 et à deux heures d’inactivité.
 
 ### `compris`
 
@@ -175,6 +190,8 @@ complet**, jamais un delta : le front peut remplacer tout son état par la derni
 | `aromes`       | string[]                             | Arômes cités par le client, le principal en premier                        |
 | `contraintes`  | string[]                             | Ex. `["peu sucré", "bio"]`                                                 |
 | `profil`       | string[]                             | **Ajout V2.2.2.** Profil recherché, ex. `["frais", "exotique", "acidulé"]` |
+
+`compris.volume` contient également le volume exprimé avec son unité, ou `null`.
 
 ### `pistes[]`
 
@@ -235,6 +252,7 @@ applicative (équipe Tech).
 | Valeur          | Signification                                                                          | `pistes` | `brief` | `echantillons` |
 | --------------- | -------------------------------------------------------------------------------------- | -------- | ------- | -------------- |
 | `relance`       | Il manque une information (type de produit, goût) ; `reponse` pose au plus 2 questions | vide     | null    | null           |
+| `affiner`       | Mode guidé : une question de profil avec des choix Data, puis retour aux pistes        | vide     | null    | null           |
 | `pistes`        | Les pistes sont proposées ; le client peut préciser, poser une question ou choisir     | 1 à 3    | null    | null           |
 | `recapitulatif` | Une piste est choisie ; `reponse` récapitule le brief et propose des échantillons      | 1 à 3    | objet   | null           |
 | `echantillons`  | Le brouillon de demande d'échantillons est prêt (non envoyé)                           | 1 à 3    | objet   | objet          |

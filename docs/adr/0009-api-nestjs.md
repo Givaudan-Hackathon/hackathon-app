@@ -45,6 +45,14 @@ explicitement les changements. Elle vérifie les routes, codes d’erreur,
 configuration, scripts npm et CI. L’ADR 0001 reste l’historique de la stack
 d’atelier.
 
+Le relais `POST /api/conversation` utilise HTTP/JSON vers Python : il renvoie
+200 et valide le snapshot avec un contrat Zod pur partagé avec React. Les champs
+Data additionnels sont conservés. Le refus d’une entrée (400/422 Data → 422)
+reste distinct d’une panne (5xx/429 Data → 503), d’un corps inexploitable (502)
+et d’un délai dépassé, corps inclus (504). Le délai serveur configurable reste
+borné à 120 secondes, avec 30 secondes par défaut. Ce raccordement ajoute un
+relais au socle, sans persister la conversation ni créer de commande.
+
 ## Conséquences
 
 - Conventions communes pour séparer traitement HTTP, logique et accès aux services.

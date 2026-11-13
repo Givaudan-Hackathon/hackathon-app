@@ -4,7 +4,7 @@ info:
   version: 0.2.0
   description: >-
     Contrat des routes implémentées dans l'API NestJS.
-    Expose les routes de démonstration (santé, questions) et le relais vers 
+    Expose les routes de démonstration (santé, questions) et le relais vers
     l'assistant Python (conversation) pour la création de briefs.
 servers:
   - url: http://localhost:3000
@@ -85,7 +85,7 @@ paths:
       tags: [Conversation (Data)]
       summary: Relayer un message à l'assistant Python (Data)
       description: >-
-        Transmet l'état de la conversation au moteur Python. Permet de décrire 
+        Transmet un message au moteur Python et valide son snapshot complet. Permet de décrire
         un besoin, de choisir une piste d'arôme (via son ID) et de générer un brief.
       requestBody:
         required: true
@@ -120,7 +120,7 @@ paths:
               example:
                 error: 'Le message est requis si aucune piste_id n’est fournie.'
         '422':
-          description: Le service Data a refusé la requête (ex. identifiant de piste inconnu).
+          description: Entrée refusée par Data (400/422), notamment piste devenue invalide ; les pannes Python 5xx ne sont jamais classées en 422.
           content:
             application/json:
               schema:
@@ -176,6 +176,10 @@ components:
     ConversationRequest:
       type: object
       properties:
+        guidage:
+          type: boolean
+          default: false
+          description: Active les questions à choix issues des données Python.
         session_id:
           type: string
           maxLength: 64
@@ -192,33 +196,46 @@ components:
           description: ID de la piste sélectionnée par l'utilisateur.
 
     ConversationResponse:
+      description: Snapshot complet validé par le contrat partagé api/src/contracts/conversation.ts. Les champs additionnels Data sont conservés. En relance ou affiner, les pistes sont vides ; un brief sélectionne une piste existante.
       type: object
       required:
         [
           session_id,
           etape,
+          intention,
           reponse,
           compris,
           pistes,
           solutions,
           brief,
           echantillons,
+          version_modele,
+          attribution,
         ]
       properties:
         session_id:
           type: string
         etape:
           type: string
-          enum: [relance, pistes, recapitulatif, echantillons]
+          enum: [relance, affiner, pistes, recapitulatif, echantillons]
         intention:
           type: string
-          nullable: true
+          enum:
+            [
+              nouvelle_demande,
+              precision,
+              question,
+              question_piste,
+              choix_piste,
+              demande_echantillons,
+              hors_sujet,
+            ]
         reponse:
           type: string
         compris:
           type: object
           additionalProperties: true
-          description: Contient notamment `profil`.
+          description: Contient notamment `profil` et `volume` (texte avec unité ou null).
         pistes:
           type: array
           items:
@@ -241,6 +258,21 @@ components:
             statut:
               type: string
               example: brouillon_non_envoye
+        questions:
+          type: array
+          maxItems: 2
+          items:
+            type: object
+            required: [id, question, choix]
+            properties:
+              id:
+                type: string
+              question:
+                type: string
+              choix:
+                type: array
+                items:
+                  type: string
         version_modele:
           type: string
         attribution:
@@ -271,7 +303,7 @@ components:
           example:
             error: Le service a renvoyé une erreur illisible.
     Erreur503:
-      description: Service distant injoignable.
+      description: Service distant injoignable, en panne (5xx) ou limité (429).
       content:
         application/json:
           schema:

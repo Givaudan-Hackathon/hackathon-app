@@ -3,25 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hackathon</title>
+    <meta name="theme-color" content="#f7f8f4" />
+    <meta
+      name="description"
+      content="Décrivez votre idée, explorez les arômes et préparez votre projet avec l’assistant Givaudan. Prototype interactif pour les petits clients."
+    />
+    <title>Givaudan — Le goût de vos idées</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <main>
-      <h1>Hackathon</h1>
-      <p id="health" role="status">Connexion à l'API…</p>
-      <form>
-        <label for="question">Question à l'IA</label>
-        <input
-          id="question"
-          name="question"
-          placeholder="Posez une question à l'IA"
-          required
-        />
-        <button type="submit">Envoyer</button>
-      </form>
-      <p id="submit-status" role="status"></p>
-      <ul id="questions"></ul>
-    </main>
-    <script type="module" src="/src/main.ts"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

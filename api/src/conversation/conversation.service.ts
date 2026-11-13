@@ -1,5 +1,13 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { snapshotSchema } from '../contracts/conversation.js';
 import { ConversationRequestDto } from './dto/conversation-request.dto.js';
+
+function timedOut(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    ['TimeoutError', 'AbortError'].includes(error.name)
+  );
+}
 
 @Injectable()
 export class ConversationService {
@@ -9,30 +17,40 @@ export class ConversationService {
     payload: ConversationRequestDto,
   ): Promise<Record<string, unknown>> {
     const baseUrl = process.env.DATA_API_BASE_URL;
-
-    if (!baseUrl) {
+    const timeout = Number(process.env.DATA_API_TIMEOUT_MS ?? 30_000);
+    let url: URL;
+    try {
+      if (
+        !baseUrl ||
+        !Number.isInteger(timeout) ||
+        timeout < 1 ||
+        timeout > 120_000
+      )
+        throw new Error('Invalid Data configuration');
+      url = new URL(`${baseUrl.replace(/\/+$/, '')}/conversation`);
+      if (!['http:', 'https:'].includes(url.protocol))
+        throw new Error('Invalid protocol');
+    } catch {
       throw new HttpException(
-        'Configuration DATA_API_BASE_URL manquante.',
+        { error: 'La configuration de l’assistant est indisponible.' },
         500,
       );
     }
-
     const message = payload.message?.trim() || '';
     const pisteId = payload.piste_id?.trim() || null;
-
-    // Règle métier : le message ne peut pas être vide si pas de piste_id
-    if (!message && !pisteId) {
+    if ((!message && !pisteId) || message.length > 500)
       throw new HttpException(
-        { error: "Le message est requis si aucune piste_id n'est fournie." },
+        {
+          error:
+            'Décrivez votre besoin en 1 à 500 caractères ou choisissez une piste.',
+        },
         400,
       );
-    }
 
-    const url = `${baseUrl.replace(/\/+$/, '')}/conversation`;
-
+    const signal = AbortSignal.timeout(timeout);
     let response: Response;
     try {
-      response = await fetch(url, {
+      response = await fetch(url.href, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,58 +58,88 @@ export class ConversationService {
         },
         body: JSON.stringify({
           session_id: payload.session_id || null,
-          message: message,
+          message,
           piste_id: pisteId,
+          ...(payload.guidage !== undefined
+            ? { guidage: payload.guidage }
+            : {}),
         }),
-        signal: AbortSignal.timeout(30_000),
+        signal,
       });
-    } catch (error: unknown) {
-      if (
-        error instanceof Error &&
-        (error.name === 'TimeoutError' || error.name === 'AbortError')
-      ) {
+    } catch (error) {
+      if (signal.aborted || timedOut(error))
         throw new HttpException(
-          { error: "Le service Data n'a pas répondu dans les 30 secondes." },
+          {
+            error:
+              'L’assistant met trop de temps à répondre. Réessayez dans un instant.',
+          },
           504,
         );
-      }
-      this.logger.error('Erreur réseau Data:', error);
+      this.logger.warn('Service Data injoignable.');
       throw new HttpException(
-        { error: 'Le service Data est injoignable.' },
+        {
+          error:
+            'L’assistant est momentanément indisponible. Votre projet est conservé.',
+        },
         503,
       );
     }
 
-    if (!response.ok) {
-      this.logger.warn(`Erreur Data HTTP ${response.status}`);
-      let errorBody: Record<string, unknown>;
-      try {
-        errorBody = (await response.json()) as Record<string, unknown>;
-      } catch {
-        throw new HttpException(
-          { error: 'Le service Data a renvoyé une erreur illisible.' },
-          502,
-        );
-      }
-
-      const errorMessage =
-        typeof errorBody?.detail === 'string'
-          ? errorBody.detail
-          : typeof errorBody?.error === 'string'
-            ? errorBody.error
-            : 'Erreur Data inconnue.';
-
-      throw new HttpException({ error: errorMessage }, 422);
-    }
-
+    let data: unknown;
     try {
-      const data = (await response.json()) as Record<string, unknown>;
-      return data; // On retourne tout l'objet (brief, echantillons, etc.)
-    } catch {
+      data = await response.json();
+    } catch (error) {
+      if (signal.aborted || timedOut(error))
+        throw new HttpException(
+          {
+            error:
+              'L’assistant met trop de temps à répondre. Réessayez dans un instant.',
+          },
+          504,
+        );
+      if (!response.ok && response.status >= 500)
+        throw new HttpException(
+          { error: 'L’assistant est momentanément indisponible.' },
+          response.status === 504 ? 504 : 503,
+        );
       throw new HttpException(
-        { error: 'Le service Data a renvoyé un JSON invalide.' },
+        { error: 'La réponse de l’assistant est illisible. Réessayez.' },
         502,
       );
     }
+    if (!response.ok) {
+      this.logger.warn(`Service Data HTTP ${response.status}.`);
+      if ([400, 422].includes(response.status))
+        throw new HttpException(
+          {
+            error:
+              'Le message ou la piste n’a pas été accepté. Précisez votre projet ou choisissez une piste encore proposée.',
+          },
+          422,
+        );
+      if (response.status === 504)
+        throw new HttpException(
+          { error: 'L’assistant met trop de temps à répondre.' },
+          504,
+        );
+      if (response.status >= 500 || response.status === 429)
+        throw new HttpException(
+          {
+            error:
+              'L’assistant est momentanément indisponible. Réessayez dans un instant.',
+          },
+          503,
+        );
+      throw new HttpException(
+        { error: 'Le service de l’assistant n’a pas pu traiter la demande.' },
+        502,
+      );
+    }
+    if (!snapshotSchema.safeParse(data).success)
+      throw new HttpException(
+        { error: 'La réponse de l’assistant est incomplète. Réessayez.' },
+        502,
+      );
+    return data as Record<string, unknown>;
   }
 }

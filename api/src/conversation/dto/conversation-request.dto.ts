@@ -1,6 +1,10 @@
-import { IsString, IsOptional, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, MaxLength } from 'class-validator';
 
 export class ConversationRequestDto {
+  @IsBoolean()
+  @IsOptional()
+  guidage?: boolean;
+
   @IsString()
   @IsOptional()
   @MaxLength(64)
