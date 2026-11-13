@@ -3,6 +3,49 @@
 Hackathon Givaudan, thème 02 : plateforme de commande intelligente.
 Document de synthèse de la brique Data. Tous les chiffres renvoient à un fichier du dépôt.
 
+## Livrables de la semaine
+
+Reprend le document « Cours et livrables Data » du hackathon, jour par jour.
+
+**Lundi 9 — Exploration**
+
+| #   | Livrable attendu                              | Preuve dans le dépôt                                                                                                                                                                                                                               |
+| --- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Inventaire des sources et modalités d'accès   | [inventaire_sources.md](data-brique/docs/inventaire_sources.md)                                                                                                                                                                                    |
+| 2   | Premier échantillon récupéré                  | Échantillon v0, API `/search`, 1 042 produits : [off_obf_sample_v0.csv](data-brique/data/raw/off_obf_sample_v0.csv), script [fetch_sample.py](data-brique/scripts/fetch_sample.py)                                                                 |
+| 3   | Analyse initiale de la qualité                | [quality_report.md du lundi](https://github.com/Givaudan-Hackathon/hackathon-app/blob/3ab26e0/data-brique/docs/quality_report.md) (commit `3ab26e0`, échantillon v0) ; colonne v0 de [comparaison_v0_v1.md](data-brique/docs/comparaison_v0_v1.md) |
+| 4   | Solution alternative si données indisponibles | Colonne « Alternative » de [inventaire_sources.md](data-brique/docs/inventaire_sources.md) ; commandes : données synthétiques documentées                                                                                                          |
+
+**Mardi 10 — Gate 1**
+
+| #   | Livrable attendu                          | Preuve dans le dépôt                                                                                                                                                                                         |
+| --- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Dataset exploitable                       | [sample_v1.csv](data-brique/data/processed/sample_v1.csv) (2 193 produits) + [sample_v1.meta.json](data-brique/data/processed/sample_v1.meta.json) ; [quality_report.md](data-brique/docs/quality_report.md) |
+| 2   | Premier résultat représentatif (baseline) | Baseline V1 : mots-clés + TF-IDF, [moteur_v1.py](data-brique/src/moteur_v1.py)                                                                                                                               |
+| 3   | Preuve de faisabilité (script, notebook)  | [baseline_v1.ipynb](data-brique/notebooks/baseline_v1.ipynb)                                                                                                                                                 |
+| 4   | Premier Swagger / OpenAPI                 | [contrat_api.md](data-brique/docs/contrat_api.md) ; Swagger généré par FastAPI sur `/docs`                                                                                                                   |
+| 5   | Endpoint accessible à Tech via ngrok      | [api/main.py](data-brique/api/main.py) : `GET /sante` et `POST /recommander`, servis par la baseline V1 réelle plutôt qu'une réponse factice                                                                 |
+
+**Jeudi 12 — Prototype**
+
+| #   | Livrable attendu                   | Preuve dans le dépôt                                                                                                                                                                                                                       |
+| --- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Données nettoyées et préparées     | [flavors_catalogue_complet.csv](data-brique/data/processed/catalogue_complet/flavors_catalogue_complet.csv) (8 943 produits), [banque_references_demo.csv](data-brique/data/processed/banque_references_demo.csv) (30 références fictives) |
+| 2   | Pipeline de traitement fonctionnel | [scripts/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/scripts) (section 2)                                                                                                                |
+| 3   | Modèle V2 publié                   | [moteur_v22.py](data-brique/src/moteur_v22.py), [PR #18](https://github.com/Givaudan-Hackathon/hackathon-app/pull/18) fusionnée ; [v2_notes.md](data-brique/docs/v2_notes.md)                                                              |
+| 4   | Métriques et protocole sur 30 cas  | [cas_reference_30.csv](data-brique/benchmark/cas_reference_30.csv), [validation_30_cas.md](data-brique/docs/validation_30_cas.md) (section 4)                                                                                              |
+| 5   | API renvoyant les résultats réels  | `POST /conversation` dans [api/main.py](data-brique/api/main.py) ; [contrat_api.md](data-brique/docs/contrat_api.md) (section 5)                                                                                                           |
+
+**Vendredi 13 — Finalisation**
+
+| #   | Livrable attendu                   | Preuve dans le dépôt                                                                                                                                                                                         |
+| --- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Code et documentation finalisés    | [PR #36](https://github.com/Givaudan-Hackathon/hackathon-app/pull/36) (V2.3) ; ce document                                                                                                                   |
+| 2   | Procédure de reproduction          | [reproduire.md](data-brique/docs/reproduire.md)                                                                                                                                                              |
+| 3   | Comparaison V1 / V2 avec métriques | Section 4, figures dans [docs/figures/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/docs/figures)                                                            |
+| 4   | Analyse des limites et des biais   | Sections 8 (limites) et 9 (biais)                                                                                                                                                                            |
+| 5   | Résultats Data intégrés à la démo  | Section 7 : parcours React → NestJS → API Data dans `develop` ([PR #28](https://github.com/Givaudan-Hackathon/hackathon-app/pull/28), [PR #35](https://github.com/Givaudan-Hackathon/hackathon-app/pull/35)) |
+
 ## 0. Présentation
 
 **Le prototype.** Un client décrit son projet en texte libre (« un yaourt à la fraise »).
@@ -31,14 +74,14 @@ L'assistant :
 | Meryem Lizoul | Tout le dossier [data-brique/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique) : données, pipeline, moteurs V1 → V2.3, benchmark, validation, API, applis Streamlit, docs.                                                                                                    |
 | Owen Lambert  | Compte Git `justeowen`. Service RAG du dossier [rag/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/rag), importé du fork `example-rag` (FastAPI + ChromaDB + Ollama), [PR #16](https://github.com/Givaudan-Hackathon/hackathon-app/pull/16). Ce service n'est pas appelé par le moteur. |
 
-**Date.** 12/11/2026.
+**Date.** 12/11/2026, complété le 13/11/2026.
 
 **Versions.**
 
-| Version           | Où                                                                                                                         | État                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `v2.2.5-contexte` | [PR #18](https://github.com/Givaudan-Hackathon/hackathon-app/pull/18), tête `0db9b30`                                      | Fusionnée dans `develop` (commit `c670bcf`).      |
-| `v2.3.0-affiner`  | Branche [`feature/data-affiner`](https://github.com/Givaudan-Hackathon/hackathon-app/tree/feature/data-affiner), `569fc85` | En ligne sur l'API (port 8000). Pas encore de PR. |
+| Version           | Où                                                                                                                                                                                                    | État                                                       |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `v2.2.5-contexte` | [PR #18](https://github.com/Givaudan-Hackathon/hackathon-app/pull/18), tête `0db9b30`                                                                                                                 | Fusionnée dans `develop` (commit `c670bcf`).               |
+| `v2.3.0-affiner`  | Branche [`feature/data-affiner`](https://github.com/Givaudan-Hackathon/hackathon-app/tree/feature/data-affiner), [PR #36](https://github.com/Givaudan-Hackathon/hackathon-app/pull/36) vers `develop` | En ligne sur l'API (port 8000). PR ouverte, non fusionnée. |
 
 ## 1. Données
 
@@ -241,7 +284,19 @@ chaque cas. Le modèle est appelé pour 5 cas sur 30 : 7,30 s en moyenne ces foi
 sinon. Pour comparaison, `v2.2.5-contexte` mesurait 1,06 s de moyenne et 0,50 s de médiane, sans
 l'étape Affiner (même fichier, commit `0db9b30`).
 
-**Tests.** 89 tests pytest ([tests/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/tests)), dont les non-régressions des 3 revues
+**Figures.** Générées par [generer_figures.py](data-brique/scripts/generer_figures.py) à partir des
+fichiers de [benchmark/sorties/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/benchmark/sorties) :
+aucun chiffre n'est saisi à la main.
+
+![Validation sur les 30 cas, avant / après, par critère](data-brique/docs/figures/validation_avant_apres.png)
+
+![Comparaison V1 / V2.1 / V2.2 sur les critères comparables](data-brique/docs/figures/comparaison_versions.png)
+
+```bash
+.venv/Scripts/python scripts/generer_figures.py   # depuis data-brique/, écrit docs/figures/*.png
+```
+
+**Tests.** 93 tests pytest ([tests/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/tests)) : 89 tests Data et 4 tests du guidage ajoutés par Tech, après la fusion de `develop`. Ils incluent les non-régressions des 3 revues
 Codex ([test_revue_codex.py](data-brique/tests/test_revue_codex.py),
 [test_revue_codex_3.py](data-brique/tests/test_revue_codex_3.py)) et l'étape Affiner
 ([test_affiner.py](data-brique/tests/test_affiner.py)).
@@ -336,19 +391,49 @@ tunnel est relancé avec ce domaine. En-tête à ajouter : `ngrok-skip-browser-w
 
 ## 6. Intégration Tech
 
-État au 12/11/2026, d'après les tickets et les PR :
+État au 13/11/2026, d'après les tickets et les PR :
 
 - **Contrat :** la [PR #18](https://github.com/Givaudan-Hackathon/hackathon-app/pull/18) est
-  fusionnée dans `develop`. Le ticket [#31](https://github.com/Givaudan-Hackathon/hackathon-app/issues/31)
-  prend son contrat comme « contrat de départ à préserver ».
-- **Relais NestJS → API Python :** en cours, ticket [#31](https://github.com/Givaudan-Hackathon/hackathon-app/issues/31) (ouvert).
-- **Front React :** en cours, ticket [#20](https://github.com/Givaudan-Hackathon/hackathon-app/issues/20)
-  et [PR #28](https://github.com/Givaudan-Hackathon/hackathon-app/pull/28) (brouillon).
-- **Étape Affiner :** ticket [#30](https://github.com/Givaudan-Hackathon/hackathon-app/issues/30). Elle ne
-  bloque pas la 1re intégration ; la valeur `affiner` demandera d'adapter les consommateurs.
-- **Validation métier :** ticket [#29](https://github.com/Givaudan-Hackathon/hackathon-app/issues/29) (ouvert).
+  fusionnée dans `develop` (squash `c670bcf`, moteur `v2.2.5-contexte`).
+- **Relais NestJS → API Python :** fait. [PR #35](https://github.com/Givaudan-Hackathon/hackathon-app/pull/35)
+  fusionnée ; ticket [#31](https://github.com/Givaudan-Hackathon/hackathon-app/issues/31) fermé.
+- **Front React :** branché sur Nest et Python. [PR #28](https://github.com/Givaudan-Hackathon/hackathon-app/pull/28)
+  fusionnée ; tickets [#20](https://github.com/Givaudan-Hackathon/hackathon-app/issues/20) et
+  [#32](https://github.com/Givaudan-Hackathon/hackathon-app/issues/32) fermés.
+- **Démarrage :** `compose.yaml` lance React, Nest, l'API Data et PostgreSQL (commit `8bd106b`,
+  ticket [#21](https://github.com/Givaudan-Hackathon/hackathon-app/issues/21) ouvert).
+- **Guidage :** Tech a ajouté un champ `guidage` à `POST /conversation`. Il est réuni avec l'étape
+  Affiner du moteur dans la [PR #36](https://github.com/Givaudan-Hackathon/hackathon-app/pull/36).
+- **Étape Affiner :** ticket [#30](https://github.com/Givaudan-Hackathon/hackathon-app/issues/30)
+  ouvert, en attente de la fusion de la PR #36.
+- **Validation métier :** ticket [#29](https://github.com/Givaudan-Hackathon/hackathon-app/issues/29) ouvert.
 
-## 7. Limites
+## 7. Vendredi : finalisation
+
+1. **Code et documentation finalisés.** La [PR #36](https://github.com/Givaudan-Hackathon/hackathon-app/pull/36)
+   porte `v2.3.0-affiner` vers `develop` :
+   - étape Affiner ;
+   - synonymes ;
+   - guide de reproduction ;
+   - changements de contrat pour le front.
+
+   `develop` y est fusionné et les 93 tests passent. La documentation est listée en section 10.
+
+2. **Procédure de reproduction.** [reproduire.md](data-brique/docs/reproduire.md) : installation,
+   données, vecteurs, lancement, vérifications. Les commandes ont été testées sur une copie neuve
+   du dépôt.
+3. **Comparaison V1 / V2 avec métriques.** Section 4 : tableaux par critère, jeu de 30 cas et jeu
+   de 10 cas jamais vus, et les 2 figures. Section 3 : benchmark des modèles
+   ([Benchmark_llm.pdf](data-brique/benchmark/Benchmark_llm.pdf)).
+4. **Résultats intégrés à la démonstration.**
+   - **Parcours :** dans `develop`, React → NestJS → `POST /conversation` (section 6). Le client
+     reçoit les pistes d'arômes, le brief et le brouillon d'échantillons calculés par le moteur.
+   - **Version actuelle :** `develop` sert `v2.2.5-contexte` ; `v2.3.0-affiner` y arrivera avec
+     la PR #36.
+   - **Applis Data :** les applis Streamlit (ports 8501 et 8502) montrent le même moteur
+     (section 5).
+
+## 8. Limites
 
 - **Références fictives :** les codes DEMO sont inventés. Aucune vraie référence Givaudan.
 - **Hébergement :** l'API tourne sur le PC de l'équipe (CPU), exposée par ngrok. Elle s'arrête
@@ -357,28 +442,39 @@ tunnel est relancé avec ce domaine. En-tête à ajouter : `ngrok-skip-browser-w
   l'appeler.
 - **Validation :** les 30 cas ont guidé les corrections ; seul le jeu de 10 cas est indépendant.
 - **Cas jamais vus : 6/10.** F01, F07, F09, F10 attendent la décision du Product (ticket #29).
-- **Couverture du catalogue :** boissons et desserts aromatisés. Glaces, yaourts aux fruits,
-  biscuits, snacks salés et sauces sont hors catalogue : le marché étudié est alors limité, et la
-  réponse le dit.
-- **Biais de l'échantillon :** quota de 200 par famille, sans lien avec les proportions du marché.
+- **Produits hors catalogue :** biscuits, snacks salés, sauces. Le marché étudié est alors
+  limité, et la réponse le dit (biais de couverture, section 9).
 - **Mesure :** critères stricts, un seul message par cas. La conversation est couverte par les
   tests pytest.
 - **Sessions :** gardées en mémoire ; un redémarrage de l'API les efface.
 
-## 8. Tableau récapitulatif
+## 9. Biais
 
-| Livrable     | Preuves dans le dépôt                                                                                                                                                                                                                                                                                                                |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1. Données   | [inventaire_sources.md](data-brique/docs/inventaire_sources.md), [quality_report.md](data-brique/docs/quality_report.md), [comparaison_v0_v1.md](data-brique/docs/comparaison_v0_v1.md), [LICENSE_DONNEES.md](data-brique/data/LICENSE_DONNEES.md)                                                                                   |
-| 2. Pipeline  | [scripts/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/scripts), [reproduire.md](data-brique/docs/reproduire.md)                                                                                                                                                                     |
-| 3. Modèle    | [Benchmark_llm.pdf](data-brique/benchmark/Benchmark_llm.pdf), [resultats.md](data-brique/benchmark/resultats.md), [v2_notes.md](data-brique/docs/v2_notes.md), [src/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/src), [baseline_v1.ipynb](data-brique/notebooks/baseline_v1.ipynb) |
-| 4. Métriques | [validation_30_cas.md](data-brique/docs/validation_30_cas.md), [benchmark/sorties/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/benchmark/sorties), [tests/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/tests)                      |
-| 5. API       | [api/main.py](data-brique/api/main.py), [contrat_api.md](data-brique/docs/contrat_api.md), Swagger `/docs`                                                                                                                                                                                                                           |
+Une limite est ce que le prototype ne fait pas. Un biais déforme ce qu'il fait.
+
+| Biais                           | D'où il vient                                                                                                                                                                                                                                                       | Effet sur les résultats                                                                                                                                                                                        | Comment le réduire                                                                                                                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Géographique**                | Seuls les produits vendus en France, en langue `fr`, sont gardés ([sample_v1.meta.json](data-brique/data/processed/sample_v1.meta.json)).                                                                                                                           | L'étude de marché décrit le marché français. Pour un client qui vise un autre pays, les arômes et associations « fréquents » peuvent être faux.                                                                | Ajouter un pays cible au brief et filtrer le catalogue sur `countries_tags` de ce pays ; indiquer le pays étudié dans la réponse.                                                                           |
+| **Couverture**                  | Le catalogue Flavors couvre surtout des boissons (aromatisées, lactées, protéinées, végétales) et des desserts aromatisés. Glaces (2 275 produits) et yaourts aux fruits (2 117) ont été écartés ([inventaire_sources.md](data-brique/docs/inventaire_sources.md)). | Pour un autre type de produit, le moteur étudie les produits les plus proches, pas le bon marché. Exemples : C21 (chips) et C24 (biscuits) dans [validation_30_cas.md](data-brique/docs/validation_30_cas.md). | Ajouter les familles écartées (glaces, yaourts aux fruits), puis les biscuits et le salé, et relancer l'indexation (54 min pour 8 943 produits).                                                            |
+| **Échantillonnage**             | `sample_v1` prend 200 produits par famille, alors que le catalogue compte 4 788 boissons aromatisées pour 273 protéinées ([inventaire_sources.md](data-brique/docs/inventaire_sources.md)).                                                                         | Les familles rares sont surreprésentées dans V1 et dans le benchmark des modèles, qui utilisent cet échantillon. Le moteur V2.2+ n'est pas concerné : il utilise le catalogue complet.                         | Échantillon proportionnel, ou pondération par la taille de la famille ; garder le catalogue complet pour les études de marché.                                                                              |
+| **Sélection d'Open Food Facts** | Les produits sont saisis par des bénévoles. Les produits les plus connus sont mieux renseignés. Le filtre garde seulement les produits dont la liste d'ingrédients cite un arôme.                                                                                   | « 25 produits sur 50 » est une fréquence dans Open Food Facts, pas une part de marché. Un produit dont la liste d'ingrédients ne cite pas l'arôme est absent de l'étude.                                       | Croiser avec des données de ventes ou de panels ; présenter les comptages comme une fréquence dans la base ; chercher aussi l'arôme dans le nom du produit.                                                 |
+| **Protocole**                   | Les 30 cas ont été écrits par l'équipe, qui a ensuite corrigé le moteur en les regardant (par mécanismes).                                                                                                                                                          | 26/30 surestime la qualité réelle. Sur les 10 cas jamais vus, le score est 6/10.                                                                                                                               | Utiliser un jeu plus grand, écrit par le Product ou par des clients et figé avant les corrections, et ne mesurer qu'une fois (ticket [#29](https://github.com/Givaudan-Hackathon/hackathon-app/issues/29)). |
+
+## 10. Tableau récapitulatif
+
+| Livrable     | Preuves dans le dépôt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Données   | [inventaire_sources.md](data-brique/docs/inventaire_sources.md), [quality_report.md](data-brique/docs/quality_report.md), [comparaison_v0_v1.md](data-brique/docs/comparaison_v0_v1.md), [LICENSE_DONNEES.md](data-brique/data/LICENSE_DONNEES.md)                                                                                                                                                                                                                                                       |
+| 2. Pipeline  | [scripts/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/scripts), [reproduire.md](data-brique/docs/reproduire.md)                                                                                                                                                                                                                                                                                                                                         |
+| 3. Modèle    | [Benchmark_llm.pdf](data-brique/benchmark/Benchmark_llm.pdf), [resultats.md](data-brique/benchmark/resultats.md), [v2_notes.md](data-brique/docs/v2_notes.md), [src/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/src), [baseline_v1.ipynb](data-brique/notebooks/baseline_v1.ipynb)                                                                                                                                                                     |
+| 4. Métriques | [validation_30_cas.md](data-brique/docs/validation_30_cas.md), [generer_figures.py](data-brique/scripts/generer_figures.py), [docs/figures/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/docs/figures), [benchmark/sorties/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/benchmark/sorties), [tests/](https://github.com/Givaudan-Hackathon/hackathon-app/tree/docs/livrable-data-g15/data-brique/tests) |
+| 5. API       | [api/main.py](data-brique/api/main.py), [contrat_api.md](data-brique/docs/contrat_api.md), Swagger `/docs`                                                                                                                                                                                                                                                                                                                                                                                               |
 
 | Suivi                           | Lien                                                                          |
 | ------------------------------- | ----------------------------------------------------------------------------- |
 | PR #18 (V1 → V2.2.5, fusionnée) | https://github.com/Givaudan-Hackathon/hackathon-app/pull/18                   |
 | Branche V2.3                    | https://github.com/Givaudan-Hackathon/hackathon-app/tree/feature/data-affiner |
+| PR #36 (V2.3, ouverte)          | https://github.com/Givaudan-Hackathon/hackathon-app/pull/36                   |
 | Ticket #29 : validation métier  | https://github.com/Givaudan-Hackathon/hackathon-app/issues/29                 |
 | Ticket #30 : étape Affiner      | https://github.com/Givaudan-Hackathon/hackathon-app/issues/30                 |
 | Ticket #31 : relais NestJS      | https://github.com/Givaudan-Hackathon/hackathon-app/issues/31                 |

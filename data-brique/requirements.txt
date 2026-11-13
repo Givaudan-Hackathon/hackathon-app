@@ -2,6 +2,7 @@
 jupyter
 nbformat==5.11.1
 streamlit==1.66.1  # demo_streamlit.py (appli de test du contrat V2)
+matplotlib==3.11.2  # scripts/generer_figures.py (figures du livrable)
 # tests
 pytest==9.2.0
 httpx==0.28.1  # client de fastapi.testclient (httpx2 non retenu : provenance PyPI non verifiable)
